@@ -29,6 +29,12 @@ function fechaIso(texto) {
   return m ? `${m[3]}-${m[2]}-${m[1]}T${m[4]}` : null;
 }
 
+/** Algunas gasolineras sin marca tienen como rótulo su número de registro ("Nº 10.935"). */
+const rotulo = (s) => {
+  const r = (s ?? '').trim();
+  return /^n[º°o.]?\s*[\d.]+$/i.test(r) ? '' : r;
+};
+
 const MENORES = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'a', 'en']);
 const titulo = (s) =>
   (s ?? '')
@@ -54,7 +60,7 @@ export function compactar(json) {
     if (precios.every((p) => p === null)) continue;
     estaciones.push([
       e['IDEESS'],
-      (e['Rótulo'] ?? '').trim(),
+      rotulo(e['Rótulo']),
       titulo(e['Dirección']),
       titulo(e['Municipio']),
       titulo(e['Provincia']),

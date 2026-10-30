@@ -4,6 +4,7 @@
 
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import { URL_MINISTERIO, compactar } from '../assets/js/carburantes.js';
+import { anotar } from './estado.mjs';
 
 const salida = new URL('../data/gasolina.json', import.meta.url);
 
@@ -26,6 +27,7 @@ async function descargar() {
 const json = await descargar();
 if (!json) {
   console.warn('Sin datos de carburantes: se publica la web sin data/gasolina.json');
+  await anotar('gasolina', false, 'No se pudo descargar del Ministerio');
   process.exit(0);
 }
 
@@ -33,3 +35,5 @@ const datos = compactar(json);
 await mkdir(new URL('../data/', import.meta.url), { recursive: true });
 await writeFile(salida, JSON.stringify(datos));
 console.log(`${datos.estaciones.length} gasolineras (${datos.fecha}). Medias:`, datos.medias);
+const ok = datos.estaciones.length > 5000;
+await anotar('gasolina', ok, `${datos.estaciones.length} gasolineras, precios del ${datos.fecha}`);

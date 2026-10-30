@@ -17,12 +17,15 @@ Precio de la luz hora a hora, gasolineras más baratas y simulador de hipoteca c
 Es una web estática publicada en GitHub Pages. Una GitHub Action (`.github/workflows/publicar.yml`):
 
 1. Pasa los tests.
-2. Descarga el PVPC de hoy y de mañana de Red Eléctrica (`data/luz.json`) y los precios de todas las gasolineras del Ministerio, reducidos a lo necesario (`data/gasolina.json`).
-3. Publica la web con esos datos.
+2. Recupera los datos ya publicados, para no perderlos si alguna fuente falla.
+3. Descarga el PVPC de hoy y de mañana de Red Eléctrica (`data/luz.json`) y los precios de todas las gasolineras del Ministerio, reducidos a lo necesario (`data/gasolina.json`).
+4. Descarga la fuente Archivo y Leaflet de npm a `vendor/`, para servirlos desde la propia web (sin Google Fonts ni CDN).
+5. Publica la web.
+6. Si alguna fuente ha fallado, abre un issue con la etiqueta `datos` (o comenta en el que ya está abierto). Cuando vuelve a funcionar, lo cierra.
 
 Se ejecuta al hacer push a `main`, a mano desde la pestaña *Actions* y varias veces al día (incluida la tarde, cuando REE publica el precio de mañana). Los datos no se guardan en el repositorio: se generan en cada despliegue.
 
-Si el fichero de la luz no tiene el día de hoy, la página intenta leer la API de REE directamente desde el navegador. La gasolina depende solo del fichero: la búsqueda es por ubicación o por código postal, y el mapa usa Leaflet con OpenStreetMap.
+Si el fichero de la luz no tiene el día de hoy, la página intenta leer la API de REE directamente desde el navegador. La gasolina depende solo del fichero y avisa si los precios tienen más de 14 horas. La búsqueda es por ubicación o por código postal, y el mapa usa Leaflet con teselas de OpenStreetMap, que solo se descargan al buscar.
 
 ## Estructura
 
@@ -47,6 +50,13 @@ Requiere Node 20 o superior, sin dependencias.
 npm test        # tests
 npm run datos   # descarga data/luz.json y data/gasolina.json
 npm run dev     # sirve la web en local
+```
+
+En local, sin `vendor/`, la web usa la fuente del sistema y no muestra el mapa. Para tenerlos:
+
+```bash
+npm install --no-save --no-package-lock leaflet@1.9.4 @fontsource-variable/archivo@5
+node scripts/vendor.mjs
 ```
 
 ## Publicación

@@ -30,6 +30,7 @@ const respuesta = {
     estacion({ IDEESS: '3', 'Tipo Venta': 'R' }), // venta restringida: fuera
     estacion({ IDEESS: '4', 'Latitud': '' }), // sin coordenadas: fuera
     estacion({ IDEESS: '5', 'Precio Gasolina 95 E5': '', 'Precio Gasoleo A': '' }), // sin precios: fuera
+    estacion({ IDEESS: '6', 'Rótulo': 'Nº 10.935', 'Latitud': '30,0' }), // sin marca, lejos
   ],
 };
 
@@ -43,8 +44,9 @@ test('números con coma decimal', () => {
 test('compacta solo las estaciones útiles', () => {
   const d = compactar(respuesta);
   assert.equal(d.fecha, '2026-10-30T21:10:33');
-  assert.deepEqual(d.estaciones.map((e) => e[0]), ['1', '2']);
-  assert.equal(d.medias.g95, 1.434);
+  assert.deepEqual(d.estaciones.map((e) => e[0]), ['1', '2', '6']);
+  assert.equal(d.estaciones[2][1], '', 'el número de registro no es una marca');
+  assert.equal(d.medias.g95, 1.442);
   assert.equal(d.medias.g98, null);
 
   const [uno] = expandir(d);
