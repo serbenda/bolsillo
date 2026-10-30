@@ -13,6 +13,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: pages
@@ -34,15 +35,33 @@ jobs:
       - name: Tests
         run: npm test
 
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Recuperar los datos publicados (por si alguna fuente falla ahora)
+        env:
+          BASE: ${{ steps.pages.outputs.base_url }}
+        run: |
+          mkdir -p data
+          for f in luz gasolina; do
+            curl -fsSL --max-time 60 "$BASE/data/$f.json" -o "data/$f.json" || rm -f "data/$f.json"
+          done
+          ls -la data
+
       - name: Descargar datos (luz de REE y carburantes del Ministerio)
         run: npm run datos
 
+      - name: Descargar fuente y mapa para servirlos desde la web
+        # Si falla, la web sigue funcionando con la fuente del sistema y sin mapa.
+        continue-on-error: true
+        run: |
+          npm install --no-save --no-package-lock leaflet@1.9.4 @fontsource-variable/archivo@5
+          node scripts/vendor.mjs
+
       - name: Preparar la web
         run: |
-          mkdir -p _site
-          cp -r index.html luz gasolina hipoteca assets data .nojekyll _site/
-
-      - uses: actions/configure-pages@v5
+          mkdir -p _site vendor
+          cp -r index.html luz gasolina hipoteca assets data vendor .nojekyll _site/
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -50,3 +69,34 @@ jobs:
 
       - id: despliegue
         uses: actions/deploy-pages@v4
+
+      - name: Avisar con un issue si falla alguna fuente de datos
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let estado = {};
+            try { estado = JSON.parse(fs.readFileSync('data/estado.json', 'utf8')); } catch {}
+            const fallos = Object.entries(estado).filter(([, e]) => !e.ok);
+            if (!Object.keys(estado).length) fallos.push(['datos', { detalle: 'No se generó data/estado.json' }]);
+
+            const { owner, repo } = context.repo;
+            const TITULO = 'Fallo al actualizar los datos';
+            const abiertos = (await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'datos' })).data;
+            const ejecucion = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            if (fallos.length) {
+              const cuerpo = fallos.map(([f, e]) => `- **${f}**: ${e.detalle}`).join('\n') + `\n\n[Ver ejecución](${ejecucion})`;
+              if (abiertos.length) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: abiertos[0].number, body: `Sigue fallando:\n\n${cuerpo}` });
+              } else {
+                await github.rest.issues.create({ owner, repo, title: TITULO, labels: ['datos'], body: `La web se ha publicado con los últimos datos buenos.\n\n${cuerpo}` });
+              }
+              core.warning(`Fuentes con fallo: ${fallos.map(([f]) => f).join(', ')}`);
+            } else {
+              for (const i of abiertos) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: i.number, body: `Resuelto: todas las fuentes vuelven a funcionar. [Ver ejecución](${ejecucion})` });
+                await github.rest.issues.update({ owner, repo, issue_number: i.number, state: 'closed' });
+              }
+            }

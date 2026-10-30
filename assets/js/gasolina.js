@@ -3,6 +3,7 @@ import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal } from './carburan
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/gasolina.json', import.meta.url);
 const MAXIMO_LISTA = 25;
+const HORAS_ANTIGUEDAD = 14; // el Ministerio publica varias veces al día
 
 const euros = (p) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(p);
 const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(d)} km`);
@@ -102,7 +103,7 @@ function pintar() {
   const max = Math.max(...precios);
   const mejor = todas[0];
 
-  $('titular').textContent = `La más barata a menos de ${r} km: ${mejor.rotulo || 'sin nombre'}, a ${euros(mejor[c])} €/l.`;
+  $('titular').textContent = `La más barata a menos de ${r} km: ${mejor.rotulo || 'una gasolinera sin marca'}, a ${euros(mejor[c])} €/l.`;
   $('entradilla').textContent = `${nombre} cerca ${centro.etiqueta}. A ${km(mejor.km)}, en ${mejor.direccion}.`;
 
   const ahorro50 = (max - min) * 50;
@@ -121,7 +122,7 @@ function pintar() {
         <li class="estacion">
           <span class="precio ${clase}">${euros(e[c])}<small>€/l</small></span>
           <div>
-            <h3>${escapar(e.rotulo || 'Sin nombre')}</h3>
+            <h3>${escapar(e.rotulo || 'Gasolinera sin marca')}</h3>
             <p>${escapar(e.direccion)}, ${escapar(e.municipio)}</p>
             <p class="meta"><span>A ${km(e.km)}</span><span>${escapar(e.horario)}</span></p>
           </div>
@@ -179,8 +180,14 @@ async function iniciar() {
     const datos = await r.json();
     estaciones = expandir(datos);
     if (datos.fecha) {
+      const fecha = new Date(datos.fecha);
       const f = new Intl.DateTimeFormat('es-ES', { dateStyle: 'long', timeStyle: 'short' });
-      $('actualizado').textContent = `Precios del ${f.format(new Date(datos.fecha))}.`;
+      $('actualizado').textContent = `Precios del ${f.format(fecha)}.`;
+      const horas = (Date.now() - fecha.getTime()) / 3600000;
+      if (horas > HORAS_ANTIGUEDAD) {
+        $('antiguedad').textContent = `Estos precios son del ${f.format(fecha)} y pueden haber cambiado. Estamos teniendo problemas para actualizarlos.`;
+        $('antiguedad').hidden = false;
+      }
     }
   } catch {
     avisar('Los precios de carburantes no están disponibles ahora mismo. Vuelve a intentarlo en un rato.');
