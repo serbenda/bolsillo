@@ -25,11 +25,16 @@ async function json(url) {
   return null;
 }
 
-const [gen, precios] = await Promise.all([json(urlGeneracion(desde, hasta)), json(urlPreciosRango(desde, hasta))]);
-const dias = combinar(parsearGeneracion(gen), preciosDiarios(precios));
+const gen = await json(urlGeneracion(desde, hasta));
+// Precios: si el rango hasta hoy falla (p. ej. justo al cambiar de día), se pide hasta ayer
+let precios = preciosDiarios(await json(urlPreciosRango(desde, hasta)));
+if (Object.keys(precios).length < 20) precios = preciosDiarios(await json(urlPreciosRango(desde, fechaMadrid(-1))));
+const dias = combinar(parsearGeneracion(gen), precios);
+const conPrecio = dias.filter((d) => d.precio !== null).length;
+console.log(`Generación: ${dias.length} días, ${conPrecio} con precio`);
 
-if (dias.length < 20) {
-  await anotar('generacion', false, `REE devolvió ${dias.length} días de generación`);
+if (dias.length < 20 || conPrecio < 20) {
+  await anotar('generacion', false, `REE devolvió ${dias.length} días de generación, ${conPrecio} con precio`);
   console.warn('Generación: se mantienen los datos anteriores');
   process.exit(0);
 }
@@ -38,4 +43,4 @@ await mkdir(new URL('../data/', import.meta.url), { recursive: true });
 await writeFile(salida, JSON.stringify({ actualizado: new Date().toISOString(), dias }));
 const ultimo = dias.at(-1);
 console.log(`Generación: ${dias.length} días, último ${ultimo.fecha} con ${Math.round(ultimo.renovable * 100)} % renovable`);
-await anotar('generacion', true, `${dias.length} días`);
+await anotar('generacion', true, `${dias.length} días, ${conPrecio} con precio`);

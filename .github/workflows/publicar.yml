@@ -84,7 +84,7 @@ jobs:
           set -o pipefail
           npm run e2e 2>&1 | tee "$RUNNER_TEMP/e2e.log" || {
             # Los fallos salen como anotaciones en la PR, para verlos sin abrir el registro
-            grep -E "^not ok|AssertionError|Error:|expected|actual|^\s+[+-] " "$RUNNER_TEMP/e2e.log" | head -40 | sed 's/^/::error::/'
+            grep -E "^not ok|AssertionError|Error:|expected|actual|message:|^\s+[+-] " "$RUNNER_TEMP/e2e.log" | head -40 | sed 's/^/::error::/'
             exit 1
           }
 
