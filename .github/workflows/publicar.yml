@@ -43,12 +43,12 @@ jobs:
           BASE: ${{ steps.pages.outputs.base_url }}
         run: |
           mkdir -p data
-          for f in luz gasolina; do
+          for f in luz gasolina euribor; do
             curl -fsSL --max-time 60 "$BASE/data/$f.json" -o "data/$f.json" || rm -f "data/$f.json"
           done
           ls -la data
 
-      - name: Descargar datos (luz de REE y carburantes del Ministerio)
+      - name: Descargar datos (luz de REE, carburantes del Ministerio y Euríbor del Banco de España)
         run: npm run datos
 
       - name: Descargar fuente y mapa para servirlos desde la web

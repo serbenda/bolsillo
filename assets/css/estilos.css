@@ -309,3 +309,39 @@ td:last-child, th:last-child { text-align: right; }
   .estacion { grid-template-columns: 5.5rem 1fr; }
   .llegar { grid-column: 2; }
 }
+
+/* Hipoteca */
+.formulario h2 { margin-bottom: 1.25rem; }
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem 1.5rem;
+}
+.campos .campo input, .campos .campo select { width: 100%; min-width: 0; letter-spacing: normal; }
+.con-unidad { position: relative; display: block; }
+.con-unidad input { padding-right: 3.5rem; font-variant-numeric: tabular-nums; }
+.con-unidad b {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 400;
+  color: var(--tenue);
+  pointer-events: none;
+}
+.formulario .nota { margin: 1rem 0 0; }
+table.escenarios { width: min(100%, 560px); }
+.escenarios small { color: var(--tenue); }
+.escenarios tr.actual td { font-weight: 700; }
+.historia { margin: 1.25rem 0 0; }
+.historia svg { width: 100%; height: clamp(200px, 32vw, 300px); display: block; overflow: visible; }
+.historia .rejilla { stroke: var(--linea); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.historia .cero { stroke: var(--tenue); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.historia .linea { fill: none; stroke: var(--tinta); stroke-width: 2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.historia .eje { fill: var(--tenue); font-size: 12px; font-family: var(--fuente); }
+.historia .punto-ahora { fill: var(--punta); stroke: var(--papel); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.historia .punto-revision { fill: var(--superficie); stroke: var(--tinta); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.clave { display: inline-block; width: 0.75em; height: 0.75em; border-radius: 50%; margin: 0 0.35em 0 0.75em; vertical-align: -0.05em; }
+.clave:first-child { margin-left: 0; }
+.ahora-clave { background: var(--punta); }
+.revision-clave { background: var(--superficie); border: 2px solid var(--tinta); }

@@ -10,7 +10,7 @@ Precio de la luz hora a hora, gasolineras más baratas y simulador de hipoteca c
 |---|---|---|---|
 | [Luz](luz/) | ¿Cuándo pongo la lavadora? | [Red Eléctrica (REData)](https://www.ree.es/es/datos/apidatos) | Disponible |
 | [Gasolina](gasolina/) | ¿Dónde echo gasolina? | [Ministerio para la Transición Ecológica](https://datos.gob.es/es/catalogo/e05068001-precio-de-carburantes-en-las-gasolineras-espanolas) | Disponible |
-| Hipoteca | ¿Cuánto me sube la hipoteca? | Banco de España | En preparación |
+| [Hipoteca](hipoteca/) | ¿Cuánto me sube la hipoteca? | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html), serie `D_1NBAF472` | Disponible |
 
 ## Cómo funciona
 
@@ -18,7 +18,7 @@ Es una web estática publicada en GitHub Pages. Una GitHub Action (`.github/work
 
 1. Pasa los tests.
 2. Recupera los datos ya publicados, para no perderlos si alguna fuente falla.
-3. Descarga el PVPC de hoy y de mañana de Red Eléctrica (`data/luz.json`) y los precios de todas las gasolineras del Ministerio, reducidos a lo necesario (`data/gasolina.json`).
+3. Descarga el PVPC de hoy y de mañana de Red Eléctrica (`data/luz.json`), los precios de todas las gasolineras del Ministerio, reducidos a lo necesario (`data/gasolina.json`), y la serie histórica del Euríbor a un año del Banco de España (`data/euribor.json`).
 4. Descarga la fuente Archivo y Leaflet de npm a `vendor/`, para servirlos desde la propia web (sin Google Fonts ni CDN).
 5. Publica la web.
 6. Si alguna fuente ha fallado, abre un issue con la etiqueta `datos` (o comenta en el que ya está abierto). Cuando vuelve a funcionar, lo cierra.
@@ -33,11 +33,12 @@ Si el fichero de la luz no tiene el día de hoy, la página intenta leer la API 
 index.html            Portada
 luz/                  Sección de la luz
 gasolina/             Sección de la gasolina
-hipoteca/             Próxima sección
+hipoteca/             Simulador de hipoteca
 assets/css/           Estilos comunes
 assets/js/ree.js      Acceso a la API de REE (navegador y Node)
 assets/js/ventana.js  Cálculo del tramo más barato
 assets/js/carburantes.js  Datos del Ministerio: compactar, distancias, búsqueda
+assets/js/euribor.js  Euríbor del Banco de España y cálculo de cuotas
 scripts/              Descarga de datos para la Action
 tests/                Tests con node:test
 ```
@@ -48,7 +49,7 @@ Requiere Node 20 o superior, sin dependencias.
 
 ```bash
 npm test        # tests
-npm run datos   # descarga data/luz.json y data/gasolina.json
+npm run datos   # descarga data/luz.json, data/gasolina.json y data/euribor.json
 npm run dev     # sirve la web en local
 ```
 
