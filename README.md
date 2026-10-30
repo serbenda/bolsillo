@@ -18,7 +18,7 @@ Luz hora a hora, gasolineras más baratas, hipoteca e inflación. Sin cookies, s
 ![Sin dependencias](https://img.shields.io/badge/dependencias-0-17784e)
 ![Sin cookies](https://img.shields.io/badge/cookies-0-17784e)
 ![Funciona sin conexión](https://img.shields.io/badge/sin_conexión-sí-17784e)
-[![Licencia MIT](https://img.shields.io/badge/licencia-MIT-172033)](LICENSE)
+[![Todos los derechos reservados](https://img.shields.io/badge/licencia-todos_los_derechos_reservados-172033)](LICENSE)
 
 <a href="https://bendi.dev/bolsillo/"><img src="https://bendi.dev/bolsillo/capturas/portada.png" width="860" alt="Portada de bolsillo con el recibo del día: luz, hora más barata, gasolina, diésel, Euríbor e inflación"></a>
 
@@ -285,7 +285,9 @@ Es desde donde la API del INE ofrece la serie vigente (base 2025), que es la ref
 
 ## Licencia
 
-El código es libre, con [licencia MIT](LICENSE). Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones ([ver fuentes](https://bendi.dev/bolsillo/fuentes/)). bolsillo no está vinculado a ninguno de esos organismos.
+**© 2026 Bendi. Todos los derechos reservados.** El repositorio es público para que se pueda ver el código, pero no se concede licencia de uso: no se puede copiar, clonar para usarlo, modificar ni redistribuir sin permiso. Detalles en [LICENSE](LICENSE).
+
+Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones ([ver fuentes](https://bendi.dev/bolsillo/fuentes/)). bolsillo no está vinculado a ninguno de esos organismos.
 
 <div align="center">
 <br>

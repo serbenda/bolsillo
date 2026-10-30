@@ -43,6 +43,15 @@ test('combina generación y precio con el porcentaje renovable', () => {
   assert.equal(dias[1].precio, 0.2);
 });
 
+test('descarta los días incompletos', () => {
+  const g = {
+    '2026-10-28': { total: 1000, grupos: { solar: 500, gas: 500 } },
+    '2026-10-29': { total: 1100, grupos: { solar: 500, gas: 600 } },
+    '2026-10-30': { total: 40, grupos: { gas: 40 } }, // recién empezado
+  };
+  assert.deepEqual(combinar(g, {}).map((d) => d.fecha), ['2026-10-28', '2026-10-29']);
+});
+
 test('efecto de las renovables en el precio', () => {
   const dias = [0.1, 0.2, 0.3, 0.6, 0.7, 0.8].map((r, i) => ({ fecha: `d${i}`, renovable: r, precio: 0.3 - r / 4 }));
   const e = efectoRenovables(dias);
