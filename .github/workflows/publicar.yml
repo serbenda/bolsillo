@@ -41,12 +41,12 @@ jobs:
           BASE: ${{ steps.pages.outputs.base_url || 'https://bendi.dev/bolsillo' }}
         run: |
           mkdir -p data
-          for f in luz gasolina euribor; do
+          for f in luz generacion gasolina gasolina-historico euribor ipc; do
             curl -fsSL --max-time 60 "$BASE/data/$f.json" -o "data/$f.json" || rm -f "data/$f.json"
           done
           ls -la data
 
-      - name: Descargar datos (luz de REE, carburantes del Ministerio y Euríbor del Banco de España)
+      - name: Descargar datos (REE, Ministerio, Banco de España e INE)
         run: npm run datos
 
       - name: Códigos postales (GeoNames, CC BY 4.0)
@@ -71,11 +71,19 @@ jobs:
       - name: Preparar la web
         run: |
           mkdir -p _site vendor
-          cp -r index.html luz gasolina hipoteca fuentes assets data vendor \
+          cp -r index.html luz gasolina hipoteca ipc fuentes assets data vendor \
             manifest.webmanifest sw.js sitemap.xml .nojekyll _site/
 
       - name: Tests de navegador y accesibilidad
         run: npm run e2e
+
+      - name: Lighthouse (rendimiento, accesibilidad, buenas prácticas y SEO)
+        run: npm run lighthouse
+
+      - name: Capturas para el README
+        # Si fallan no pasa nada: el README seguirá enseñando las anteriores
+        continue-on-error: true
+        run: npm run capturas
 
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

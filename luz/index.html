@@ -40,6 +40,7 @@
       <a href="./" aria-current="page">Luz</a>
       <a href="../gasolina/">Gasolina</a>
       <a href="../hipoteca/">Hipoteca</a>
+      <a href="../ipc/">Inflación</a>
     </nav>
   </header>
 
@@ -98,6 +99,35 @@
       </table>
       <p class="nota">Consumos típicos de un hogar medio. El tuyo depende del aparato y del programa.</p>
     </section>
+    <section aria-labelledby="t-porque" id="bloque-porque" hidden>
+      <h2 id="t-porque">¿Por qué está cara o barata?</h2>
+      <p class="entradilla" id="gen-frase"></p>
+      <div class="mezcla" id="mezcla" aria-hidden="true"></div>
+      <ul class="mezcla-leyenda" id="mezcla-leyenda"></ul>
+
+      <div class="efecto" id="efecto" hidden>
+        <p class="efecto-titulo">Últimos <span id="efecto-dias"></span> días, precio medio sin impuestos</p>
+        <div class="efecto-pareja">
+          <div class="efecto-dato verde">
+            <span class="efecto-precio" id="efecto-muchas"></span>
+            <span id="efecto-muchas-txt"></span>
+          </div>
+          <div class="efecto-dato rojo">
+            <span class="efecto-precio" id="efecto-pocas"></span>
+            <span id="efecto-pocas-txt"></span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subtitulo">Precio y renovables, día a día</h3>
+      <div class="grafico dias" id="grafico-dias" role="img"></div>
+      <div class="leyenda" aria-hidden="true">
+        <span><i style="background:var(--valle)"></i>Mucha renovable</span>
+        <span><i style="background:var(--llano)"></i>Intermedia</span>
+        <span><i style="background:var(--punta)"></i>Poca renovable</span>
+      </div>
+      <p class="nota">Generación peninsular por tecnología publicada por Red Eléctrica. La altura de cada barra es el precio medio del día; el color, cuánta electricidad fue renovable.</p>
+    </section>
   </main>
 
   <footer class="envoltorio pie">
@@ -108,6 +138,7 @@
   </footer>
 
   <script type="module" src="../assets/js/luz.js"></script>
+  <script type="module" src="../assets/js/luz-generacion.js"></script>
   <script type="module" src="../assets/js/comun.js"></script>
 </body>
 </html>

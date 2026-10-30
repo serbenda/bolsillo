@@ -40,6 +40,7 @@
       <a href="../luz/">Luz</a>
       <a href="../gasolina/">Gasolina</a>
       <a href="./" aria-current="page">Hipoteca</a>
+      <a href="../ipc/">Inflación</a>
     </nav>
   </header>
 
@@ -82,6 +83,27 @@
         <thead><tr><th scope="col">Euríbor</th><th scope="col">Cuota al mes</th><th scope="col">Frente a ahora</th></tr></thead>
         <tbody id="escenarios"></tbody>
       </table>
+    </section>
+
+    <section aria-labelledby="t-amortizar" id="bloque-amortizar" hidden>
+      <h2 id="t-amortizar">¿Y si amortizo?</h2>
+      <label class="campo campo-amortizar">
+        <span>Dinero que adelantas</span>
+        <span class="con-unidad"><input id="extra" inputmode="numeric" autocomplete="off" value="10.000"><b>€</b></span>
+      </label>
+      <div class="opciones-amortizar">
+        <div class="opcion" id="op-cuota">
+          <h3>Reducir cuota</h3>
+          <p class="opcion-dato" id="op-cuota-dato"></p>
+          <p id="op-cuota-txt"></p>
+        </div>
+        <div class="opcion recomendada" id="op-plazo">
+          <h3>Reducir plazo</h3>
+          <p class="opcion-dato" id="op-plazo-dato"></p>
+          <p id="op-plazo-txt"></p>
+        </div>
+      </div>
+      <p class="nota" id="amortizar-nota">Con el tipo actual sin cambios y sin contar la comisión por amortización que pueda cobrar tu banco.</p>
     </section>
 
     <section aria-labelledby="t-historia" id="bloque-historia" hidden>

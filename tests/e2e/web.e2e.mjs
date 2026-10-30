@@ -5,38 +5,21 @@
 
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
-
-const RAIZ = new URL('../../_site/', import.meta.url).pathname;
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.xml': 'application/xml' };
+import { arrancar } from './servidor.mjs';
 
 let servidor, navegador, base;
 
 before(async () => {
-  // Servidor estático mínimo que imita GitHub Pages bajo /bolsillo/
-  servidor = createServer(async (req, res) => {
-    let ruta = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/bolsillo/, '');
-    ruta = normalize(join(RAIZ, ruta));
-    try {
-      if ((await stat(ruta)).isDirectory()) ruta = join(ruta, 'index.html');
-      res.writeHead(200, { 'Content-Type': TIPOS[extname(ruta)] ?? 'application/octet-stream' });
-      res.end(await readFile(ruta));
-    } catch {
-      res.writeHead(404).end('no encontrado');
-    }
-  });
-  await new Promise((ok) => servidor.listen(0, ok));
-  base = `http://localhost:${servidor.address().port}/bolsillo/`;
+  servidor = await arrancar();
+  base = servidor.base;
   navegador = await chromium.launch();
 });
 
 after(async () => {
   await navegador?.close();
-  servidor?.close();
+  await servidor?.cerrar();
 });
 
 async function abrir(ruta, opciones = {}) {
@@ -63,6 +46,7 @@ test('portada: recibo con datos del día', async () => {
   assert.match(await pagina.textContent('#r-luz'), /€\/kWh/);
   assert.match(await pagina.textContent('#r-g95'), /€\/l/);
   assert.match(await pagina.textContent('#r-euribor'), /%/);
+  assert.match(await pagina.textContent('#r-ipc'), /%/);
   await accesible(pagina);
   await contexto.close();
 });
@@ -77,6 +61,10 @@ test('luz: titular, gráfico y coste por aparato', async () => {
   assert.match(await pagina.textContent('#t-plan'), /secadora/);
   await pagina.click('#con-impuestos');
   assert.match(await pagina.textContent('#ahorro'), /sin impuestos/);
+  // Por qué está cara o barata: generación de REE
+  assert.match(await pagina.textContent('#gen-frase'), /renovable/);
+  assert.ok((await pagina.locator('#mezcla .seg').count()) >= 3);
+  assert.ok((await pagina.locator('#grafico-dias .barra').count()) >= 20);
   await accesible(pagina);
   await contexto.close();
 });
@@ -111,6 +99,20 @@ test('hipoteca: cuota con el último Euríbor', async () => {
   assert.equal(await pagina.locator('#escenarios tr').count(), 5);
   await pagina.fill('#capital', '200000');
   assert.match(await pagina.textContent('#entradilla'), /pasarías de pagar/);
+  await pagina.fill('#extra', '20000');
+  assert.match(await pagina.textContent('#op-plazo-dato'), /antes/);
+  assert.match(await pagina.textContent('#op-cuota-dato'), /al mes/);
+  await accesible(pagina);
+  await contexto.close();
+});
+
+test('inflación: calculadora del IPC', async () => {
+  const { pagina, errores, contexto } = await abrir('ipc/');
+  assert.deepEqual(errores, []);
+  assert.match(await pagina.textContent('#titular'), /%/);
+  await pagina.fill('#cantidad', '250');
+  assert.match(await pagina.textContent('#resultado'), /250,00 €.*equivalen a/);
+  assert.ok((await pagina.locator('#historia polyline').count()) === 1);
   await accesible(pagina);
   await contexto.close();
 });

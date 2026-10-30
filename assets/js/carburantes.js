@@ -135,7 +135,66 @@ export function porProvincias(datos) {
     c.n++;
     c.caja = [Math.min(c.caja[0], fila[iLat]), Math.min(c.caja[1], fila[iLon]), Math.max(c.caja[2], fila[iLat]), Math.max(c.caja[3], fila[iLon])];
   }
+  // Precio medio de cada combustible en cada provincia
+  const claves = Object.keys(COMBUSTIBLES);
+  for (const [id, p] of Object.entries(provincias)) {
+    cajas[id].medias = Object.fromEntries(
+      claves.map((k) => {
+        const i = datos.columnas.indexOf(k);
+        const ps = p.estaciones.map((f) => f[i]).filter((v) => v !== null);
+        return [k, ps.length ? Math.round((ps.reduce((a, b) => a + b, 0) / ps.length) * 1000) / 1000 : null];
+      })
+    );
+  }
   return { indice: { fecha: datos.fecha, medias: datos.medias, provincias: cajas }, provincias };
+}
+
+/* ---------- Histórico de precios medios ---------- */
+
+/**
+ * Añade (o sustituye) el día de hoy al histórico de medias nacionales y por provincia,
+ * y se queda con los últimos `dias` días.
+ * Forma: { nacional: [{ f: 'YYYY-MM-DD', g95, … }], provincias: { '28': [{ f, g95, … }] } }
+ */
+export function actualizarHistorico(historico, indice, dias = 120) {
+  const fecha = (indice.fecha ?? '').slice(0, 10);
+  if (!fecha) return historico ?? { nacional: [], provincias: {} };
+  const h = { nacional: [...(historico?.nacional ?? [])], provincias: { ...(historico?.provincias ?? {}) } };
+  const poner = (lista, medias) => {
+    const sin = (lista ?? []).filter((x) => x.f !== fecha);
+    return [...sin, { f: fecha, ...medias }].sort((a, b) => a.f.localeCompare(b.f)).slice(-dias);
+  };
+  h.nacional = poner(h.nacional, indice.medias);
+  for (const [id, p] of Object.entries(indice.provincias)) {
+    if (p.medias) h.provincias[id] = poner(h.provincias[id], p.medias);
+  }
+  return h;
+}
+
+/**
+ * Compara el precio de hoy con la semana anterior en una serie del histórico.
+ * Devuelve { hoy, media7, hace7, diferencia } (diferencia = hoy - media de los 7 días previos) o null.
+ */
+export function tendencia(serie, combustible) {
+  const puntos = (serie ?? []).filter((x) => typeof x[combustible] === 'number');
+  if (puntos.length < 2) return null;
+  const hoy = puntos.at(-1);
+  const previos = puntos.slice(-8, -1);
+  const media7 = previos.reduce((s, x) => s + x[combustible], 0) / previos.length;
+  const semana = puntos.find((x) => x.f === restarDias(hoy.f, 7));
+  return {
+    hoy: hoy[combustible],
+    media7,
+    hace7: semana ? semana[combustible] : null,
+    diferencia: hoy[combustible] - media7,
+    dias: puntos.length,
+  };
+}
+
+function restarDias(fecha, n) {
+  const d = new Date(`${fecha}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - n);
+  return d.toISOString().slice(0, 10);
 }
 
 /** Distancia (km) desde un punto al rectángulo [latMin, lonMin, latMax, lonMax]; 0 si está dentro. */

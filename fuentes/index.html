@@ -40,23 +40,26 @@
       <a href="../luz/">Luz</a>
       <a href="../gasolina/">Gasolina</a>
       <a href="../hipoteca/">Hipoteca</a>
+      <a href="../ipc/">Inflación</a>
     </nav>
   </header>
 
   <main class="envoltorio texto">
     <h1 class="titular">Fuentes y condiciones</h1>
-    <p class="entradilla">Todos los datos son públicos y oficiales. Aquí está de dónde sale cada uno y qué hacemos con ellos.</p>
+    <p class="entradilla">Todos los datos son públicos y oficiales: Red Eléctrica, el Ministerio para la Transición Ecológica, el Banco de España y el INE. Aquí está de dónde sale cada uno y qué hacemos con ellos.</p>
 
     <section aria-labelledby="t-luz">
       <h2 id="t-luz">Precio de la luz</h2>
       <p>Precio voluntario para el pequeño consumidor (PVPC, tarifa 2.0TD) de la península, publicado por <a href="https://www.ree.es/es/datos/apidatos">Red Eléctrica</a> en su API de datos abiertos. Incluye energía, peajes y cargos. El precio de mañana se publica hacia las 20:15.</p>
       <p>«Con impuestos» suma al término de energía el impuesto especial sobre la electricidad y el IVA vigentes. La factura real añade el término de potencia, el alquiler del contador y, en su caso, el bono social. Los consumos de cada aparato son estimaciones típicas.</p>
+      <p>La generación por tecnología (solar, eólica, gas…) es la peninsular diaria que publica Red Eléctrica. La comparación de precios entre días con más y menos renovables parte los últimos 30 días por la mitad según su porcentaje renovable.</p>
     </section>
 
     <section aria-labelledby="t-gasolina">
       <h2 id="t-gasolina">Gasolineras</h2>
       <p>Precios de las estaciones de servicio de venta al público del <a href="https://datos.gob.es/es/catalogo/e05068001-precio-de-carburantes-en-las-gasolineras-espanolas">Ministerio para la Transición Ecológica y el Reto Demográfico</a>, que las gasolineras están obligadas a comunicar. Se actualizan varias veces al día.</p>
       <p>«Abierta ahora» se calcula con el horario que cada gasolinera declara al Ministerio. Los códigos postales vienen de <a href="https://www.geonames.org/">GeoNames</a> (licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>) y el mapa, de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.</p>
+      <p>«¿Echo hoy o espero?» usa un histórico propio: cada día se guarda el precio medio de cada combustible en cada provincia, y se compara el de hoy con la media de los siete días anteriores. El histórico empieza el 31 de octubre de 2026.</p>
     </section>
 
     <section aria-labelledby="t-hipoteca">
@@ -64,9 +67,14 @@
       <p>Euríbor a un año, índice oficial de referencia del mercado hipotecario, de la <a href="https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html">API de estadísticas del Banco de España</a> (serie D_1NBAF472). El simulador usa el sistema francés de amortización y es orientativo: tu banco aplica lo que diga tu escritura.</p>
     </section>
 
+    <section aria-labelledby="t-ipc">
+      <h2 id="t-ipc">Inflación</h2>
+      <p>Índice general nacional del <a href="https://www.ine.es/dyngs/IPC/es/index.htm">IPC del INE</a> (serie IPC290751, base 2025, desde enero de 2002). Las equivalencias multiplican la cantidad por el cociente entre el índice de las dos fechas.</p>
+    </section>
+
     <section aria-labelledby="t-privacidad">
       <h2 id="t-privacidad">Privacidad</h2>
-      <p>No hay cookies, anuncios ni cuentas. Las visitas se cuentan con <a href="https://www.goatcounter.com/">GoatCounter</a>, que no guarda datos personales. Tu ubicación, tu código postal y los datos de tu hipoteca se quedan en tu navegador: no se envían a ningún sitio. El mapa descarga sus imágenes de OpenStreetMap solo cuando haces una búsqueda.</p>
+      <p>No hay cookies, anuncios ni cuentas. Las visitas se cuentan con <a href="https://www.goatcounter.com/">GoatCounter</a>, que no guarda datos personales. Tu ubicación, tu código postal, los datos de tu hipoteca y tus cálculos se quedan en tu navegador: no se envían a ningún sitio. El mapa descarga sus imágenes de OpenStreetMap solo cuando haces una búsqueda.</p>
     </section>
 
     <section aria-labelledby="t-reutilizar">

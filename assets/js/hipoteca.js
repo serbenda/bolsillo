@@ -1,11 +1,11 @@
-import { cuotaMensual, interesesPrimerAno, euriborDe } from './euribor.js';
+import { cuotaMensual, interesesPrimerAno, euriborDe, amortizar } from './euribor.js';
 
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/euribor.json', import.meta.url);
 
 const euros = (n, dec = 0) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
-const pct = (n) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(n)} %`;
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: 'always' }).format(n);
+const pct = (n) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(n)}\u00a0%`;
 const nombreMes = (mes) =>
   new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${mes}-01T00:00:00Z`));
 
@@ -43,7 +43,7 @@ function calcular() {
     return;
   }
   avisar('');
-  for (const id of ['capital', 'anos', 'diferencial', 'revision']) guardar(id, $(id).value);
+  for (const id of ['capital', 'anos', 'diferencial', 'revision', 'extra']) guardar(id, $(id).value);
 
   const cuotaAntes = cuotaMensual(capital, meses, antes + diferencial);
   const cuotaAhora = cuotaMensual(capital, meses, ultimo.valor + diferencial);
@@ -67,6 +67,7 @@ function calcular() {
   $('resumen').hidden = false;
 
   pintarEscenarios(capital, meses, diferencial, ultimo.valor, cuotaAhora);
+  pintarAmortizar(capital, meses, ultimo.valor + diferencial);
   pintarHistoria(revision);
 }
 
@@ -83,6 +84,35 @@ function pintarEscenarios(capital, meses, diferencial, actual, cuotaAhora) {
   });
   $('escenarios').innerHTML = filas.join('');
   $('bloque-escenarios').hidden = false;
+}
+
+const plazoTexto = (m) => {
+  const a = Math.floor(m / 12), r = m % 12;
+  const partes = [a ? `${a} ${a === 1 ? 'año' : 'años'}` : '', r ? `${r} ${r === 1 ? 'mes' : 'meses'}` : ''].filter(Boolean);
+  return partes.join(' y ') || '0 meses';
+};
+
+function pintarAmortizar(capital, meses, tipo) {
+  const extra = entero($('extra').value);
+  const bloque = $('bloque-amortizar');
+  bloque.hidden = false;
+  if (!(extra > 0)) {
+    $('op-cuota-dato').textContent = $('op-plazo-dato').textContent = '—';
+    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = 'Escribe cuánto dinero quieres adelantar.';
+    return;
+  }
+  const r = amortizar(capital, meses, tipo, extra);
+  if (r.liquida) {
+    $('op-cuota-dato').textContent = $('op-plazo-dato').textContent = 'Hipoteca pagada';
+    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = `Con ${euros(extra)} cancelas todo el capital pendiente y te ahorras ${euros(r.base.intereses)} de intereses.`;
+    return;
+  }
+  $('op-cuota-dato').textContent = `${euros(r.reducirCuota.cuota)} al mes`;
+  $('op-cuota-txt').textContent =
+    `Pagas ${euros(r.base.cuota - r.reducirCuota.cuota)} menos cada mes durante el mismo plazo y te ahorras ${euros(r.reducirCuota.ahorro)} en intereses.`;
+  $('op-plazo-dato').textContent = `${plazoTexto(r.reducirPlazo.mesesMenos)} antes`;
+  $('op-plazo-txt').textContent =
+    `Sigues pagando ${euros(r.base.cuota)} al mes, terminas antes y te ahorras ${euros(r.reducirPlazo.ahorro)} en intereses: ${euros(r.reducirPlazo.ahorro - r.reducirCuota.ahorro)} más que reduciendo cuota.`;
 }
 
 function pintarHistoria(revision) {
@@ -147,15 +177,17 @@ async function iniciar() {
   // Por defecto, hace 12 meses (revisión anual).
   select.value = serie.at(-13)?.mes ?? serie[0].mes;
 
-  for (const id of ['capital', 'anos', 'diferencial', 'revision']) {
+  for (const id of ['capital', 'anos', 'diferencial', 'revision', 'extra']) {
     const v = leer(id);
     if (v !== null && (id !== 'revision' || [...select.options].some((o) => o.value === v))) $(id).value = v;
     $(id).addEventListener('input', calcular);
   }
-  $('capital').addEventListener('blur', () => {
-    const n = entero($('capital').value);
-    if (n > 0) $('capital').value = new Intl.NumberFormat('es-ES').format(n);
-  });
+  for (const id of ['capital', 'extra']) {
+    $(id).addEventListener('blur', () => {
+      const n = entero($(id).value);
+      if (n > 0) $(id).value = new Intl.NumberFormat('es-ES').format(n);
+    });
+  }
   $('formulario').addEventListener('submit', (e) => e.preventDefault());
 
   const f = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });

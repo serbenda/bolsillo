@@ -1,4 +1,4 @@
-import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal, provinciasCercanas, abierta, ahoraEnEspana } from './carburantes.js';
+import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal, provinciasCercanas, abierta, ahoraEnEspana, tendencia } from './carburantes.js';
 
 const $ = (id) => document.getElementById(id);
 const DATOS = new URL('../../data/', import.meta.url);
@@ -23,6 +23,61 @@ async function json(ruta) {
   const r = await fetch(new URL(ruta, DATOS), { cache: 'no-cache' });
   if (!r.ok) throw new Error(`${ruta}: ${r.status}`);
   return r.json();
+}
+
+const historicos = new Map(); // provincia → serie diaria de medias
+
+async function historicoDe(prov) {
+  if (!historicos.has(prov)) {
+    historicos.set(prov, json(`gasolina/historico/${prov}.json`).catch(() => []));
+  }
+  return historicos.get(prov);
+}
+
+const centimos = (x) => new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(Math.abs(x) * 100);
+const diaCorto = (f) => new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${f}T12:00:00Z`));
+
+async function pintarTendencia(prov, c) {
+  const bloque = $('bloque-tendencia');
+  const serie = await historicoDe(prov);
+  const nombreProv = indice?.provincias?.[prov]?.nombre ?? 'tu provincia';
+  const combustibleTxt = COMBUSTIBLES[c].nombre.toLowerCase();
+  const t = tendencia(serie, c);
+  if (!serie.length) { bloque.hidden = true; return; }
+  if (!t) {
+    $('tendencia-frase').textContent = `Empezamos a guardar los precios de ${nombreProv} el ${diaCorto(serie[0].f)}.`;
+    $('tendencia-detalle').textContent = 'En unos días verás aquí si hoy está más caro o más barato que la semana pasada.';
+    $('tendencia-grafico').hidden = true;
+    bloque.hidden = false;
+    return;
+  }
+  const igual = Math.abs(t.diferencia) < 0.005;
+  $('tendencia-frase').textContent = igual
+    ? `En ${nombreProv}, la ${combustibleTxt} está en la media de la última semana.`
+    : t.diferencia < 0
+      ? `Buen momento: en ${nombreProv}, la ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por debajo de la media de la semana.`
+      : `Si puedes, espera: en ${nombreProv}, la ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por encima de la media de la semana.`;
+  $('tendencia-detalle').textContent =
+    `Media de hoy: ${euros(t.hoy)} €/l. Media de los días anteriores: ${euros(t.media7)} €/l.` +
+    (t.hace7 !== null ? ` Hace una semana: ${euros(t.hace7)} €/l.` : '');
+  pintarChispa(serie.slice(-30), c, nombreProv, combustibleTxt);
+  bloque.hidden = false;
+}
+
+function pintarChispa(serie, c, nombreProv, combustibleTxt) {
+  const svg = $('tendencia-grafico');
+  const puntos = serie.filter((x) => typeof x[c] === 'number');
+  if (puntos.length < 3) { svg.hidden = true; return; }
+  svg.hidden = false;
+  const W = Math.max(svg.clientWidth || 600, 280), H = 90, M = 8;
+  const vs = puntos.map((x) => x[c]);
+  const min = Math.min(...vs), max = Math.max(...vs) || min + 0.01;
+  const x = (i) => M + (i / (puntos.length - 1)) * (W - 2 * M);
+  const y = (v) => M + (max === min ? 0.5 : (max - v) / (max - min)) * (H - 2 * M);
+  const linea = puntos.map((p, i) => `${x(i).toFixed(1)},${y(p[c]).toFixed(1)}`).join(' ');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `<polyline points="${linea}" class="linea"/><circle cx="${x(puntos.length - 1)}" cy="${y(vs.at(-1))}" r="4.5" class="punto"/>`;
+  svg.setAttribute('aria-label', `Precio medio de la ${combustibleTxt} en ${nombreProv} los últimos ${puntos.length} días: entre ${euros(min)} y ${euros(max)} €/l; hoy ${euros(vs.at(-1))} €/l.`);
 }
 
 async function cargarProvincias(ids) {
@@ -132,6 +187,7 @@ function pintar() {
       : 'Prueba a ampliar la distancia o a elegir otro combustible.';
     $('resumen').hidden = true;
     $('resultados').hidden = true;
+    $('bloque-tendencia').hidden = true;
     return;
   }
 
@@ -170,6 +226,9 @@ function pintar() {
     .join('');
 
   pintarMapa(lista, min, max);
+
+  // Provincia de referencia para la tendencia: la de la gasolinera más barata
+  if (mejor.prov) pintarTendencia(mejor.prov, c);
 }
 
 function usarUbicacion() {
