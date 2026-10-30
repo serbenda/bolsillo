@@ -47,7 +47,7 @@ async function pintarTendencia(prov, c) {
   if (!t) {
     $('tendencia-frase').textContent = `Empezamos a guardar los precios de ${nombreProv} el ${diaCorto(serie[0].f)}.`;
     $('tendencia-detalle').textContent = 'En unos días verás aquí si hoy está más caro o más barato que la semana pasada.';
-    $('tendencia-grafico').hidden = true;
+    $('tendencia-caja').hidden = true;
     bloque.hidden = false;
     return;
   }
@@ -67,8 +67,8 @@ async function pintarTendencia(prov, c) {
 function pintarChispa(serie, c, nombreProv, combustibleTxt) {
   const svg = $('tendencia-grafico');
   const puntos = serie.filter((x) => typeof x[c] === 'number');
-  if (puntos.length < 3) { svg.hidden = true; return; }
-  svg.hidden = false;
+  if (puntos.length < 3) { $('tendencia-caja').hidden = true; return; }
+  $('tendencia-caja').hidden = false;
   const W = Math.max(svg.clientWidth || 600, 280), H = 90, M = 8;
   const vs = puntos.map((x) => x[c]);
   const min = Math.min(...vs), max = Math.max(...vs) || min + 0.01;

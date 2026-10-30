@@ -55,7 +55,7 @@ test('luz: titular, gráfico y coste por aparato', async () => {
   const { pagina, errores, contexto } = await abrir('luz/');
   assert.deepEqual(errores, []);
   assert.doesNotMatch(await pagina.textContent('#titular'), /Cargando|no está disponible/);
-  assert.ok((await pagina.locator('#grafico .barra').count()) >= 23);
+  assert.ok((await pagina.locator('#grafico .barra').count()) >= 23, 'barras de 24 horas');
   assert.equal(await pagina.locator('#costes tr').count(), 5);
   await pagina.click('text=Secadora');
   assert.match(await pagina.textContent('#t-plan'), /secadora/);
@@ -63,8 +63,8 @@ test('luz: titular, gráfico y coste por aparato', async () => {
   assert.match(await pagina.textContent('#ahorro'), /sin impuestos/);
   // Por qué está cara o barata: generación de REE
   assert.match(await pagina.textContent('#gen-frase'), /renovable/);
-  assert.ok((await pagina.locator('#mezcla .seg').count()) >= 3);
-  assert.ok((await pagina.locator('#grafico-dias .barra').count()) >= 20);
+  assert.ok((await pagina.locator('#mezcla .seg').count()) >= 3, `segmentos de generación: ${await pagina.locator('#mezcla .seg').count()}`);
+  assert.ok((await pagina.locator('#grafico-dias .barra').count()) >= 20, `días con precio y generación: ${await pagina.locator('#grafico-dias .barra').count()}`);
   await accesible(pagina);
   await contexto.close();
 });
@@ -76,7 +76,7 @@ test('gasolina: búsqueda por código postal', async () => {
   await pagina.click('button[type=submit]');
   await pagina.waitForSelector('.estacion', { timeout: 10000 });
   assert.match(await pagina.textContent('#titular'), /€\/l/);
-  assert.ok((await pagina.locator('.estacion').count()) > 0);
+  assert.ok((await pagina.locator('.estacion').count()) > 0, 'gasolineras en la lista');
   await accesible(pagina);
   await contexto.close();
 });

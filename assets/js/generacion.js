@@ -68,8 +68,11 @@ export function preciosDiarios(json) {
 
 /** Une generación y precio en una lista ordenada por fecha con el % renovable de cada día. */
 export function combinar(generacion, precios) {
+  // Fuera los días incompletos (p. ej. hoy recién empezado): menos del 60 % de la generación habitual
+  const totales = Object.values(generacion).map((d) => d.total).filter((t) => t > 0).sort((a, b) => a - b);
+  const mediana = totales[Math.floor(totales.length / 2)] ?? 0;
   return Object.entries(generacion)
-    .filter(([, d]) => d.total > 0)
+    .filter(([, d]) => d.total > 0 && d.total >= mediana * 0.6)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([fecha, d]) => {
       const renovable = Object.entries(d.grupos)
