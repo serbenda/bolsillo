@@ -234,3 +234,78 @@ td:last-child, th:last-child { text-align: right; }
   .grafico.listo .barra { animation: crecer 600ms cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i) * 18ms); transform-origin: bottom; }
   @keyframes crecer { from { transform: scaleY(0); } }
 }
+
+/* Gasolina: buscador y filtros */
+.buscador, .filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-top: 1.75rem;
+}
+.filtros { gap: 1rem 2rem; margin-top: 1.25rem; }
+.filtros .duraciones { margin: 0; }
+.o { color: var(--tenue); padding-bottom: 0.6rem; }
+.campo { display: grid; gap: 0.3rem; font-size: 0.9rem; color: var(--tenue); }
+.campo input, .campo select {
+  font: inherit;
+  font-size: 1rem;
+  color: var(--tinta);
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: var(--radio);
+  padding: 0.55rem 0.75rem;
+  min-width: 9rem;
+}
+.campo input { width: 8rem; min-width: 0; letter-spacing: 0.08em; }
+.boton {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radio);
+  border: 1px solid var(--tinta);
+  background: var(--tinta);
+  color: var(--papel);
+  cursor: pointer;
+}
+.boton.secundario { background: transparent; color: var(--tinta); }
+.boton:disabled { opacity: 0.45; cursor: not-allowed; }
+.aviso { margin-top: 1.25rem; }
+
+/* Gasolina: mapa y lista */
+.mapa {
+  height: clamp(260px, 45vw, 420px);
+  border-radius: var(--radio);
+  border: 1px solid var(--linea);
+  background: var(--superficie);
+  z-index: 0;
+}
+.estaciones { list-style: none; padding: 0; margin: 1.5rem 0 0; border-top: 2px solid var(--tinta); }
+.estacion {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto;
+  gap: 0.25rem 1.25rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+.estacion h3 { font-size: 1.05rem; font-weight: 700; }
+.estacion p { margin: 0.15rem 0 0; color: var(--tenue); font-size: 0.95rem; }
+.estacion .meta { display: flex; flex-wrap: wrap; gap: 0 1rem; font-size: 0.85rem; }
+.precio {
+  font-stretch: 112%;
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1;
+  border-left: 5px solid var(--color);
+  padding-left: 0.6rem;
+}
+.precio small { display: block; font-size: 0.75rem; font-weight: 400; color: var(--tenue); margin-top: 0.2rem; font-stretch: 100%; }
+.precio.barata { --color: var(--valle); }
+.precio.media { --color: var(--llano); }
+.precio.cara { --color: var(--punta); }
+.llegar { font-size: 0.9rem; white-space: nowrap; }
+@media (max-width: 560px) {
+  .estacion { grid-template-columns: 5.5rem 1fr; }
+  .llegar { grid-column: 2; }
+}

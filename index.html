@@ -34,11 +34,11 @@
         </a>
       </li>
       <li>
-        <div class="pendiente">
+        <a href="gasolina/">
           <h2>¿Dónde echo gasolina?</h2>
           <p>Las gasolineras más baratas cerca de ti, con precios del Ministerio actualizados varias veces al día.</p>
-          <span class="dato">En preparación</span>
-        </div>
+          <span class="dato" id="dato-gasolina">—<small>€/l media gasolina 95</small></span>
+        </a>
       </li>
       <li>
         <div class="pendiente">
@@ -60,6 +60,12 @@
     const { hoy } = await cargarLuz();
     const actual = hoy?.find((h) => h.hora === horaMadrid());
     if (actual) document.getElementById('dato-luz').firstChild.textContent = formatoPrecio(actual.precio);
+
+    try {
+      const r = await fetch('data/gasolina.json', { cache: 'no-cache' });
+      const { medias } = await r.json();
+      if (medias?.g95) document.getElementById('dato-gasolina').firstChild.textContent = formatoPrecio(medias.g95);
+    } catch {}
   </script>
 </body>
 </html>

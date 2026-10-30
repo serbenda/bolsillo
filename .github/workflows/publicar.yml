@@ -5,8 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Horas en UTC. El PVPC de mañana se publica hacia las 20:15 (hora peninsular).
-    - cron: '7 0,19,20,21 * * *'
+    # Horas en UTC. El PVPC de mañana se publica hacia las 20:15 (hora peninsular);
+    # los carburantes se actualizan varias veces al día.
+    - cron: '7 0,6,12,19,20,21 * * *'
 
 permissions:
   contents: read
@@ -33,7 +34,7 @@ jobs:
       - name: Tests
         run: npm test
 
-      - name: Descargar precio de la luz (REE)
+      - name: Descargar datos (luz de REE y carburantes del Ministerio)
         run: npm run datos
 
       - name: Preparar la web
