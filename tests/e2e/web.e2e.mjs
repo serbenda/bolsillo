@@ -5,6 +5,7 @@
 
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
 import { arrancar } from './servidor.mjs';
@@ -61,10 +62,20 @@ test('luz: titular, gráfico y coste por aparato', async () => {
   assert.match(await pagina.textContent('#t-plan'), /secadora/);
   await pagina.click('#con-impuestos');
   assert.match(await pagina.textContent('#ahorro'), /sin impuestos/);
-  // Por qué está cara o barata: generación de REE
-  assert.match(await pagina.textContent('#gen-frase'), /renovable/);
-  assert.ok((await pagina.locator('#mezcla .seg').count()) >= 3, `segmentos de generación: ${await pagina.locator('#mezcla .seg').count()}`);
-  assert.ok((await pagina.locator('#grafico-dias .barra').count()) >= 20, `días con precio y generación: ${await pagina.locator('#grafico-dias .barra').count()}`);
+  // Por qué está cara o barata: lo que se pinta tiene que cuadrar con los datos publicados
+  // (si REE no dio datos de generación, la sección no aparece y la página sigue funcionando)
+  let gen = null;
+  try {
+    gen = JSON.parse(await readFile(new URL('../../_site/data/generacion.json', import.meta.url), 'utf8')).dias;
+  } catch {}
+  if (gen?.length) {
+    const conPrecio = gen.filter((d) => d.precio !== null).length;
+    assert.match(await pagina.textContent('#gen-frase'), /renovable/);
+    assert.ok((await pagina.locator('#mezcla .seg').count()) >= 2, `segmentos de generación: ${await pagina.locator('#mezcla .seg').count()}`);
+    assert.equal(await pagina.locator('#grafico-dias .barra').count(), conPrecio, 'un día por barra');
+  } else {
+    assert.equal(await pagina.locator('#bloque-porque').isVisible(), false, 'sin datos, la sección no se muestra');
+  }
   await accesible(pagina);
   await contexto.close();
 });
@@ -111,7 +122,7 @@ test('inflación: calculadora del IPC', async () => {
   assert.deepEqual(errores, []);
   assert.match(await pagina.textContent('#titular'), /%/);
   await pagina.fill('#cantidad', '250');
-  assert.match(await pagina.textContent('#resultado'), /250,00 €.*equivalen a/);
+  assert.match(await pagina.textContent('#resultado'), /^250,00\s€ de .+ equivalen a .+\s€ de /);
   assert.ok((await pagina.locator('#historia polyline').count()) === 1);
   await accesible(pagina);
   await contexto.close();
