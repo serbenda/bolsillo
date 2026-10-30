@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gasolineras más baratas cerca de ti · bolsillo</title>
+  <meta name="description" content="Las gasolineras más baratas cerca de ti, con los precios oficiales del Ministerio para la Transición Ecológica.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+  <header class="envoltorio cabecera">
+    <a class="marca" href="../">bolsillo</a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="../luz/">Luz</a>
+      <a href="./" aria-current="page">Gasolina</a>
+      <a href="../hipoteca/">Hipoteca</a>
+    </nav>
+  </header>
+
+  <main class="envoltorio">
+    <section aria-labelledby="titular">
+      <h1 class="titular" id="titular">¿Dónde echo gasolina?</h1>
+      <p class="entradilla" id="entradilla">Busca por tu ubicación o por código postal y te ordenamos las gasolineras de más barata a más cara.</p>
+
+      <form class="buscador" id="buscador">
+        <button type="button" class="boton" id="ubicacion">Usar mi ubicación</button>
+        <span class="o">o</span>
+        <label class="campo">
+          <span>Código postal</span>
+          <input id="cp" name="cp" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="28100">
+        </label>
+        <button type="submit" class="boton secundario">Buscar</button>
+      </form>
+
+      <div class="filtros">
+        <label class="campo">
+          <span>Combustible</span>
+          <select id="combustible"></select>
+        </label>
+        <fieldset class="duraciones" id="radios">
+          <legend>Distancia</legend>
+          <label><input type="radio" name="radio" value="2"> 2 km</label>
+          <label><input type="radio" name="radio" value="5" checked> 5 km</label>
+          <label><input type="radio" name="radio" value="10"> 10 km</label>
+          <label><input type="radio" name="radio" value="25"> 25 km</label>
+        </fieldset>
+      </div>
+
+      <p id="mensaje" class="aviso" role="status" hidden></p>
+      <div class="ahora" id="resumen" hidden></div>
+    </section>
+
+    <section aria-label="Resultados" id="resultados" hidden>
+      <div id="mapa" class="mapa"></div>
+      <ol class="estaciones" id="lista"></ol>
+    </section>
+  </main>
+
+  <footer class="envoltorio pie">
+    <p>Precios oficiales del Ministerio para la Transición Ecológica, solo gasolineras de venta al público. Comprueba el precio en el surtidor: puede haber cambiado desde la última actualización.</p>
+    <p id="actualizado"></p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module" src="../assets/js/gasolina.js"></script>
+</body>
+</html>

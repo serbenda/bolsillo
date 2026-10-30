@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bolsillo · luz, gasolina e hipoteca con datos públicos</title>
+  <meta name="description" content="Precio de la luz hora a hora, gasolineras más baratas y simulador de hipoteca con datos públicos de España.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+  <link rel="stylesheet" href="assets/css/estilos.css">
+</head>
+<body>
+  <header class="envoltorio cabecera">
+    <a class="marca" href="./">bolsillo</a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="luz/">Luz</a>
+      <a href="gasolina/">Gasolina</a>
+      <a href="hipoteca/">Hipoteca</a>
+    </nav>
+  </header>
+
+  <main class="envoltorio">
+    <h1 class="titular">Lo que cuesta el día a día, con datos oficiales.</h1>
+    <p class="entradilla">Precios públicos de Red Eléctrica, el Ministerio y el Banco de España, puestos para responder a preguntas de casa.</p>
+
+    <ul class="secciones">
+      <li>
+        <a href="luz/">
+          <h2>¿Cuándo pongo la lavadora?</h2>
+          <p>Precio de la luz PVPC hora a hora, hoy y mañana, y la mejor hora para los electrodomésticos.</p>
+          <span class="dato" id="dato-luz">—<small>€/kWh ahora</small></span>
+        </a>
+      </li>
+      <li>
+        <a href="gasolina/">
+          <h2>¿Dónde echo gasolina?</h2>
+          <p>Las gasolineras más baratas cerca de ti, con precios del Ministerio actualizados varias veces al día.</p>
+          <span class="dato" id="dato-gasolina">—<small>€/l media gasolina 95</small></span>
+        </a>
+      </li>
+      <li>
+        <div class="pendiente">
+          <h2>¿Cuánto me sube la hipoteca?</h2>
+          <p>Simulador con el Euríbor real del Banco de España y su evolución histórica.</p>
+          <span class="dato">En preparación</span>
+        </div>
+      </li>
+    </ul>
+  </main>
+
+  <footer class="envoltorio pie">
+    <p>Web sin anuncios ni cookies. Código en <a href="https://github.com/serbenda/bolsillo">GitHub</a>.</p>
+  </footer>
+
+  <script type="module">
+    import { cargarLuz, formatoPrecio } from './assets/js/datos-luz.js';
+    import { horaMadrid } from './assets/js/ree.js';
+    const { hoy } = await cargarLuz();
+    const actual = hoy?.find((h) => h.hora === horaMadrid());
+    if (actual) document.getElementById('dato-luz').firstChild.textContent = formatoPrecio(actual.precio);
+
+    try {
+      const r = await fetch('data/gasolina.json', { cache: 'no-cache' });
+      const { medias } = await r.json();
+      if (medias?.g95) document.getElementById('dato-gasolina').firstChild.textContent = formatoPrecio(medias.g95);
+    } catch {}
+  </script>
+</body>
+</html>
