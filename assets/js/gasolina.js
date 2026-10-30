@@ -1,7 +1,8 @@
-import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal } from './carburantes.js';
+import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal, provinciasCercanas, abierta, ahoraEnEspana } from './carburantes.js';
 
 const $ = (id) => document.getElementById(id);
-const FICHERO = new URL('../../data/gasolina.json', import.meta.url);
+const DATOS = new URL('../../data/', import.meta.url);
+const RADIO_MAXIMO = 25; // se cargan las provincias para el radio mayor y así cambiarlo es instantáneo
 const MAXIMO_LISTA = 25;
 const HORAS_ANTIGUEDAD = 14; // el Ministerio publica varias veces al día
 
@@ -13,8 +14,35 @@ const escapar = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<'
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.${k}`); } catch { return null; } };
 
+let indice = null; // fecha, medias y caja de cada provincia
+const cargadas = new Map(); // provincia → estaciones
 let estaciones = [];
 let centro = null; // { lat, lon, etiqueta }
+
+async function json(ruta) {
+  const r = await fetch(new URL(ruta, DATOS), { cache: 'no-cache' });
+  if (!r.ok) throw new Error(`${ruta}: ${r.status}`);
+  return r.json();
+}
+
+async function cargarProvincias(ids) {
+  await Promise.all(
+    ids.filter((id) => !cargadas.has(id)).map(async (id) => {
+      try {
+        cargadas.set(id, expandir(await json(`gasolina/${id}.json`)));
+      } catch {
+        cargadas.set(id, []);
+      }
+    })
+  );
+  estaciones = [...new Set(ids)].flatMap((id) => cargadas.get(id) ?? []);
+}
+
+async function fijarCentro(nuevo) {
+  centro = nuevo;
+  await cargarProvincias(provinciasCercanas(indice, centro, RADIO_MAXIMO));
+  pintar();
+}
 let mapa = null;
 let capa = null;
 
@@ -39,6 +67,10 @@ function prepararFiltros() {
   if (opcion) opcion.checked = true;
   const cp = leer('cp');
   if (cp) $('cp').value = cp;
+
+  const soloAbiertas = $('abiertas');
+  soloAbiertas.checked = leer('abiertas') !== 'no';
+  soloAbiertas.addEventListener('change', () => { guardar('abiertas', soloAbiertas.checked ? 'si' : 'no'); pintar(); });
 
   select.addEventListener('change', () => { guardar('combustible', combustible()); pintar(); });
   document.querySelectorAll('input[name=radio]').forEach((i) =>
@@ -86,12 +118,18 @@ function pintar() {
   if (!centro || !estaciones.length) return;
   const c = combustible();
   const r = radio();
-  const todas = cercanas(estaciones, centro, r, c);
+  const momento = ahoraEnEspana();
+  const conEstado = estaciones.map((e) => ({ ...e, abierta: abierta(e.horario, momento) }));
+  const filtradas = $('abiertas').checked ? conEstado.filter((e) => e.abierta !== false) : conEstado;
+  const todas = cercanas(filtradas, centro, r, c);
   const nombre = COMBUSTIBLES[c].nombre;
 
   if (!todas.length) {
-    $('titular').textContent = `No hay gasolineras con ${nombre.toLowerCase()} a menos de ${r} km.`;
-    $('entradilla').textContent = 'Prueba a ampliar la distancia o a elegir otro combustible.';
+    const abiertas = $('abiertas').checked ? ' abiertas ahora' : '';
+    $('titular').textContent = `No hay gasolineras${abiertas} con ${nombre.toLowerCase()} a menos de ${r} km.`;
+    $('entradilla').textContent = abiertas
+      ? 'Prueba a ampliar la distancia, a elegir otro combustible o a ver también las cerradas.'
+      : 'Prueba a ampliar la distancia o a elegir otro combustible.';
     $('resumen').hidden = true;
     $('resultados').hidden = true;
     return;
@@ -124,7 +162,7 @@ function pintar() {
           <div>
             <h3>${escapar(e.rotulo || 'Gasolinera sin marca')}</h3>
             <p>${escapar(e.direccion)}, ${escapar(e.municipio)}</p>
-            <p class="meta"><span>A ${km(e.km)}</span><span>${escapar(e.horario)}</span></p>
+            <p class="meta"><span>A ${km(e.km)}</span><span class="estado ${e.abierta === true ? 'abierta' : e.abierta === false ? 'cerrada' : ''}">${e.abierta === true ? 'Abierta' : e.abierta === false ? 'Cerrada' : 'Horario'}</span><span>${escapar(e.horario)}</span></p>
           </div>
           <a class="llegar" href="${destino}" target="_blank" rel="noopener">Cómo llegar</a>
         </li>`;
@@ -143,30 +181,38 @@ function usarUbicacion() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       avisar('');
-      centro = { lat: pos.coords.latitude, lon: pos.coords.longitude, etiqueta: 'de ti' };
-      pintar();
+      fijarCentro({ lat: pos.coords.latitude, lon: pos.coords.longitude, etiqueta: 'de ti' });
     },
     () => avisar('No hemos podido obtener tu ubicación. Busca por código postal.'),
     { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
   );
 }
 
-function buscarCodigoPostal(ev) {
+async function buscarCodigoPostal(ev) {
   ev.preventDefault();
   const cp = $('cp').value.trim();
   if (!/^\d{5}$/.test(cp)) {
     avisar('Escribe un código postal de 5 cifras, por ejemplo 28100.');
     return;
   }
-  const c = centroCodigoPostal(estaciones, cp);
-  if (!c) {
-    avisar(`No hay gasolineras registradas en el ${cp}. Prueba con el código postal de un municipio cercano o usa tu ubicación.`);
+  const prov = cp.slice(0, 2);
+  let lugar = null;
+  try {
+    const cps = await json(`cp/${prov}.json`);
+    if (cps[cp]) lugar = { lat: cps[cp][0], lon: cps[cp][1], municipio: cps[cp][2] };
+  } catch {}
+  if (!lugar) {
+    // Sin listado de códigos postales: usamos las gasolineras de ese código como referencia.
+    await cargarProvincias([prov]);
+    lugar = centroCodigoPostal(estaciones, cp);
+  }
+  if (!lugar) {
+    avisar(`No encontramos el ${cp}. Comprueba que está bien escrito o usa tu ubicación.`);
     return;
   }
   avisar('');
   guardar('cp', cp);
-  centro = { lat: c.lat, lon: c.lon, etiqueta: `del ${cp} (${c.municipio})` };
-  pintar();
+  fijarCentro({ lat: lugar.lat, lon: lugar.lon, etiqueta: `del ${cp} (${lugar.municipio})` });
 }
 
 async function iniciar() {
@@ -175,12 +221,9 @@ async function iniciar() {
   $('buscador').addEventListener('submit', buscarCodigoPostal);
 
   try {
-    const r = await fetch(FICHERO, { cache: 'no-cache' });
-    if (!r.ok) throw new Error(r.status);
-    const datos = await r.json();
-    estaciones = expandir(datos);
-    if (datos.fecha) {
-      const fecha = new Date(datos.fecha);
+    indice = await json('gasolina/indice.json');
+    if (indice.fecha) {
+      const fecha = new Date(indice.fecha);
       const f = new Intl.DateTimeFormat('es-ES', { dateStyle: 'long', timeStyle: 'short' });
       $('actualizado').textContent = `Precios del ${f.format(fecha)}.`;
       const horas = (Date.now() - fecha.getTime()) / 3600000;

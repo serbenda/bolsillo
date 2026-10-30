@@ -1,12 +1,15 @@
-// Descarga los precios de todas las gasolineras y guarda data/gasolina.json compacto.
-// Lo ejecuta la GitHub Action antes de publicar la web.
-// Si el Ministerio falla, no rompe el despliegue: la sección mostrará un aviso.
+// Descarga los precios de todas las gasolineras y los guarda:
+//   data/gasolina.json             fichero completo compacto (sirve de copia para la siguiente publicación)
+//   data/gasolina/indice.json      fecha, medias y caja de cada provincia
+//   data/gasolina/<provincia>.json gasolineras de cada provincia (lo que descarga la web)
+// Si el Ministerio falla, se reparten los datos de la publicación anterior y se avisa.
 
-import { writeFile, mkdir, readFile } from 'node:fs/promises';
-import { URL_MINISTERIO, compactar } from '../assets/js/carburantes.js';
+import { writeFile, mkdir, readFile, rm } from 'node:fs/promises';
+import { URL_MINISTERIO, compactar, porProvincias } from '../assets/js/carburantes.js';
 import { anotar } from './estado.mjs';
 
-const salida = new URL('../data/gasolina.json', import.meta.url);
+const completo = new URL('../data/gasolina.json', import.meta.url);
+const carpeta = new URL('../data/gasolina/', import.meta.url);
 
 async function descargar() {
   // Permite pasar un fichero ya descargado: node scripts/fetch-gasolina.mjs fichero.json
@@ -24,16 +27,34 @@ async function descargar() {
   return null;
 }
 
+let datos = null;
 const json = await descargar();
-if (!json) {
-  console.warn('Sin datos de carburantes: se publica la web sin data/gasolina.json');
+if (json) {
+  datos = compactar(json);
+  const ok = datos.estaciones.length >= Number(process.env.GASOLINERAS_MINIMO ?? 5000);
+  await anotar('gasolina', ok, `${datos.estaciones.length} gasolineras, precios del ${datos.fecha}`);
+  if (!ok) datos = null;
+} else {
   await anotar('gasolina', false, 'No se pudo descargar del Ministerio');
-  process.exit(0);
 }
 
-const datos = compactar(json);
-await mkdir(new URL('../data/', import.meta.url), { recursive: true });
-await writeFile(salida, JSON.stringify(datos));
-console.log(`${datos.estaciones.length} gasolineras (${datos.fecha}). Medias:`, datos.medias);
-const ok = datos.estaciones.length > 5000;
-await anotar('gasolina', ok, `${datos.estaciones.length} gasolineras, precios del ${datos.fecha}`);
+if (!datos) {
+  try {
+    datos = JSON.parse(await readFile(completo, 'utf8'));
+    if (!datos.columnas?.includes('prov')) throw new Error('formato antiguo');
+    console.warn(`Se usan los datos anteriores (${datos.fecha})`);
+  } catch (e) {
+    console.warn(`Sin datos de carburantes que publicar: ${e.message}`);
+    process.exit(0);
+  }
+}
+
+const { indice, provincias } = porProvincias(datos);
+await rm(carpeta, { recursive: true, force: true });
+await mkdir(carpeta, { recursive: true });
+await writeFile(completo, JSON.stringify(datos));
+await writeFile(new URL('indice.json', carpeta), JSON.stringify(indice));
+for (const [id, p] of Object.entries(provincias)) {
+  await writeFile(new URL(`${id}.json`, carpeta), JSON.stringify(p));
+}
+console.log(`${datos.estaciones.length} gasolineras en ${Object.keys(provincias).length} provincias (${datos.fecha}). Medias:`, datos.medias);

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal } from '../assets/js/carburantes.js';
+import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal, porProvincias, provinciasCercanas, abierta, codigosPostales } from '../assets/js/carburantes.js';
 
 const estacion = (extra) => ({
   'C.P.': '28100',
@@ -13,6 +13,7 @@ const estacion = (extra) => ({
   'Rótulo': 'GASOLINERA UNO',
   'Tipo Venta': 'P',
   'IDEESS': '1',
+  'IDProvincia': '28',
   'Precio Gasolina 95 E5': '1,459',
   'Precio Gasolina 98 E5': '',
   'Precio Gasoleo A': '1,399',
@@ -30,7 +31,7 @@ const respuesta = {
     estacion({ IDEESS: '3', 'Tipo Venta': 'R' }), // venta restringida: fuera
     estacion({ IDEESS: '4', 'Latitud': '' }), // sin coordenadas: fuera
     estacion({ IDEESS: '5', 'Precio Gasolina 95 E5': '', 'Precio Gasoleo A': '' }), // sin precios: fuera
-    estacion({ IDEESS: '6', 'Rótulo': 'Nº 10.935', 'Latitud': '30,0' }), // sin marca, lejos
+    estacion({ IDEESS: '6', 'Rótulo': 'Nº 10.935', 'Latitud': '30,0', 'IDProvincia': '35' }), // sin marca, lejos
   ],
 };
 
@@ -75,4 +76,44 @@ test('centro de un código postal', () => {
   const c = centroCodigoPostal(lista, '28100');
   assert.equal(c.municipio, 'Alcobendas');
   assert.equal(centroCodigoPostal(lista, '99999'), null);
+});
+
+test('reparte por provincias con su caja', () => {
+  const { indice, provincias } = porProvincias(compactar(respuesta));
+  assert.deepEqual(Object.keys(provincias).sort(), ['28', '35']);
+  assert.equal(provincias['28'].estaciones.length, 2);
+  assert.equal(indice.provincias['28'].n, 2);
+  assert.deepEqual(indice.provincias['28'].caja, [40.5, -3.64086, 40.53758, -3.64086]);
+  assert.ok(indice.medias.g95 > 1.4);
+  // Desde Alcobendas, a 25 km solo hace falta Madrid
+  assert.deepEqual(provinciasCercanas(indice, { lat: 40.54, lon: -3.64 }, 25), ['28']);
+});
+
+test('horarios: abierta o cerrada', () => {
+  const lunes10 = { dia: 0, min: 600 };
+  const sabado15 = { dia: 5, min: 900 };
+  const domingo3 = { dia: 6, min: 180 };
+  assert.equal(abierta('L-D: 24H', domingo3), true);
+  assert.equal(abierta('L-V: 07:00-22:00; S-D: 08:00-14:00', lunes10), true);
+  assert.equal(abierta('L-V: 07:00-22:00; S-D: 08:00-14:00', sabado15), false);
+  assert.equal(abierta('L-S: 07:00-14:00 y 16:00-21:00', { dia: 2, min: 15 * 60 }), false);
+  assert.equal(abierta('L-S: 07:00-14:00 y 16:00-21:00', { dia: 2, min: 17 * 60 }), true);
+  assert.equal(abierta('L-D: 22:00-06:00', domingo3), true); // pasa de medianoche
+  assert.equal(abierta('V-L: 08:00-20:00', lunes10), true); // rango de días que da la vuelta
+  assert.equal(abierta('L-V: 07:00-22:00', domingo3), false);
+  assert.equal(abierta('Consultar en la estación', lunes10), null);
+  assert.equal(abierta('', lunes10), null);
+});
+
+test('códigos postales de GeoNames', () => {
+  const tsv = [
+    ['ES', '28100', 'Alcobendas', 'Comunidad de Madrid', 'MD', 'Madrid', 'M', '', '', '40.5475', '-3.6420', '4'],
+    ['ES', '28100', 'Alcobendas centro', 'Comunidad de Madrid', 'MD', 'Madrid', 'M', '', '', '40.5375', '-3.6320', '4'],
+    ['ES', '35001', 'Las Palmas', 'Canarias', 'CN', 'Las Palmas', 'GC', '', '', '28.1', '-15.4', '4'],
+    ['FR', '75001', 'Paris', '', '', '', '', '', '', '48.8', '2.3', '4'],
+  ].map((c) => c.join('\t')).join('\n');
+  assert.deepEqual(codigosPostales(tsv), {
+    28: { 28100: [40.5425, -3.637, 'Alcobendas'] },
+    35: { 35001: [28.1, -15.4, 'Las Palmas'] },
+  });
 });

@@ -1,0 +1,22 @@
+{
+  "name": "bolsillo: luz, gasolina e hipoteca",
+  "short_name": "bolsillo",
+  "description": "Precio de la luz hora a hora, gasolineras más baratas y simulador de hipoteca con datos oficiales de España.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef1ee",
+  "theme_color": "#172033",
+  "icons": [
+    { "src": "assets/img/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/img/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/img/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Precio de la luz", "url": "luz/" },
+    { "name": "Gasolineras", "url": "gasolina/" },
+    { "name": "Hipoteca", "url": "hipoteca/" }
+  ]
+}

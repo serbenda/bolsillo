@@ -5,14 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gasolineras más baratas cerca de ti · bolsillo</title>
   <meta name="description" content="Las gasolineras más baratas cerca de ti, con los precios oficiales del Ministerio para la Transición Ecológica.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://bendi.dev/bolsillo/gasolina/">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <meta name="theme-color" content="#eef1ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#10161f" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="bolsillo">
+  <meta property="og:title" content="Gasolineras más baratas y abiertas cerca de ti">
+  <meta property="og:description" content="Las gasolineras más baratas cerca de ti, con los precios oficiales del Ministerio para la Transición Ecológica.">
+  <meta property="og:url" content="https://bendi.dev/bolsillo/gasolina/">
+  <meta property="og:image" content="https://bendi.dev/bolsillo/assets/img/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
   <link rel="stylesheet" href="../vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/css/estilos.css">
 </head>
 <body>
   <header class="envoltorio cabecera">
-    <a class="marca" href="../">bolsillo</a>
+    <a class="marca" href="../" aria-label="bolsillo, inicio">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="15" y="15" width="9" height="20" rx="2.5" class="b1"/>
+        <rect x="27.5" y="9" width="9" height="26" rx="2.5" class="b2"/>
+        <rect x="40" y="3" width="9" height="32" rx="2.5" class="b3"/>
+        <path d="M9 24.5c0-1.4 1.1-2.5 2.5-2.5h41c1.4 0 2.5 1.1 2.5 2.5V43c0 1-.6 1.9-1.5 2.3L33.1 54.6a2.6 2.6 0 0 1-2.2 0L10.5 45.3A2.5 2.5 0 0 1 9 43z" class="bolsillo"/>
+        <path d="M13.5 27h37v14.6L32 50.2 13.5 41.6z" class="costura"/>
+      </svg>
+      <span>bolsillo</span>
+    </a>
     <nav class="nav" aria-label="Secciones">
       <a href="../luz/">Luz</a>
       <a href="./" aria-current="page">Gasolina</a>
@@ -47,6 +71,10 @@
           <label><input type="radio" name="radio" value="10"> 10 km</label>
           <label><input type="radio" name="radio" value="25"> 25 km</label>
         </fieldset>
+        <label class="interruptor">
+          <input type="checkbox" id="abiertas" checked>
+          <span>Solo abiertas ahora</span>
+        </label>
       </div>
 
       <p id="antiguedad" class="aviso" hidden></p>
@@ -62,11 +90,13 @@
 
   <footer class="envoltorio pie">
     <p>Precios oficiales del Ministerio para la Transición Ecológica, solo gasolineras de venta al público. Comprueba el precio en el surtidor: puede haber cambiado desde la última actualización.</p>
-    <p>El mapa se descarga de OpenStreetMap solo cuando haces una búsqueda.</p>
+    <p>El mapa se descarga de OpenStreetMap solo cuando haces una búsqueda. Los códigos postales son de <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0). «Abierta» sale del horario que declara cada gasolinera al Ministerio.</p>
     <p id="actualizado"></p>
+    <p><a href="../fuentes/">Fuentes y condiciones</a></p>
   </footer>
 
   <script src="../vendor/leaflet/leaflet.js"></script>
   <script type="module" src="../assets/js/gasolina.js"></script>
+  <script type="module" src="../assets/js/comun.js"></script>
 </body>
 </html>
