@@ -39,11 +39,11 @@
         </a>
       </li>
       <li>
-        <div class="pendiente">
+        <a href="hipoteca/">
           <h2>¿Cuánto me sube la hipoteca?</h2>
           <p>Simulador con el Euríbor real del Banco de España y su evolución histórica.</p>
-          <span class="dato">En preparación</span>
-        </div>
+          <span class="dato" id="dato-euribor">—<small>Euríbor a un año</small></span>
+        </a>
       </li>
     </ul>
   </main>
@@ -63,6 +63,14 @@
       const r = await fetch('data/gasolina.json', { cache: 'no-cache' });
       const { medias } = await r.json();
       if (medias?.g95) document.getElementById('dato-gasolina').firstChild.textContent = formatoPrecio(medias.g95);
+    } catch {}
+
+    try {
+      const r = await fetch('data/euribor.json', { cache: 'no-cache' });
+      const { serie } = await r.json();
+      const u = serie?.at(-1);
+      if (u) document.getElementById('dato-euribor').firstChild.textContent =
+        new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3 }).format(u.valor) + ' %';
     } catch {}
   </script>
 </body>

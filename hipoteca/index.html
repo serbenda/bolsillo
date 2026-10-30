@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hipoteca · bolsillo</title>
+  <title>¿Cuánto me sube la hipoteca? · bolsillo</title>
+  <meta name="description" content="Calcula cuánto cambia tu cuota en la próxima revisión con el Euríbor a un año publicado por el Banco de España.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
   <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
   <link rel="stylesheet" href="../assets/css/estilos.css">
@@ -14,12 +15,65 @@
     <nav class="nav" aria-label="Secciones">
       <a href="../luz/">Luz</a>
       <a href="../gasolina/">Gasolina</a>
-      <a href="../hipoteca/" aria-current="page">Hipoteca</a>
+      <a href="./" aria-current="page">Hipoteca</a>
     </nav>
   </header>
+
   <main class="envoltorio">
-    <h1 class="titular">¿Cuánto me sube la hipoteca?</h1>
-    <p class="entradilla">Estamos preparando el simulador de hipoteca con el Euríbor del Banco de España. Mientras tanto, mira <a href="../luz/">cuándo sale más barata la luz</a>.</p>
+    <section aria-labelledby="titular">
+      <h1 class="titular" id="titular">¿Cuánto me sube la hipoteca?</h1>
+      <p class="entradilla" id="entradilla">Pon los datos de tu hipoteca variable y te decimos cuánto cambia la cuota con el último Euríbor publicado.</p>
+      <div class="ahora" id="resumen" hidden></div>
+      <p id="mensaje" class="aviso" role="status" hidden></p>
+    </section>
+
+    <section aria-labelledby="t-datos">
+      <form class="planificador formulario" id="formulario" novalidate>
+        <h2 id="t-datos">Tu hipoteca</h2>
+        <div class="campos">
+          <label class="campo">
+            <span>Capital pendiente</span>
+            <span class="con-unidad"><input id="capital" inputmode="numeric" autocomplete="off" value="150.000"><b>€</b></span>
+          </label>
+          <label class="campo">
+            <span>Años que quedan</span>
+            <span class="con-unidad"><input id="anos" inputmode="numeric" autocomplete="off" value="25"><b>años</b></span>
+          </label>
+          <label class="campo">
+            <span>Diferencial</span>
+            <span class="con-unidad"><input id="diferencial" inputmode="decimal" autocomplete="off" value="0,75"><b>%</b></span>
+          </label>
+          <label class="campo">
+            <span>Euríbor de tu última revisión</span>
+            <select id="revision"></select>
+          </label>
+        </div>
+        <p class="nota">Si no sabes el mes, mira el último recibo o la carta de revisión del banco: suele indicar el Euríbor aplicado.</p>
+      </form>
+    </section>
+
+    <section aria-labelledby="t-escenarios" id="bloque-escenarios" hidden>
+      <h2 id="t-escenarios">Si el Euríbor cambia</h2>
+      <table class="escenarios">
+        <thead><tr><th scope="col">Euríbor</th><th scope="col">Cuota al mes</th><th scope="col">Frente a ahora</th></tr></thead>
+        <tbody id="escenarios"></tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="t-historia" id="bloque-historia" hidden>
+      <h2 id="t-historia">El Euríbor desde 1999</h2>
+      <figure class="historia">
+        <svg id="historia" role="img"></svg>
+        <figcaption class="nota" id="pie-historia"></figcaption>
+      </figure>
+    </section>
   </main>
+
+  <footer class="envoltorio pie">
+    <p>Euríbor a un año publicado por el Banco de España (serie D_1NBAF472). Cálculo orientativo con el sistema francés de amortización. Tu banco aplicará el índice que fije tu escritura, normalmente el publicado uno o dos meses antes de la revisión.</p>
+    <p id="actualizado"></p>
+  </footer>
+
+  <script type="module" src="../assets/js/hipoteca.js"></script>
 </body>
 </html>
