@@ -50,3 +50,19 @@ test('euríbor de un mes', () => {
   assert.equal(euriborDe(serie, '2026-08'), 2.954);
   assert.equal(euriborDe(serie, '2026-07'), null);
 });
+
+import { amortizar } from '../assets/js/euribor.js';
+
+test('amortización anticipada: reducir plazo ahorra más intereses que reducir cuota', () => {
+  const r = amortizar(150000, 300, 4, 10000);
+  assert.equal(r.base.meses, 300);
+  assert.ok(r.reducirCuota.cuota < r.base.cuota);
+  assert.ok(Math.abs(r.base.cuota - r.reducirCuota.cuota - 52.78) < 0.1); // 10.000 € menos a 25 años al 4 %
+  assert.equal(r.reducirPlazo.mesesMenos, 32); // 2 años y 8 meses antes
+  assert.ok(r.reducirPlazo.ahorro > r.reducirCuota.ahorro);
+  assert.ok(r.reducirCuota.ahorro > 5000 && r.reducirCuota.ahorro < 6500, r.reducirCuota.ahorro);
+});
+
+test('amortizar todo liquida la hipoteca', () => {
+  assert.equal(amortizar(10000, 60, 3, 20000).liquida, true);
+});

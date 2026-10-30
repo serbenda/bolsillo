@@ -123,6 +123,7 @@ section + section { margin-top: 3.5rem; }
 .icono.luz { background: var(--llano); fill: #1a1405; }
 .icono.gasolina { background: var(--punta); }
 .icono.hipoteca { background: var(--valle); }
+.icono.ipc { background: var(--tinta); fill: var(--papel); }
 .secciones h2 { grid-column: 2; }
 .secciones a:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
 .secciones p { grid-column: 2; margin: 0; color: var(--tenue); max-width: 60ch; }
@@ -456,3 +457,50 @@ table.costes { width: min(100%, 640px); }
 .texto section + section { margin-top: 2.25rem; }
 .texto h2 { margin-bottom: 0.5rem; }
 .texto p { margin: 0.6rem 0 0; }
+
+/* Luz: por qué está cara o barata */
+.subtitulo { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0; }
+.mezcla { display: flex; height: 2.25rem; border-radius: var(--radio); overflow: hidden; margin-top: 1.25rem; gap: 2px; }
+.mezcla .seg { display: block; flex-grow: 0; flex-shrink: 0; }
+.seg.solar { background: #e2b33a; }
+.seg.eolica { background: #2f9e8f; }
+.seg.hidraulica { background: #3d74c4; }
+.seg.otrasRenovables { background: #8bbf5b; }
+.seg.nuclear { background: #8c6bbf; }
+.seg.gas { background: #c45c3c; }
+.seg.otras { background: #8a8f98; }
+.mezcla-leyenda { list-style: none; padding: 0; margin: 0.75rem 0 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; color: var(--tenue); font-size: 0.92rem; }
+.mezcla-leyenda strong { color: var(--tinta); }
+.mezcla-leyenda i { display: inline-block; width: 0.8em; height: 0.8em; border-radius: 2px; margin-right: 0.4em; vertical-align: -0.05em; }
+.efecto { margin-top: 1.75rem; }
+.efecto-titulo { margin: 0; color: var(--tenue); }
+.efecto-pareja { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; margin-top: 0.75rem; }
+.efecto-dato { background: var(--superficie); border: 1px solid var(--linea); border-left: 6px solid var(--c); border-radius: var(--radio); padding: 1rem 1.25rem; color: var(--tenue); }
+.efecto-dato.verde { --c: var(--valle); }
+.efecto-dato.rojo { --c: var(--punta); }
+.efecto-precio { display: block; font-stretch: 112%; font-weight: 800; font-size: 1.75rem; color: var(--tinta); line-height: 1.15; }
+.grafico.dias { height: clamp(150px, 26vw, 220px); }
+.grafico.dias .barra span { white-space: nowrap; }
+.grafico.dias .barra:not(:nth-child(3n + 1)) span,
+.grafico.dias .barra span { visibility: visible; }
+
+/* Gasolina: tendencia */
+.tendencia { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio); padding: clamp(1.25rem, 3vw, 2rem); }
+.tendencia .resultado { margin-top: 0.75rem; max-width: 46ch; }
+.tendencia .resultado + p { margin: 0.5rem 0 0; color: var(--tenue); }
+.chispa { width: 100%; height: 90px; margin-top: 1rem; display: block; }
+.chispa .linea { fill: none; stroke: var(--tinta); stroke-width: 2; stroke-linejoin: round; }
+.chispa .punto { fill: var(--punta); stroke: var(--superficie); stroke-width: 2; }
+
+/* Hipoteca: amortización anticipada */
+.campo-amortizar { max-width: 16rem; margin-top: 1rem; }
+.opciones-amortizar { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.opcion { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio); padding: 1.25rem; }
+.opcion.recomendada { border: 2px solid var(--valle); }
+.opcion h3 { font-size: 1rem; color: var(--tenue); font-weight: 600; }
+.opcion-dato { font-stretch: 112%; font-weight: 800; font-size: 1.6rem; margin: 0.35rem 0 0; line-height: 1.15; }
+.opcion p:last-child { color: var(--tenue); margin: 0.5rem 0 0; }
+.historia .tramo { fill: var(--llano); opacity: 0.14; }
+.cabecera { flex-wrap: wrap; row-gap: 0.75rem; }
+@media (max-width: 480px) { .nav { gap: 0.9rem; font-size: 0.9rem; } }
+.formulario .resultado { margin-top: 1.25rem; }

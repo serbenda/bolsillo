@@ -53,3 +53,39 @@ export function interesesPrimerAno(capital, meses, tipo) {
 export function euriborDe(serie, mes) {
   return serie.find((p) => p.mes === mes)?.valor ?? null;
 }
+
+/** Simula el préstamo con una cuota fija hasta liquidarlo: { meses, intereses }. */
+function liquidar(capital, cuota, tipo, maximo = 1200) {
+  const i = Math.max(tipo, 0) / 100 / 12;
+  let pendiente = capital;
+  let intereses = 0;
+  let meses = 0;
+  while (pendiente > 0.005 && meses < maximo) {
+    const int = pendiente * i;
+    intereses += int;
+    pendiente -= Math.min(cuota - int, pendiente);
+    meses++;
+  }
+  return { meses, intereses };
+}
+
+/**
+ * Amortización anticipada de `extra` euros con el tipo actual constante.
+ * Compara reducir la cuota (mismo plazo) con reducir el plazo (misma cuota).
+ */
+export function amortizar(capital, meses, tipo, extra) {
+  const cuota = cuotaMensual(capital, meses, tipo);
+  const base = liquidar(capital, cuota, tipo);
+  const resto = Math.max(capital - extra, 0);
+  if (resto === 0) {
+    return { base: { cuota, intereses: base.intereses }, liquida: true };
+  }
+  const cuotaMenor = cuotaMensual(resto, meses, tipo);
+  const conCuota = liquidar(resto, cuotaMenor, tipo);
+  const conPlazo = liquidar(resto, cuota, tipo);
+  return {
+    base: { cuota, intereses: base.intereses, meses: base.meses },
+    reducirCuota: { cuota: cuotaMenor, intereses: conCuota.intereses, ahorro: base.intereses - conCuota.intereses },
+    reducirPlazo: { meses: conPlazo.meses, mesesMenos: base.meses - conPlazo.meses, intereses: conPlazo.intereses, ahorro: base.intereses - conPlazo.intereses },
+  };
+}

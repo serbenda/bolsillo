@@ -1,13 +1,15 @@
 // Service worker de bolsillo: la web funciona sin conexión con los últimos datos descargados.
-// - Páginas y datos (data/*.json): primero la red; si no hay conexión, lo último guardado.
-// - Estilos, scripts, fuentes e imágenes: lo guardado, y se actualiza en segundo plano.
+// - Páginas, estilos, scripts y datos: primero la red (así nunca se mezclan versiones);
+//   si no hay conexión, lo último guardado.
+// - Fuente, mapa e imágenes, que casi nunca cambian: lo guardado, y se actualiza en segundo plano.
 
-const VERSION = 'bolsillo-v1';
+const VERSION = 'bolsillo-v2';
 const BASICOS = [
   './',
   'luz/',
   'gasolina/',
   'hipoteca/',
+  'ipc/',
   'fuentes/',
   'assets/css/estilos.css',
   'assets/js/comun.js',
@@ -20,6 +22,10 @@ const BASICOS = [
   'assets/js/gasolina.js',
   'assets/js/euribor.js',
   'assets/js/hipoteca.js',
+  'assets/js/generacion.js',
+  'assets/js/luz-generacion.js',
+  'assets/js/ipc.js',
+  'assets/js/ipc-pagina.js',
   'assets/img/favicon.svg',
   'manifest.webmanifest',
 ];
@@ -62,7 +68,6 @@ async function primeroCache(req, evento) {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return; // mapas y visitas: siempre a la red
-  const datos = url.pathname.includes('/data/');
-  const pagina = e.request.mode === 'navigate';
-  e.respondWith(datos || pagina ? primeroRed(e.request) : primeroCache(e.request, e));
+  const estable = url.pathname.includes('/vendor/') || url.pathname.includes('/assets/img/');
+  e.respondWith(estable ? primeroCache(e.request, e) : primeroRed(e.request));
 });

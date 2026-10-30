@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal, porProvincias, provinciasCercanas, abierta, codigosPostales } from '../assets/js/carburantes.js';
+import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal, porProvincias, provinciasCercanas, abierta, codigosPostales, actualizarHistorico, tendencia } from '../assets/js/carburantes.js';
 
 const estacion = (extra) => ({
   'C.P.': '28100',
@@ -116,4 +116,28 @@ test('códigos postales de GeoNames', () => {
     28: { 28100: [40.5425, -3.637, 'Alcobendas'] },
     35: { 35001: [28.1, -15.4, 'Las Palmas'] },
   });
+});
+
+test('histórico: añade el día, sustituye si se repite y recorta', () => {
+  const { indice } = porProvincias(compactar(respuesta));
+  assert.equal(indice.provincias['28'].medias.g95, 1.434);
+  let h = actualizarHistorico(null, indice);
+  assert.equal(h.nacional.length, 1);
+  assert.equal(h.nacional[0].f, '2026-10-30');
+  assert.equal(h.provincias['28'][0].g95, 1.434);
+  h = actualizarHistorico(h, indice); // misma fecha: no se duplica
+  assert.equal(h.nacional.length, 1);
+  const viejo = { nacional: Array.from({ length: 5 }, (_, i) => ({ f: `2026-10-2${i}`, g95: 1.5 })), provincias: {} };
+  assert.equal(actualizarHistorico(viejo, indice, 3).nacional.length, 3);
+});
+
+test('tendencia frente a la semana anterior', () => {
+  const serie = Array.from({ length: 9 }, (_, i) => ({ f: `2026-10-${String(22 + i).padStart(2, '0')}`, g95: i === 8 ? 1.5 : 1.55 }));
+  const t = tendencia(serie, 'g95');
+  assert.equal(t.hoy, 1.5);
+  assert.ok(Math.abs(t.media7 - 1.55) < 1e-9);
+  assert.ok(t.diferencia < 0);
+  assert.equal(t.hace7, 1.55);
+  assert.equal(tendencia(serie.slice(0, 1), 'g95'), null);
+  assert.equal(tendencia(serie, 'g98'), null);
 });

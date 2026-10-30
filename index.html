@@ -40,6 +40,7 @@
       <a href="luz/">Luz</a>
       <a href="gasolina/">Gasolina</a>
       <a href="hipoteca/">Hipoteca</a>
+      <a href="ipc/">Inflación</a>
     </nav>
   </header>
 
@@ -47,7 +48,7 @@
     <section class="portada" aria-labelledby="titular">
       <div class="portada-texto">
         <h1 class="titular" id="titular">Lo que cuesta el día a día, con datos oficiales.</h1>
-        <p class="entradilla">Precios públicos de Red Eléctrica, el Ministerio y el Banco de España, puestos para responder a preguntas de casa.</p>
+        <p class="entradilla">Precios públicos de Red Eléctrica, el Ministerio, el Banco de España y el INE, puestos para responder a preguntas de casa.</p>
       </div>
 
       <figure class="recibo" aria-labelledby="recibo-titulo">
@@ -61,6 +62,7 @@
           <div><dt>Gasolina 95, media</dt><dd id="r-g95">—</dd></div>
           <div><dt>Diésel, media</dt><dd id="r-diesel">—</dd></div>
           <div><dt>Euríbor a un año</dt><dd id="r-euribor">—</dd></div>
+          <div><dt>Inflación, último año</dt><dd id="r-ipc">—</dd></div>
         </dl>
         <p class="recibo-pie">Datos oficiales, actualizados cada día</p>
       </figure>
@@ -86,6 +88,13 @@
           <svg class="icono hipoteca" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 2 15h4v13h8v-8h4v8h8V15h4z"/></svg>
           <h2>¿Cuánto me sube la hipoteca?</h2>
           <p>Cuánto cambia tu cuota con el último Euríbor del Banco de España, con escenarios y su historia desde 1999.</p>
+        </a>
+      </li>
+      <li>
+        <a href="ipc/">
+          <svg class="icono ipc" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26h24v2H4zM6 20l6-6 5 4 9-10 1.5 1.4L17.2 20.6l-5-4L7.4 21.4z"/></svg>
+          <h2>¿Cuánto ha subido la vida?</h2>
+          <p>Cuánto valen hoy tus euros de otra fecha con el IPC oficial del INE, y la inflación mes a mes desde 2003.</p>
         </a>
       </li>
     </ul>
@@ -119,11 +128,17 @@
       if (medias?.diesel) $('r-diesel').textContent = `${num(medias.diesel, 3)} €/l`;
     }).catch(() => {});
 
+    fetch('data/ipc.json', { cache: 'no-cache' }).then((r) => r.json()).then(async ({ serie }) => {
+      const { interanual } = await import('./assets/js/ipc.js');
+      const t = interanual(serie).at(-1);
+      if (t) $('r-ipc').textContent = `${num(t.tasa * 100, 1)}\u00a0%`;
+    }).catch(() => {});
+
     fetch('data/euribor.json', { cache: 'no-cache' }).then((r) => r.json()).then(({ serie }) => {
       const u = serie?.at(-1);
       if (!u) return;
       const mes = new Intl.DateTimeFormat('es-ES', { month: 'short', timeZone: 'UTC' }).format(new Date(`${u.mes}-01T00:00:00Z`)).replace('.', '');
-      $('r-euribor').textContent = `${num(u.valor, 3)} % (${mes})`;
+      $('r-euribor').textContent = `${num(u.valor, 3)}\u00a0% (${mes})`;
     }).catch(() => {});
   </script>
   <script type="module" src="assets/js/comun.js"></script>

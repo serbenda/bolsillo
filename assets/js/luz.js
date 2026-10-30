@@ -7,7 +7,7 @@ const $ = (id) => document.getElementById(id);
 const ETIQUETA = { barata: 'más barata', media: 'intermedia', cara: 'más cara' };
 const euros = (n) =>
   new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-const porcentaje = (n) => `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(n * 100)} %`;
+const porcentaje = (n) => `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(n * 100)}\u00a0%`;
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.luz.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.luz.${k}`); } catch { return null; } };
