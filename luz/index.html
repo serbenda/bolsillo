@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Precio de la luz hoy · bolsillo</title>
+  <meta name="description" content="Precio de la luz PVPC hora a hora, hoy y mañana, y la mejor hora para poner la lavadora, el lavavajillas o cargar el coche.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap">
+  <link rel="stylesheet" href="../assets/css/estilos.css">
+</head>
+<body>
+  <header class="envoltorio cabecera">
+    <a class="marca" href="../">bolsillo</a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="./" aria-current="page">Luz</a>
+      <a href="../gasolina/">Gasolina</a>
+      <a href="../hipoteca/">Hipoteca</a>
+    </nav>
+  </header>
+
+  <main class="envoltorio">
+    <section aria-labelledby="titular">
+      <h1 class="titular" id="titular">Cargando el precio de la luz…</h1>
+      <div class="ahora" id="ahora" hidden></div>
+      <div id="error" class="aviso" hidden>
+        No hemos podido cargar el precio de Red Eléctrica. Vuelve a intentarlo en unos minutos.
+      </div>
+    </section>
+
+    <section aria-labelledby="t-dia" id="bloque-grafico" hidden>
+      <h2 id="t-dia">Hora a hora</h2>
+      <div class="pestanas" role="group" aria-label="Día">
+        <button type="button" data-dia="hoy" aria-pressed="true">Hoy</button>
+        <button type="button" data-dia="manana" aria-pressed="false">Mañana</button>
+      </div>
+      <p class="nota" id="nota-manana" hidden>El precio de mañana se publica hacia las 20:15.</p>
+      <div class="grafico" id="grafico" role="img"></div>
+      <div class="leyenda" aria-hidden="true">
+        <span><i style="background:var(--valle)"></i>Más barata</span>
+        <span><i style="background:var(--llano)"></i>Intermedia</span>
+        <span><i style="background:var(--punta)"></i>Más cara</span>
+        <span><i style="background:transparent;outline:2px solid var(--tinta)"></i>Ahora</span>
+      </div>
+      <details>
+        <summary>Ver todos los precios</summary>
+        <table>
+          <thead><tr><th scope="col">Hora</th><th scope="col">€/kWh</th></tr></thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </details>
+    </section>
+
+    <section aria-labelledby="t-plan" id="bloque-plan" hidden>
+      <div class="planificador">
+        <h2 id="t-plan">¿Cuándo pongo la lavadora?</h2>
+        <fieldset class="duraciones">
+          <legend>¿Cuánto dura?</legend>
+          <label><input type="radio" name="duracion" value="1"> 1 hora</label>
+          <label><input type="radio" name="duracion" value="2" checked> 2 horas</label>
+          <label><input type="radio" name="duracion" value="3"> 3 horas</label>
+          <label><input type="radio" name="duracion" value="4"> 4 horas</label>
+        </fieldset>
+        <p class="resultado" id="resultado" aria-live="polite"></p>
+        <p id="ahorro"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="envoltorio pie">
+    <p>Precio PVPC de la península (tarifa 2.0TD) publicado por Red Eléctrica, con peajes y cargos y sin impuestos. Si tienes tarifa de mercado libre, tu precio es otro.</p>
+    <p id="actualizado"></p>
+  </footer>
+
+  <script type="module" src="../assets/js/luz.js"></script>
+</body>
+</html>

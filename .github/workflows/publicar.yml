@@ -1,0 +1,51 @@
+name: Actualizar datos y publicar
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Horas en UTC. El PVPC de mañana se publica hacia las 20:15 (hora peninsular).
+    - cron: '7 0,19,20,21 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tests
+        run: npm test
+
+      - name: Descargar precio de la luz (REE)
+        run: npm run datos
+
+      - name: Preparar la web
+        run: |
+          mkdir -p _site
+          cp -r index.html luz gasolina hipoteca assets data .nojekyll _site/
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: despliegue
+        uses: actions/deploy-pages@v4
