@@ -5,13 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Precio de la luz hoy · bolsillo</title>
   <meta name="description" content="Precio de la luz PVPC hora a hora, hoy y mañana, y la mejor hora para poner la lavadora, el lavavajillas o cargar el coche.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='14' width='6' height='15' rx='1' fill='%231d8a5b'/><rect x='13' y='8' width='6' height='21' rx='1' fill='%23c98e0c'/><rect x='23' y='3' width='6' height='26' rx='1' fill='%23b42318'/></svg>">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://bendi.dev/bolsillo/luz/">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <meta name="theme-color" content="#eef1ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#10161f" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="bolsillo">
+  <meta property="og:title" content="Precio de la luz hoy y cuándo poner la lavadora">
+  <meta property="og:description" content="Precio de la luz PVPC hora a hora, hoy y mañana, y la mejor hora para poner la lavadora, el lavavajillas o cargar el coche.">
+  <meta property="og:url" content="https://bendi.dev/bolsillo/luz/">
+  <meta property="og:image" content="https://bendi.dev/bolsillo/assets/img/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
   <link rel="stylesheet" href="../assets/css/estilos.css">
 </head>
 <body>
   <header class="envoltorio cabecera">
-    <a class="marca" href="../">bolsillo</a>
+    <a class="marca" href="../" aria-label="bolsillo, inicio">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="15" y="15" width="9" height="20" rx="2.5" class="b1"/>
+        <rect x="27.5" y="9" width="9" height="26" rx="2.5" class="b2"/>
+        <rect x="40" y="3" width="9" height="32" rx="2.5" class="b3"/>
+        <path d="M9 24.5c0-1.4 1.1-2.5 2.5-2.5h41c1.4 0 2.5 1.1 2.5 2.5V43c0 1-.6 1.9-1.5 2.3L33.1 54.6a2.6 2.6 0 0 1-2.2 0L10.5 45.3A2.5 2.5 0 0 1 9 43z" class="bolsillo"/>
+        <path d="M13.5 27h37v14.6L32 50.2 13.5 41.6z" class="costura"/>
+      </svg>
+      <span>bolsillo</span>
+    </a>
     <nav class="nav" aria-label="Secciones">
       <a href="./" aria-current="page">Luz</a>
       <a href="../gasolina/">Gasolina</a>
@@ -23,6 +47,10 @@
     <section aria-labelledby="titular">
       <h1 class="titular" id="titular">Cargando el precio de la luz…</h1>
       <div class="ahora" id="ahora" hidden></div>
+      <label class="interruptor" id="interruptor" hidden>
+        <input type="checkbox" id="con-impuestos" checked>
+        <span>Precios con impuestos (impuesto eléctrico e IVA)</span>
+      </label>
       <div id="error" class="aviso" hidden>
         No hemos podido cargar el precio de Red Eléctrica. Vuelve a intentarlo en unos minutos.
       </div>
@@ -54,24 +82,32 @@
     <section aria-labelledby="t-plan" id="bloque-plan" hidden>
       <div class="planificador">
         <h2 id="t-plan">¿Cuándo pongo la lavadora?</h2>
-        <fieldset class="duraciones">
-          <legend>¿Cuánto dura?</legend>
-          <label><input type="radio" name="duracion" value="1"> 1 hora</label>
-          <label><input type="radio" name="duracion" value="2" checked> 2 horas</label>
-          <label><input type="radio" name="duracion" value="3"> 3 horas</label>
-          <label><input type="radio" name="duracion" value="4"> 4 horas</label>
+        <fieldset class="duraciones" id="aparatos">
+          <legend>¿Qué vas a poner?</legend>
         </fieldset>
         <p class="resultado" id="resultado" aria-live="polite"></p>
         <p id="ahorro"></p>
       </div>
     </section>
+
+    <section aria-labelledby="t-costes" id="bloque-costes" hidden>
+      <h2 id="t-costes">Lo que cuesta cada aparato</h2>
+      <table class="costes">
+        <thead><tr><th scope="col">Aparato</th><th scope="col">Si lo pones ahora</th><th scope="col">En el mejor momento</th></tr></thead>
+        <tbody id="costes"></tbody>
+      </table>
+      <p class="nota">Consumos típicos de un hogar medio. El tuyo depende del aparato y del programa.</p>
+    </section>
   </main>
 
   <footer class="envoltorio pie">
-    <p>Precio PVPC de la península (tarifa 2.0TD) publicado por Red Eléctrica, con peajes y cargos y sin impuestos. Si tienes tarifa de mercado libre, tu precio es otro.</p>
+    <p>Precio PVPC de la península (tarifa 2.0TD) publicado por Red Eléctrica, con peajes y cargos. Con impuestos se le suman el impuesto eléctrico (<span id="iee"></span>) y el IVA (<span id="iva"></span>) del término de energía; la factura añade además la potencia contratada y el alquiler del contador. Si tienes tarifa de mercado libre, tu precio es otro.</p>
+    <p>Red Eléctrica solo publica en abierto el precio de la península. En Canarias, Ceuta y Melilla, además, los impuestos son otros (IGIC o IPSI en lugar de IVA).</p>
     <p id="actualizado"></p>
+    <p><a href="../fuentes/">Fuentes y condiciones</a></p>
   </footer>
 
   <script type="module" src="../assets/js/luz.js"></script>
+  <script type="module" src="../assets/js/comun.js"></script>
 </body>
 </html>
