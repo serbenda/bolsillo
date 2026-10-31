@@ -23,6 +23,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
   <link rel="stylesheet" href="../assets/css/estilos.css">
+  <link rel="preload" href="../data/calefaccion.json" as="fetch" crossorigin>
 </head>
 <body>
   <header class="envoltorio cabecera">
@@ -98,7 +99,7 @@
       <h2 id="t-explicacion">Lo que tienes que saber</h2>
       <details>
         <summary>¿De dónde salen los precios?</summary>
-        <p>Del BOE. El Gobierno fija cada dos meses el precio máximo de la bombona de butano de 12,5 kg y cada trimestre la tarifa de último recurso (TUR) del gas natural. Como no hay una API, bolsillo copia los precios del BOE y del Ministerio para la Transición Ecológica, y avisa cuando toca actualizarlos.</p>
+        <p>Del BOE. El Gobierno fija cada dos meses el precio máximo de la bombona de butano de 12,5 kg y cada trimestre la tarifa de último recurso (TUR) del gas natural. bolsillo los descarga solo varias veces al día de la tabla del Ministerio para la Transición Ecológica y de la API de datos abiertos del BOE.</p>
       </details>
       <details>
         <summary>¿Qué es la TUR?</summary>
@@ -117,7 +118,7 @@
 
   <footer class="envoltorio pie">
     <p class="apoyo"><a href="https://github.com/sponsors/serbenda" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.2 6.9 13.2C3 9.7.5 7.4.5 4.6.5 2.3 2.3.5 4.6.5c1.3 0 2.5.6 3.4 1.6C8.9 1.1 10.1.5 11.4.5c2.3 0 4.1 1.8 4.1 4.1 0 2.8-2.5 5.1-6.4 8.6Z"/></svg>¿Te ahorra dinero? Apoya bolsillo en GitHub Sponsors</a></p>
-    <p>Precios máximos de la bombona de butano (Ministerio para la Transición Ecológica y BOE) y tarifa de último recurso del gas natural (BOE). Se actualizan a mano con cada resolución nueva.</p>
+    <p>Precios máximos de la bombona de butano (Ministerio para la Transición Ecológica y BOE) y tarifa de último recurso del gas natural (BOE). Se actualizan solos en cuanto sale cada resolución nueva.</p>
     <p id="actualizado"></p>
     <p><a href="../fuentes/">Fuentes y condiciones</a> · <a href="../quien/">Quién hace bolsillo</a></p>
   </footer>

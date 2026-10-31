@@ -1,6 +1,6 @@
 // Página «¿Cuánto cuesta la calefacción?»: bombona de butano y TUR del gas natural.
 
-import { BUTANO, TUR, costeGas, precioKwh, KWH_BOMBONA } from './calefaccion.js';
+import { BUTANO, TUR, costeGas, precioKwh, KWH_BOMBONA, aplicar } from './calefaccion.js';
 import { graficoLineas } from './grafico-lineas.js';
 import { tr, euros, numero, porcentaje, formato } from './idioma.js';
 
@@ -101,6 +101,12 @@ function pintarTarifas() {
     `Energy price before tax for each tariff, by yearly use. Fixed charge: ${TUR.tarifas.map((t) => `${t.id}, ${euros(t.fijoMes)} a month`).join('; ')}.`
   );
 }
+
+// Precios descargados por la Action; si no están, se usan los de respaldo del módulo
+try {
+  const r = await fetch(new URL('../../data/calefaccion.json', import.meta.url));
+  if (r.ok) aplicar(await r.json());
+} catch {}
 
 pintarButano();
 pintarTarifas();

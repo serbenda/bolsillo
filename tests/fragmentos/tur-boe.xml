@@ -1,0 +1,26 @@
+<tbody>
+        <tr>
+          <td class="cuerpo_tabla_izq">TUR.1</td>
+          <td class="cuerpo_tabla_izq">Consumo inferior o igual a 5.000 kWh/año.</td>
+          <td class="cuerpo_tabla_coma">3,83</td>
+          <td class="cuerpo_tabla_coma">5,252590</td>
+        </tr>
+        <tr>
+          <td class="cuerpo_tabla_izq">TUR.2</td>
+          <td class="cuerpo_tabla_izq">Consumo superior a 5.000 kWh/año e inferior o igual a 15.000 kWh/año.</td>
+          <td class="cuerpo_tabla_coma">8,17</td>
+          <td class="cuerpo_tabla_coma">5,042762</td>
+        </tr>
+        <tr>
+          <td class="cuerpo_tabla_izq">TUR.3</td>
+          <td class="cuerpo_tabla_izq">Consumo superior a 15.000 kWh/año e inferior o igual a 50.000 kWh/año.</td>
+          <td class="cuerpo_tabla_coma">19,32</td>
+          <td class="cuerpo_tabla_coma">4,698799</td>
+        </tr>
+        <tr>
+          <td class="cuerpo_tabla_izq">TUR.10</td>
+          <td class="cuerpo_tabla_izq">Consumo superior a 150.000.000 kWh/año.</td>
+          <td class="cuerpo_tabla_coma">29.505,60</td>
+          <td class="cuerpo_tabla_coma">3,741689</td>
+        </tr>
+      </tbody>

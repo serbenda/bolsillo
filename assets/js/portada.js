@@ -10,7 +10,7 @@ import { tr, numero, porcentaje, formato, euros } from './idioma.js';
 import { indiceAplicable, rentaActualizada } from './alquiler.js';
 import { ganancia, PLAZOS } from './ahorro.js';
 import { cuotaMensual } from './euribor.js';
-import { BUTANO } from './calefaccion.js';
+import { BUTANO, aplicar as aplicarCalefaccion } from './calefaccion.js';
 import { mesesAntes } from './compra.js';
 
 const $ = (id) => document.getElementById(id);
@@ -36,7 +36,7 @@ json('gasolina/indice.json').then(({ medias }) => {
   if (medias?.diesel) $('r-diesel').textContent = `${numero(medias.diesel, 3)} €/l`;
 }).catch(() => {});
 
-$('r-butano').textContent = euros(BUTANO.precio);
+json('calefaccion.json').then(aplicarCalefaccion).catch(() => {}).finally(() => { $('r-butano').textContent = euros(BUTANO.precio); });
 
 json('ahorro.json').then(({ letras }) => {
   const u = letras?.m12?.at(-1);
