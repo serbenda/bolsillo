@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Luz, gasolina, hipoteca e inflación con datos públicos de España.",
   "scripts": {
-    "datos": "node scripts/fetch-luz.mjs && node scripts/fetch-generacion.mjs && node scripts/fetch-gasolina.mjs && node scripts/fetch-euribor.mjs && node scripts/fetch-ipc.mjs && node scripts/fetch-compra.mjs && node scripts/fetch-alquiler.mjs && node scripts/fetch-ahorro.mjs && node scripts/revisar-calefaccion.mjs",
+    "datos": "node scripts/fetch-luz.mjs && node scripts/fetch-generacion.mjs && node scripts/fetch-gasolina.mjs && node scripts/fetch-euribor.mjs && node scripts/fetch-ipc.mjs && node scripts/fetch-compra.mjs && node scripts/fetch-alquiler.mjs && node scripts/fetch-ahorro.mjs && node scripts/fetch-calefaccion.mjs",
     "test": "node --test tests/*.test.js",
     "dev": "npx --yes serve .",
     "e2e": "node --test tests/e2e/*.e2e.mjs",

@@ -199,7 +199,7 @@ Todo es público y oficial. bolsillo no guarda nada en el repositorio: los datos
 | 🛒 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | Rúbricas del IPC: alimentos (`IPC290811`) y una veintena de productos | Mensual |
 | 🔑 | [INE](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177110&idp=1254735976607) | Índice de Referencia de Arrendamientos de Vivienda, serie `IRAV1` | Mensual |
 | 🐷 | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html) | Subastas de Letras del Tesoro (`D_DTED0C0G`, `D_DTED0E0G`, `D_DTED0I0G`, `D_DTED0G0G`) y bono a 10 años (`D_G0B1F0ZP`) | Mensual / diaria |
-| 🔥 | [BOE](https://www.boe.es/) y [MITECO](https://www.miteco.gob.es/es/energia/hidrocarburos-nuevos-combustibles/glp/precios.html) | Precio máximo del butano envasado y tarifa de último recurso del gas natural (a mano, con aviso cuando caducan) | Bimestral / trimestral |
+| 🔥 | [BOE](https://www.boe.es/) y [MITECO](https://www.miteco.gob.es/es/energia/hidrocarburos-nuevos-combustibles/glp/precios.html) | Precio máximo del butano envasado y tarifa de último recurso del gas natural (tabla del Ministerio y API del BOE, automático) | Bimestral / trimestral |
 | 📈 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | IPC general nacional, serie `IPC290751` (base 2025), desde 2002 | Mensual |
 | 🗺️ | [OpenStreetMap](https://www.openstreetmap.org/copyright) | Mapa de gasolineras | Solo al buscar |
 

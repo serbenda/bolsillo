@@ -41,7 +41,7 @@ jobs:
           BASE: ${{ steps.pages.outputs.base_url || 'https://bolsillo.bendi.dev' }}
         run: |
           mkdir -p data
-          for f in luz generacion gasolina gasolina-historico euribor ipc compra alquiler ahorro; do
+          for f in luz generacion gasolina gasolina-historico euribor ipc compra alquiler ahorro calefaccion; do
             curl -fsSL --max-time 60 "$BASE/data/$f.json" -o "data/$f.json" || rm -f "data/$f.json"
           done
           ls -la data
