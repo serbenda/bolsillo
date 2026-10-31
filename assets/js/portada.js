@@ -5,6 +5,7 @@ import { horaMadrid } from './ree.js';
 import { mejorTramo } from './ventana.js';
 import { factorImpuestos } from './impuestos.js';
 import { interanual } from './ipc.js';
+import { variacion } from './compra.js';
 import { tr, numero, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
@@ -33,6 +34,11 @@ json('gasolina/indice.json').then(({ medias }) => {
 json('ipc.json').then(({ serie }) => {
   const t = interanual(serie).at(-1);
   if (t) $('r-ipc').textContent = porcentaje(t.tasa * 100, 1);
+}).catch(() => {});
+
+json('compra.json').then(({ alimentos }) => {
+  const v = variacion(alimentos, 12);
+  if (v) $('r-compra').textContent = `${v.variacion >= 0 ? '+' : '−'}${porcentaje(Math.abs(v.variacion) * 100, 1)}`;
 }).catch(() => {});
 
 json('euribor.json').then(({ serie }) => {

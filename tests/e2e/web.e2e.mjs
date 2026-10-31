@@ -48,6 +48,7 @@ test('portada: recibo con datos del día', async () => {
   assert.match(await pagina.textContent('#r-g95'), /€\/l/);
   assert.match(await pagina.textContent('#r-euribor'), /%/);
   assert.match(await pagina.textContent('#r-ipc'), /%/);
+  assert.match(await pagina.textContent('#r-compra'), /%/);
   await accesible(pagina);
   await contexto.close();
 });
@@ -128,6 +129,20 @@ test('inflación: calculadora del IPC', async () => {
   await contexto.close();
 });
 
+test('compra: lo que sube y lo que baja', async () => {
+  const { pagina, errores, contexto } = await abrir('compra/');
+  assert.deepEqual(errores, []);
+  assert.match(await pagina.textContent('#titular'), /^La compra cuesta hoy un .+ (más|menos) que hace un año\.$/);
+  assert.ok((await pagina.locator('#productos .producto').count()) >= 15);
+  await pagina.fill('#gasto', '80');
+  assert.match(await pagina.textContent('#resultado'), /^La misma compra hoy te cuesta .+\s€\.$/);
+  await pagina.check('input[name=periodo][value="60"]');
+  assert.match(await pagina.textContent('#t-productos'), /5 años/);
+  assert.match(await pagina.textContent('#etiqueta-gasto'), /hace 5 años/);
+  await accesible(pagina);
+  await contexto.close();
+});
+
 test('fuentes y ficheros de la app', async () => {
   const { pagina, errores, contexto } = await abrir('fuentes/');
   assert.deepEqual(errores, []);
@@ -159,7 +174,7 @@ async function textoEnCastellano(pagina) {
   }, CASTELLANO.source);
 }
 
-for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
+for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', compra: 'en/compra/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
   test(`inglés: ${nombre} sin errores, sin castellano y accesible`, async () => {
     const { pagina, errores, contexto } = await abrir(ruta);
     assert.deepEqual(errores, []);
@@ -187,6 +202,12 @@ test('inglés: los cálculos salen en inglés', async () => {
   ({ pagina, contexto } = await abrir('en/ipc/'));
   await pagina.fill('#cantidad', '1,000');
   assert.match(await pagina.textContent('#resultado'), /^€1,000\.00 in .+ is worth €[\d,]+\.\d\d in /);
+  await contexto.close();
+
+  ({ pagina, contexto } = await abrir('en/compra/'));
+  assert.match(await pagina.textContent('#titular'), /^Groceries cost .+ (more|less) today than a year ago\.$/);
+  await pagina.fill('#gasto', '1,000');
+  assert.match(await pagina.textContent('#resultado'), /^The same shop costs €[\d,]+\.\d\d today\.$/);
   await contexto.close();
 
   ({ pagina, contexto } = await abrir('en/gasolina/'));

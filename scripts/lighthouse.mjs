@@ -9,7 +9,7 @@ import * as chromeLauncher from 'chrome-launcher';
 import { chromium } from 'playwright';
 import { arrancar } from '../tests/e2e/servidor.mjs';
 
-const PAGINAS = { Portada: '', Luz: 'luz/', Gasolina: 'gasolina/', Hipoteca: 'hipoteca/', Inflación: 'ipc/' };
+const PAGINAS = { Portada: '', Luz: 'luz/', Gasolina: 'gasolina/', Compra: 'compra/', Hipoteca: 'hipoteca/', Inflación: 'ipc/' };
 const CATEGORIAS = {
   performance: { nombre: 'Rendimiento', minimo: 0.7, insignia: 'rendimiento' },
   accessibility: { nombre: 'Accesibilidad', minimo: 0.95, insignia: 'accesibilidad' },
