@@ -125,6 +125,8 @@ section + section { margin-top: 3.5rem; }
 .icono.hipoteca { background: var(--valle); }
 .icono.ipc { background: var(--tinta); fill: var(--papel); }
 .icono.compra { background: #2b59c3; }
+.icono.alquiler { background: #7a4fbf; }
+.icono.ahorro { background: #0f7c86; }
 .secciones h2 { grid-column: 2; }
 .secciones a:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
 .secciones p { grid-column: 2; margin: 0; color: var(--tenue); max-width: 60ch; }
@@ -561,9 +563,12 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .icono-nav.hipoteca { background: var(--valle); }
 .icono-nav.ipc { background: var(--tinta); fill: var(--papel); }
 .icono-nav.compra { background: #2b59c3; }
+.icono-nav.alquiler { background: #7a4fbf; }
+.icono-nav.ahorro { background: #0f7c86; }
 @media (max-width: 640px) {
-  /* En el móvil, el icono encima del nombre para que quepan las cuatro secciones */
-  .nav a { flex-direction: column; gap: 0.2rem; font-size: 0.8rem; }
+  /* En el móvil, el icono encima del nombre y las siete secciones en una fila */
+  .cabecera .nav { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.15rem; }
+  .nav a { flex-direction: column; gap: 0.2rem; font-size: 0.68rem; min-width: 0; text-align: center; }
   .icono-nav { width: 1.6rem; height: 1.6rem; padding: 0.3rem; border-radius: 8px; }
 }
 
@@ -633,3 +638,14 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .productos .producto.tuya .nombre { font-weight: 800; }
 .productos .producto.tuya { background: color-mix(in srgb, var(--foco) 10%, transparent); }
 #bloque-provincias .resultado { margin-top: 0.75rem; max-width: 60ch; }
+.productos.plazos .producto { grid-template-columns: minmax(9rem, 15rem) 1fr 5.5rem; }
+.productos .producto.referencia .barra-var { opacity: 0.35; }
+/* Barras desde la izquierda (lo que costaba cada año, plazos de las Letras) */
+.producto .coste .barra-var { left: 0; background: var(--tinta); opacity: 0.8; }
+.producto .coste.actual .barra-var { background: var(--foco); opacity: 1; }
+.producto .eje-barra.coste::before { display: none; }
+/* Entre móvil y escritorio ancho, el menú cabe en su propia fila */
+@media (min-width: 641px) and (max-width: 1100px) {
+  .cabecera { flex-wrap: wrap; }
+  .cabecera .nav { order: 3; flex-basis: 100%; margin-left: 0; justify-content: space-between; }
+}

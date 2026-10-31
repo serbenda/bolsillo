@@ -1,5 +1,5 @@
 import { equivalencia, interanual, poderAdquisitivo } from './ipc.js';
-import { tr, euros, porcentaje, formato } from './idioma.js';
+import { tr, euros, porcentaje, formato, numero } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/ipc.json', import.meta.url);
@@ -169,6 +169,8 @@ async function iniciar() {
     .reverse();
   for (const a of anos) $('anyo-sueldo').add(new Option(a, a));
   $('anyo-sueldo').value = anos.find((a) => Number(a) === Number(ultimo.mes.slice(0, 4)) - 5) ?? anos[0];
+  $('sueldo-antes').value = numero(1500, 0);
+  $('sueldo-hoy').value = numero(1650, 0);
   for (const id of ['sueldo-antes', 'sueldo-hoy', 'anyo-sueldo']) {
     const v = leer(id);
     if (v !== null && (id !== 'anyo-sueldo' || anos.includes(v))) $(id).value = v;

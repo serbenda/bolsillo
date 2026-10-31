@@ -128,6 +128,28 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🔑 ¿Cuánto me pueden subir el alquiler?
+**[bolsillo.bendi.dev/alquiler](https://bolsillo.bendi.dev/alquiler/)**
+
+- El **límite oficial del INE (IRAV)** para las subidas de cada mes.
+- **En euros**: con tu renta y el mes de la subida, cuánto te pueden subir como mucho.
+- Contratos anteriores al 26 de mayo de 2023, con el IPC.
+
+</td>
+<td width="50%" valign="top">
+
+### 🐷 ¿Cuánto rinden mis ahorros?
+**[bolsillo.bendi.dev/ahorro](https://bolsillo.bendi.dev/ahorro/)**
+
+- Lo que pagan las **Letras del Tesoro** a 3, 6, 9 y 12 meses en la última subasta.
+- **Cuánto ganarías**, antes y después de Hacienda.
+- Lo que **se come la inflación** si dejas el dinero parado.
+
+</td>
+</tr>
 </table>
 
 En cada sección, **Compartir** manda el resultado (tu cuota, tu compra, la hora más barata) con una imagen lista para WhatsApp; si el navegador no sabe compartir, copia el texto y el enlace.
@@ -155,6 +177,8 @@ Todo es público y oficial. bolsillo no guarda nada en el repositorio: los datos
 | 📮 | [GeoNames](https://www.geonames.org/) (CC BY 4.0) | Coordenadas de los códigos postales | En cada publicación |
 | 🏠 | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html) | Euríbor a un año, serie `D_1NBAF472`, desde 1999 | Mensual |
 | 🛒 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | Rúbricas del IPC: alimentos (`IPC290811`) y una veintena de productos | Mensual |
+| 🔑 | [INE](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177110&idp=1254735976607) | Índice de Referencia de Arrendamientos de Vivienda, serie `IRAV1` | Mensual |
+| 🐷 | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html) | Subastas de Letras del Tesoro (`D_DTED0C0G`, `D_DTED0E0G`, `D_DTED0I0G`, `D_DTED0G0G`) y bono a 10 años (`D_G0B1F0ZP`) | Mensual / diaria |
 | 📈 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | IPC general nacional, serie `IPC290751` (base 2025), desde 2002 | Mensual |
 | 🗺️ | [OpenStreetMap](https://www.openstreetmap.org/copyright) | Mapa de gasolineras | Solo al buscar |
 
@@ -233,7 +257,7 @@ Toda la web está en castellano y en inglés (**[bolsillo.bendi.dev/en](https://
 ```
 bolsillo/
 ├── index.html                Portada con el recibo del día
-├── luz/  gasolina/  compra/  hipoteca/  ipc/  fuentes/
+├── luz/  gasolina/  compra/  alquiler/  hipoteca/  ahorro/  ipc/  fuentes/
 │                             (la versión en inglés, en/, se genera al publicar)
 ├── assets/
 │   ├── css/estilos.css       Un solo fichero de estilos, con modo oscuro

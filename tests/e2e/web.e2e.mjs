@@ -49,6 +49,8 @@ test('portada: recibo con datos del día', async () => {
   assert.match(await pagina.textContent('#r-euribor'), /%/);
   assert.match(await pagina.textContent('#r-ipc'), /%/);
   assert.match(await pagina.textContent('#r-compra'), /%/);
+  assert.match(await pagina.textContent('#r-letras'), /%/);
+  assert.match(await pagina.textContent('#r-alquiler'), /%/);
   await accesible(pagina);
   await contexto.close();
 });
@@ -195,6 +197,30 @@ test('gasolina: precio por provincia', async () => {
   await contexto.close();
 });
 
+test('alquiler: cuánto te pueden subir', async () => {
+  const { pagina, errores, contexto } = await abrir('alquiler/');
+  assert.deepEqual(errores, []);
+  assert.match(await pagina.textContent('#titular'), /^Si te suben el alquiler en \p{L}+, como mucho un .+ %\.$/u);
+  await pagina.fill('#renta', '1.000');
+  assert.match(await pagina.textContent('#resultado'), /^(Te pueden subir como mucho .+ al mes: de 1\.?000,00\s€ a .+\s€\.|Ese mes no te pueden subir el alquiler\.)$/);
+  await pagina.check('input[name=firma][value="antiguo"]');
+  assert.match(await pagina.textContent('#resultado-detalle'), /IPC/);
+  assert.equal(await pagina.locator('#historia polyline').count(), 2);
+  await accesible(pagina);
+  await contexto.close();
+});
+
+test('ahorro: Letras del Tesoro', async () => {
+  const { pagina, errores, contexto } = await abrir('ahorro/');
+  assert.deepEqual(errores, []);
+  assert.match(await pagina.textContent('#titular'), /^Las Letras del Tesoro a 12 meses pagan un .+ %\.$/);
+  await pagina.fill('#cantidad', '5.000');
+  assert.match(await pagina.textContent('#resultado'), /^En 12 meses ganarías .+\s€: unos .+\s€ después de Hacienda\.$/);
+  assert.ok((await pagina.locator('#plazos .producto').count()) >= 4);
+  await accesible(pagina);
+  await contexto.close();
+});
+
 test('fuentes y ficheros de la app', async () => {
   const { pagina, errores, contexto } = await abrir('fuentes/');
   assert.deepEqual(errores, []);
@@ -226,7 +252,7 @@ async function textoEnCastellano(pagina) {
   }, CASTELLANO.source);
 }
 
-for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', compra: 'en/compra/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
+for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', compra: 'en/compra/', alquiler: 'en/alquiler/', ahorro: 'en/ahorro/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
   test(`inglés: ${nombre} sin errores, sin castellano y accesible`, async () => {
     const { pagina, errores, contexto } = await abrir(ruta);
     assert.deepEqual(errores, []);
