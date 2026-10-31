@@ -2,12 +2,24 @@ import { cargarLuz, formatoPrecio, horaTexto } from './datos-luz.js';
 import { horaMadrid } from './ree.js';
 import { mejorTramo, clasificar, media } from './ventana.js';
 import { factorImpuestos, impuestosEn, APARATOS } from './impuestos.js';
+import { tr, idioma, euros, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
-const ETIQUETA = { barata: 'más barata', media: 'intermedia', cara: 'más cara' };
-const euros = (n) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-const porcentaje = (n) => `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(n * 100)}\u00a0%`;
+const ETIQUETA = {
+  barata: tr('más barata', 'cheapest'),
+  media: tr('intermedia', 'mid-range'),
+  cara: tr('más cara', 'most expensive'),
+};
+
+// Textos de cada aparato en inglés (los de castellano están en impuestos.js)
+const APARATOS_EN = {
+  lavadora: { nombre: 'Washing machine', detalle: 'one wash at 40 °C', pregunta: 'When should I run the washing machine?' },
+  lavavajillas: { nombre: 'Dishwasher', detalle: 'one normal cycle', pregunta: 'When should I run the dishwasher?' },
+  secadora: { nombre: 'Tumble dryer', detalle: 'one load', pregunta: 'When should I run the dryer?' },
+  horno: { nombre: 'Oven', detalle: 'one hour at 200 °C', pregunta: 'When should I use the oven?' },
+  coche: { nombre: 'Electric car', detalle: 'charge for 100 km', pregunta: 'When should I charge the car?' },
+};
+const textos = (a) => (idioma === 'en' ? { ...a, ...APARATOS_EN[a.id] } : a);
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.luz.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.luz.${k}`); } catch { return null; } };
@@ -18,7 +30,10 @@ let diaVisible = 'hoy';
 let tramoElegido = null;
 let conImpuestos = leer('impuestos') !== 'no';
 
-const cuando = (fecha) => (fecha === datos.fechaHoy ? 'hoy' : 'mañana');
+const esHoy = (fecha) => fecha === datos.fechaHoy;
+const cuando = (fecha) => (esHoy(fecha) ? tr('hoy', 'today') : tr('mañana', 'tomorrow'));
+/** «a las 14:00» / «at 14:00» */
+const aLas = (h) => tr(`a las ${horaTexto(h)}`, `at ${horaTexto(h)}`);
 /** Precio a mostrar (€/kWh), con o sin impuestos según el interruptor. */
 const precio = (h) => h.precio * (conImpuestos ? factorImpuestos(h.fecha) : 1);
 const verPrecio = (h) => formatoPrecio(precio(h));
@@ -34,19 +49,22 @@ function pintarCabecera() {
   const mejor = mejorTramo(candidatas(), 1);
 
   const titular = $('titular');
-  if (mejor && mejor.inicio.fecha === datos.fechaHoy && mejor.inicio.hora === horaActual) {
-    titular.textContent = 'Ahora mismo es la hora más barata que queda.';
+  if (mejor && esHoy(mejor.inicio.fecha) && mejor.inicio.hora === horaActual) {
+    titular.textContent = tr('Ahora mismo es la hora más barata que queda.', 'Right now is the cheapest hour left.');
   } else if (mejor) {
-    titular.textContent = `La luz más barata llega ${cuando(mejor.inicio.fecha)} a las ${horaTexto(mejor.inicio.hora)}.`;
+    titular.textContent = tr(
+      `La luz más barata llega ${cuando(mejor.inicio.fecha)} ${aLas(mejor.inicio.hora)}.`,
+      `The cheapest electricity comes ${cuando(mejor.inicio.fecha)} ${aLas(mejor.inicio.hora)}.`
+    );
   }
 
   const precios = datos.hoy.map(precio);
   const mediaHoy = media(datos.hoy) * (conImpuestos ? factorImpuestos(datos.fechaHoy) : 1);
   $('ahora').innerHTML = `
-    <span>Ahora <strong>${actual ? verPrecio(actual) : '—'} €/kWh</strong>
+    <span>${tr('Ahora', 'Now')} <strong>${actual ? verPrecio(actual) : '—'} €/kWh</strong>
       ${actual ? `<span class="chapa ${claseActual}">${ETIQUETA[claseActual]}</span>` : ''}</span>
-    <span>Media de hoy <strong>${formatoPrecio(mediaHoy)}</strong></span>
-    <span>Entre <strong>${formatoPrecio(Math.min(...precios))}</strong> y <strong>${formatoPrecio(Math.max(...precios))}</strong></span>`;
+    <span>${tr('Media de hoy', "Today's average")} <strong>${formatoPrecio(mediaHoy)}</strong></span>
+    <span>${tr('Entre', 'Between')} <strong>${formatoPrecio(Math.min(...precios))}</strong> ${tr('y', 'and')} <strong>${formatoPrecio(Math.max(...precios))}</strong></span>`;
   $('ahora').classList.remove('reservado');
 }
 
@@ -67,8 +85,8 @@ function pintarGrafico() {
   horas.forEach((h, i) => {
     const barra = document.createElement('div');
     barra.className = `barra ${clases[i]}`;
-    if (h.fecha === datos.fechaHoy && h.hora < horaActual) barra.classList.add('pasada');
-    if (h.fecha === datos.fechaHoy && h.hora === horaActual) barra.classList.add('actual');
+    if (esHoy(h.fecha) && h.hora < horaActual) barra.classList.add('pasada');
+    if (esHoy(h.fecha) && h.hora === horaActual) barra.classList.add('actual');
     if (elegidas.has(`${h.fecha}-${h.hora}`)) barra.classList.add('elegida');
     barra.style.setProperty('--alto', `${(h.precio / max) * 100}%`);
     barra.style.setProperty('--i', i);
@@ -85,7 +103,10 @@ function pintarGrafico() {
   const maximo = horas.reduce((a, b) => (b.precio > a.precio ? b : a));
   grafico.setAttribute(
     'aria-label',
-    `Precio de la luz ${cuando(horas[0].fecha)} por horas. Mínimo ${verPrecio(minimo)} €/kWh a las ${horaTexto(minimo.hora)}, máximo ${verPrecio(maximo)} €/kWh a las ${horaTexto(maximo.hora)}.`
+    tr(
+      `Precio de la luz ${cuando(horas[0].fecha)} por horas. Mínimo ${verPrecio(minimo)} €/kWh ${aLas(minimo.hora)}, máximo ${verPrecio(maximo)} €/kWh ${aLas(maximo.hora)}.`,
+      `Hourly electricity price ${cuando(horas[0].fecha)}. Lowest ${verPrecio(minimo)} €/kWh ${aLas(minimo.hora)}, highest ${verPrecio(maximo)} €/kWh ${aLas(maximo.hora)}.`
+    )
   );
   requestAnimationFrame(() => grafico.classList.add('listo'));
 }
@@ -101,7 +122,7 @@ function costes(aparato) {
 
 function aparatoElegido() {
   const id = document.querySelector('input[name=aparato]:checked')?.value;
-  return APARATOS.find((a) => a.id === id) ?? APARATOS[0];
+  return textos(APARATOS.find((a) => a.id === id) ?? APARATOS[0]);
 }
 
 function pintarPlan() {
@@ -113,7 +134,10 @@ function pintarPlan() {
   $('t-plan').textContent = aparato.pregunta;
 
   if (!mejor) {
-    resultado.textContent = 'No quedan horas suficientes con precio publicado. Vuelve después de las 20:15 para ver las de mañana.';
+    resultado.textContent = tr(
+      'No quedan horas suficientes con precio publicado. Vuelve después de las 20:15 para ver las de mañana.',
+      "There aren't enough hours left with a published price. Come back after 20:15 for tomorrow's prices."
+    );
     ahorro.textContent = '';
     pintarGrafico();
     return;
@@ -121,25 +145,31 @@ function pintarPlan() {
 
   const { inicio } = mejor;
   const fin = (inicio.hora + aparato.horas) % 24;
-  const yaEs = inicio.fecha === datos.fechaHoy && inicio.hora === horaActual;
+  const yaEs = esHoy(inicio.fecha) && inicio.hora === horaActual;
   resultado.textContent = yaEs
-    ? `Ahora mismo: de ${horaTexto(inicio.hora)} a ${horaTexto(fin)} es lo más barato.`
-    : `${cuando(inicio.fecha) === 'hoy' ? 'Hoy' : 'Mañana'} a las ${horaTexto(inicio.hora)}, hasta las ${horaTexto(fin)}.`;
+    ? tr(`Ahora mismo: de ${horaTexto(inicio.hora)} a ${horaTexto(fin)} es lo más barato.`, `Right now: ${horaTexto(inicio.hora)} to ${horaTexto(fin)} is the cheapest slot.`)
+    : tr(
+        `${esHoy(inicio.fecha) ? 'Hoy' : 'Mañana'} ${aLas(inicio.hora)}, hasta las ${horaTexto(fin)}.`,
+        `${esHoy(inicio.fecha) ? 'Today' : 'Tomorrow'} ${aLas(inicio.hora)}, until ${horaTexto(fin)}.`
+      );
 
-  const impuestos = conImpuestos ? 'con impuestos' : 'sin impuestos';
+  const impuestos = conImpuestos ? tr('con impuestos', 'including taxes') : tr('sin impuestos', 'before taxes');
   if (!yaEs && ahora && ahora - enMejor >= 0.005) {
-    ahorro.textContent = `${aparato.nombre} (${aparato.detalle}): ${euros(enMejor)} en vez de ${euros(ahora)} si ${aparato.lo} pones ahora, ${impuestos}.`;
+    ahorro.textContent = tr(
+      `${aparato.nombre} (${aparato.detalle}): ${euros(enMejor)} en vez de ${euros(ahora)} si ${aparato.lo} pones ahora, ${impuestos}.`,
+      `${aparato.nombre} (${aparato.detalle}): ${euros(enMejor)} instead of ${euros(ahora)} if you start now, ${impuestos}.`
+    );
   } else {
     ahorro.textContent = `${aparato.nombre} (${aparato.detalle}): ${euros(enMejor)}, ${impuestos}.`;
   }
 
-  cambiarDia(inicio.fecha === datos.fechaHoy ? 'hoy' : 'manana');
+  cambiarDia(esHoy(inicio.fecha) ? 'hoy' : 'manana');
 }
 
 function pintarCostes() {
-  $('costes').innerHTML = APARATOS.map((a) => {
+  $('costes').innerHTML = APARATOS.map(textos).map((a) => {
     const { mejor, ahora, enMejor } = costes(a);
-    const momento = mejor ? `${cuando(mejor.inicio.fecha)} a las ${horaTexto(mejor.inicio.hora)}` : '—';
+    const momento = mejor ? `${cuando(mejor.inicio.fecha)} ${aLas(mejor.inicio.hora)}` : '—';
     return `<tr>
       <th scope="row">${a.nombre}<small>${a.detalle}</small></th>
       <td>${ahora ? euros(ahora) : '—'}</td>
@@ -167,7 +197,7 @@ function prepararAparatos() {
   const elegido = leer('aparato') ?? 'lavadora';
   $('aparatos').insertAdjacentHTML(
     'beforeend',
-    APARATOS.map(
+    APARATOS.map(textos).map(
       (a) => `<label><input type="radio" name="aparato" value="${a.id}"${a.id === elegido ? ' checked' : ''}> ${a.nombre}</label>`
     ).join('')
   );
@@ -178,14 +208,14 @@ function prepararAparatos() {
 }
 
 if (!datos.hoy) {
-  $('titular').textContent = 'El precio de la luz no está disponible ahora mismo.';
+  $('titular').textContent = tr('El precio de la luz no está disponible ahora mismo.', "The electricity price isn't available right now.");
   $('ahora').hidden = true;
   $('interruptor').hidden = true;
   $('error').hidden = false;
 } else {
   const { iee, iva } = impuestosEn(datos.fechaHoy);
-  $('iee').textContent = porcentaje(iee);
-  $('iva').textContent = porcentaje(iva);
+  $('iee').textContent = porcentaje(iee * 100, 2, 0);
+  $('iva').textContent = porcentaje(iva * 100, 2, 0);
 
   const casilla = $('con-impuestos');
   casilla.checked = conImpuestos;
@@ -209,7 +239,7 @@ if (!datos.hoy) {
   pintarTodo();
 
   if (datos.actualizado) {
-    const f = new Intl.DateTimeFormat('es-ES', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Madrid' });
-    $('actualizado').textContent = `Datos actualizados el ${f.format(datos.actualizado)}.`;
+    const f = formato({ dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Madrid' });
+    $('actualizado').textContent = tr(`Datos actualizados el ${f.format(datos.actualizado)}.`, `Data updated on ${f.format(datos.actualizado)}.`);
   }
 }

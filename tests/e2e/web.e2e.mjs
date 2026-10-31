@@ -138,3 +138,72 @@ test('fuentes y ficheros de la app', async () => {
   }
   await contexto.close();
 });
+
+/* ---------- Versión en inglés ---------- */
+
+// Palabras que delatan castellano sin traducir (no se miran direcciones ni nombres de gasolineras)
+const CASTELLANO = /¿|¡|\b(de|del|los|las|que|con|para|más|hoy|mañana|precio|hipoteca|gasolina|cuota|años|ahora)\b/i;
+async function textoEnCastellano(pagina) {
+  return pagina.evaluate((patron) => {
+    const re = new RegExp(patron, 'i');
+    const fuera = 'script, style, .estacion, #mapa, .idiomas, option, select';
+    const malos = [];
+    const recorrer = (n) => {
+      if (n.nodeType === 3) {
+        const t = n.textContent.trim();
+        if (t && re.test(t) && !n.parentElement.closest(fuera) && n.parentElement.checkVisibility()) malos.push(t.slice(0, 80));
+      } else n.childNodes.forEach(recorrer);
+    };
+    recorrer(document.body);
+    return malos;
+  }, CASTELLANO.source);
+}
+
+for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
+  test(`inglés: ${nombre} sin errores, sin castellano y accesible`, async () => {
+    const { pagina, errores, contexto } = await abrir(ruta);
+    assert.deepEqual(errores, []);
+    assert.equal(await pagina.getAttribute('html', 'lang'), 'en');
+    assert.deepEqual(await textoEnCastellano(pagina), []);
+    // El selector lleva a la misma página en castellano
+    assert.equal(await pagina.getAttribute('.idiomas a', 'href'), `/${ruta.slice(3)}`);
+    await accesible(pagina);
+    await contexto.close();
+  });
+}
+
+test('inglés: los cálculos salen en inglés', async () => {
+  let { pagina, contexto } = await abrir('en/luz/');
+  assert.match(await pagina.textContent('#titular'), /cheapest|Right now/i);
+  assert.match(await pagina.textContent('#t-plan'), /^When should I/);
+  await contexto.close();
+
+  ({ pagina, contexto } = await abrir('en/hipoteca/'));
+  await pagina.fill('#diferencial', '0.75');
+  assert.match(await pagina.textContent('#titular'), /payment/i);
+  assert.match(await pagina.textContent('#entradilla'), /Euribor .* a month\.$/);
+  await contexto.close();
+
+  ({ pagina, contexto } = await abrir('en/ipc/'));
+  await pagina.fill('#cantidad', '1,000');
+  assert.match(await pagina.textContent('#resultado'), /^€1,000\.00 in .+ is worth €[\d,]+\.\d\d in /);
+  await contexto.close();
+
+  ({ pagina, contexto } = await abrir('en/gasolina/'));
+  await pagina.fill('#cp', '28100');
+  await pagina.click('button[type=submit]');
+  await pagina.waitForSelector('.estacion', { timeout: 10000 });
+  assert.match(await pagina.textContent('#titular'), /^(Cheapest within|No )/);
+  assert.match(await pagina.textContent('.llegar'), /Directions/);
+  await contexto.close();
+});
+
+test('el selector de idioma cambia de página con un clic', async () => {
+  const { pagina, contexto } = await abrir('hipoteca/');
+  await pagina.click('.idiomas a');
+  await pagina.waitForURL(/\/en\/hipoteca\/$/);
+  await pagina.click('.idiomas a');
+  await pagina.waitForURL(/\/hipoteca\/$/);
+  assert.equal(await pagina.getAttribute('html', 'lang'), 'es');
+  await contexto.close();
+});
