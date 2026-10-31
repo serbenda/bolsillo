@@ -8,6 +8,7 @@
 Luz hora a hora, gasolineras más baratas, hipoteca e inflación. Sin cookies, sin anuncios, sin registro.
 
 [![Abrir la web](https://img.shields.io/badge/abrir_la_web-bolsillo.bendi.dev-17784e?style=for-the-badge)](https://bolsillo.bendi.dev/)
+[![English version](https://img.shields.io/badge/english-bolsillo.bendi.dev%2Fen-172033?style=for-the-badge)](https://bolsillo.bendi.dev/en/)
 
 [![Publicación](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml/badge.svg)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
 [![Rendimiento](https://img.shields.io/endpoint?url=https%3A%2F%2Fbolsillo.bendi.dev%2Finsignias%2Frendimiento.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
@@ -180,6 +181,19 @@ Se ejecuta al fusionar en `main`, en cada PR, a mano y seis veces al día. Las A
 
 ---
 
+## En castellano y en inglés
+
+Toda la web está en castellano y en inglés (**[bolsillo.bendi.dev/en](https://bolsillo.bendi.dev/en/)**), con un selector **ES / EN** en la cabecera que lleva a la misma página en el otro idioma con un clic.
+
+- La versión en inglés se genera al publicar: `scripts/ingles.mjs` traduce el texto fijo de cada página con `scripts/traducciones.mjs` y **falla si queda algo sin traducir**, así que nunca se publica una página a medias.
+- Lo que escriben los scripts (titulares, cálculos, avisos) sale en el idioma de la página, con sus números y fechas en formato inglés (`€0.21`, `2.7%`, `31 October`).
+- Cada página enlaza a su versión en el otro idioma (`hreflang`), y el sitemap incluye las dos.
+- Los tests de navegador comprueban que en las páginas en inglés no queda texto en castellano.
+
+*Everything is also available in English at [bolsillo.bendi.dev/en](https://bolsillo.bendi.dev/en/), aimed at English speakers living in Spain.*
+
+---
+
 ## Privacidad
 
 - **Sin cookies, sin anuncios y sin cuentas.**
@@ -195,6 +209,7 @@ Se ejecuta al fusionar en `main`, en cada PR, a mano y seis veces al día. Las A
 bolsillo/
 ├── index.html                Portada con el recibo del día
 ├── luz/  gasolina/  hipoteca/  ipc/  fuentes/
+│                             (la versión en inglés, en/, se genera al publicar)
 ├── assets/
 │   ├── css/estilos.css       Un solo fichero de estilos, con modo oscuro
 │   ├── img/                  Logo y favicon en SVG (los PNG se generan)
@@ -206,6 +221,7 @@ bolsillo/
 │       ├── carburantes.js    Ministerio, provincias, horarios, códigos postales, histórico
 │       ├── euribor.js        Euríbor, cuotas y amortización anticipada
 │       ├── ipc.js            IPC, equivalencias e inflación interanual
+│       ├── idioma.js         Idioma de la página y formatos de números y fechas
 │       └── …                 Un script por página y comun.js (sin conexión y visitas)
 ├── scripts/                  Lo que ejecuta la Action: datos, fuente, imágenes, Lighthouse, capturas
 ├── tests/                    Tests unitarios (node:test) y de navegador (tests/e2e)
@@ -246,6 +262,7 @@ npm run e2e && npm run lighthouse && npm run capturas
 | El consumo típico de un aparato | `APARATOS` en `assets/js/impuestos.js` |
 | La serie del Euríbor o del IPC | `SERIE_EURIBOR` en `euribor.js` o `SERIE_IPC` en `ipc.js` |
 | Los mínimos de Lighthouse | `CATEGORIAS` en `scripts/lighthouse.mjs` |
+| Un texto fijo de una página | El HTML en castellano y su traducción en `scripts/traducciones.mjs` (si falta, la publicación avisa) |
 | Una fuente deja de responder | Llega un issue `datos` con el detalle; la web sigue con los últimos datos buenos |
 
 ---

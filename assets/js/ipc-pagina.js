@@ -1,13 +1,22 @@
 import { equivalencia, interanual } from './ipc.js';
+import { tr, euros, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/ipc.json', import.meta.url);
 
-const euros = (n) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', useGrouping: 'always' }).format(n);
-const pct = (x, dec = 1) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(x * 100)}\u00a0%`;
-const FORMATO_MES = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const pct = (x, dec = 1) => porcentaje(x * 100, dec);
+const FORMATO_MES = formato({ month: 'long', year: 'numeric', timeZone: 'UTC' });
 const nombreMes = (mes) => FORMATO_MES.format(new Date(`${mes}-01T00:00:00Z`));
-const decimal = (s) => Number(String(s).trim().replace(/\./g, '').replace(',', '.'));
+// "1.250,5" o "1,250.5" → 1250.5 (vale en los dos idiomas)
+const decimal = (s) => {
+  const t = String(s).replace(/\s/g, '');
+  const ultimo = Math.max(t.lastIndexOf(','), t.lastIndexOf('.'));
+  if (ultimo < 0) return Number(t);
+  const dec = t.slice(ultimo + 1);
+  // Un punto o coma seguido de 3 cifras exactas es separador de miles («1.000», «1,000»)
+  if (dec.length === 3 && !/[.,]/.test(t.slice(0, ultimo))) return Number(t.replace(/[.,]/g, ''));
+  return Number(`${t.slice(0, ultimo).replace(/[.,]/g, '')}.${dec}`);
+};
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.ipc.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.ipc.${k}`); } catch { return null; } };
@@ -26,17 +35,23 @@ function calcular() {
   const hasta = $('hasta').value;
   const e = equivalencia(serie, cantidad, desde, hasta);
   if (!e || !(cantidad > 0)) {
-    $('resultado').textContent = 'Escribe una cantidad mayor que cero, por ejemplo 100.';
+    $('resultado').textContent = tr('Escribe una cantidad mayor que cero, por ejemplo 100.', 'Enter an amount above zero, for example 100.');
     $('resultado-detalle').textContent = '';
     return;
   }
   for (const id of ['cantidad', 'desde', 'hasta']) guardar(id, $(id).value);
   const sube = e.subida >= 0;
-  $('resultado').textContent = `${euros(cantidad)} de ${nombreMes(desde)} equivalen a ${euros(e.cantidad)} de ${nombreMes(hasta)}.`;
+  $('resultado').textContent = tr(
+    `${euros(cantidad)} de ${nombreMes(desde)} equivalen a ${euros(e.cantidad)} de ${nombreMes(hasta)}.`,
+    `${euros(cantidad)} in ${nombreMes(desde)} is worth ${euros(e.cantidad)} in ${nombreMes(hasta)}.`
+  );
   const inversa = equivalencia(serie, cantidad, hasta, desde);
   $('resultado-detalle').textContent = sube
-    ? `Los precios han subido un ${pct(e.subida)}. Dicho al revés: con ${euros(cantidad)} de ${nombreMes(hasta)} compras lo que con ${euros(inversa.cantidad)} de ${nombreMes(desde)}.`
-    : `Los precios han bajado un ${pct(-e.subida)} entre esas fechas.`;
+    ? tr(
+        `Los precios han subido un ${pct(e.subida)}. Dicho al revés: con ${euros(cantidad)} de ${nombreMes(hasta)} compras lo que con ${euros(inversa.cantidad)} de ${nombreMes(desde)}.`,
+        `Prices have risen ${pct(e.subida)}. Put the other way: ${euros(cantidad)} in ${nombreMes(hasta)} buys what ${euros(inversa.cantidad)} did in ${nombreMes(desde)}.`
+      )
+    : tr(`Los precios han bajado un ${pct(-e.subida)} entre esas fechas.`, `Prices fell ${pct(-e.subida)} between those dates.`);
   pintarHistoria(desde, hasta);
 }
 
@@ -75,9 +90,15 @@ function pintarHistoria(desde, hasta) {
 
   const maxima = tasas.reduce((a, b) => (b.tasa > a.tasa ? b : a));
   const minima = tasas.reduce((a, b) => (b.tasa < a.tasa ? b : a));
-  const resumen = `Máxima ${pct(maxima.tasa)} en ${nombreMes(maxima.mes)}; mínima ${pct(minima.tasa)} en ${nombreMes(minima.mes)}.`;
-  svg.setAttribute('aria-label', `Inflación interanual en España desde ${nombreMes(tasas[0].mes)}, en porcentaje. ${resumen}`);
-  $('pie-historia').textContent = `Porcentaje de subida de los precios frente al mismo mes del año anterior. La zona sombreada es el periodo de tu cálculo. ${resumen}`;
+  const resumen = tr(
+    `Máxima ${pct(maxima.tasa)} en ${nombreMes(maxima.mes)}; mínima ${pct(minima.tasa)} en ${nombreMes(minima.mes)}.`,
+    `Highest ${pct(maxima.tasa)} in ${nombreMes(maxima.mes)}; lowest ${pct(minima.tasa)} in ${nombreMes(minima.mes)}.`
+  );
+  svg.setAttribute('aria-label', tr(`Inflación interanual en España desde ${nombreMes(tasas[0].mes)}, en porcentaje. ${resumen}`, `Annual inflation in Spain since ${nombreMes(tasas[0].mes)}, in percent. ${resumen}`));
+  $('pie-historia').textContent = tr(
+    `Porcentaje de subida de los precios frente al mismo mes del año anterior. La zona sombreada es el periodo de tu cálculo. ${resumen}`,
+    `Price rise compared with the same month a year earlier. The shaded area is the period of your calculation. ${resumen}`
+  );
 }
 
 async function iniciar() {
@@ -87,8 +108,8 @@ async function iniciar() {
     ({ serie } = await r.json());
     if (!serie?.length) throw new Error('vacío');
   } catch {
-    $('titular').textContent = '¿Cuánto ha subido la vida?';
-    avisar('Los datos del IPC no están disponibles ahora mismo. Vuelve a intentarlo en un rato.');
+    $('titular').textContent = tr('¿Cuánto ha subido la vida?', 'How much have prices gone up?');
+    avisar(tr('Los datos del IPC no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Inflation data isn't available right now. Please try again shortly."));
     $('formulario').querySelectorAll('input, select').forEach((el) => (el.disabled = true));
     return;
   }
@@ -96,9 +117,12 @@ async function iniciar() {
   const ultimo = serie.at(-1);
   const tasa = tasas.at(-1);
   $('titular').textContent = tasa.tasa >= 0
-    ? `La vida cuesta hoy un ${pct(tasa.tasa)} más que hace un año.`
-    : `Los precios están un ${pct(-tasa.tasa)} más bajos que hace un año.`;
-  $('entradilla').textContent = `Dato de ${nombreMes(ultimo.mes)}, el último publicado por el INE. Calcula cuánto valen hoy tus euros de otra fecha.`;
+    ? tr(`La vida cuesta hoy un ${pct(tasa.tasa)} más que hace un año.`, `Living costs ${pct(tasa.tasa)} more today than a year ago.`)
+    : tr(`Los precios están un ${pct(-tasa.tasa)} más bajos que hace un año.`, `Prices are ${pct(-tasa.tasa)} lower than a year ago.`);
+  $('entradilla').textContent = tr(
+    `Dato de ${nombreMes(ultimo.mes)}, el último publicado por el INE. Calcula cuánto valen hoy tus euros de otra fecha.`,
+    `${nombreMes(ultimo.mes)} figure, the latest published by INE. Work out what your euros from another date are worth today.`
+  );
 
   const opciones = [...serie].reverse().map((p) => new Option(nombreMes(p.mes), p.mes));
   for (const o of opciones) { $('desde').add(o.cloneNode(true)); $('hasta').add(o); }
@@ -112,7 +136,7 @@ async function iniciar() {
     $(id).addEventListener('input', calcular);
   }
   $('formulario').addEventListener('submit', (e) => e.preventDefault());
-  $('actualizado').textContent = `Último dato: ${nombreMes(ultimo.mes)}.`;
+  $('actualizado').textContent = tr(`Último dato: ${nombreMes(ultimo.mes)}.`, `Latest figure: ${nombreMes(ultimo.mes)}.`);
   calcular();
 
   let espera;

@@ -1,20 +1,25 @@
 import { cuotaMensual, interesesPrimerAno, euriborDe, amortizar } from './euribor.js';
+import { tr, LOCALE, euros as eurosDec, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/euribor.json', import.meta.url);
 
-const euros = (n, dec = 0) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: 'always' }).format(n);
-const pct = (n) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(n)}\u00a0%`;
-const FORMATO_MES = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const euros = (n, dec = 0) => eurosDec(n, dec);
+const pct = (n) => porcentaje(n, 3, 2);
+const FORMATO_MES = formato({ month: 'long', year: 'numeric', timeZone: 'UTC' });
 const nombreMes = (mes) => FORMATO_MES.format(new Date(`${mes}-01T00:00:00Z`));
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.hipoteca.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.hipoteca.${k}`); } catch { return null; } };
 
-// "150.000" → 150000 ; "0,75" → 0.75
+// "150.000" o "150,000" → 150000 ; "0,75" o "0.75" → 0.75 (vale en los dos idiomas)
 const entero = (s) => Number(String(s).replace(/[^\d]/g, ''));
-const decimal = (s) => Number(String(s).trim().replace(/\./g, '').replace(',', '.'));
+const decimal = (s) => {
+  const t = String(s).replace(/\s/g, '');
+  const ultimo = Math.max(t.lastIndexOf(','), t.lastIndexOf('.'));
+  if (ultimo < 0) return Number(t);
+  return Number(`${t.slice(0, ultimo).replace(/[.,]/g, '')}.${t.slice(ultimo + 1)}`);
+};
 
 let serie = [];
 
@@ -38,7 +43,7 @@ function calcular() {
   const antes = euriborDe(serie, revision);
 
   if (!(capital > 0) || !(meses > 0) || !Number.isFinite(diferencial) || antes === null) {
-    avisar('Revisa los datos: el capital y los años tienen que ser números mayores que cero, y el diferencial un número como 0,75.');
+    avisar(tr('Revisa los datos: el capital y los años tienen que ser números mayores que cero, y el diferencial un número como 0,75.', 'Check your figures: the balance and years must be numbers above zero, and the margin a number such as 0.75.'));
     $('resumen').hidden = true;
     return;
   }
@@ -51,19 +56,23 @@ function calcular() {
   const mesUltimo = nombreMes(ultimo.mes);
 
   if (Math.abs(dif) < 1) {
-    $('titular').textContent = 'Tu cuota se queda prácticamente igual.';
+    $('titular').textContent = tr('Tu cuota se queda prácticamente igual.', 'Your payment stays practically the same.');
   } else {
-    $('titular').textContent = `Tu cuota ${dif > 0 ? 'sube' : 'baja'} ${euros(Math.abs(dif))} al mes.`;
+    $('titular').textContent = tr(
+      `Tu cuota ${dif > 0 ? 'sube' : 'baja'} ${euros(Math.abs(dif))} al mes.`,
+      `Your payment goes ${dif > 0 ? 'up' : 'down'} ${euros(Math.abs(dif))} a month.`
+    );
   }
-  $('entradilla').textContent =
-    `Con el Euríbor de ${mesUltimo} (${pct(ultimo.valor)}) en lugar del de ${nombreMes(revision)} (${pct(antes)}), ` +
-    `pasarías de pagar ${euros(cuotaAntes)} a ${euros(cuotaAhora)} al mes.`;
+  $('entradilla').textContent = tr(
+    `Con el Euríbor de ${mesUltimo} (${pct(ultimo.valor)}) en lugar del de ${nombreMes(revision)} (${pct(antes)}), pasarías de pagar ${euros(cuotaAntes)} a ${euros(cuotaAhora)} al mes.`,
+    `With the ${mesUltimo} Euribor (${pct(ultimo.valor)}) instead of ${nombreMes(revision)} (${pct(antes)}), you'd go from paying ${euros(cuotaAntes)} to ${euros(cuotaAhora)} a month.`
+  );
 
   const intereses = interesesPrimerAno(capital, meses, ultimo.valor + diferencial);
   $('resumen').innerHTML = `
-    <span>Al año <strong>${dif >= 0 ? '+' : '−'}${euros(Math.abs(dif * 12))}</strong></span>
-    <span>Tipo total <strong>${pct(Math.max(ultimo.valor + diferencial, 0))}</strong></span>
-    <span>Intereses el primer año <strong>${euros(intereses)}</strong></span>`;
+    <span>${tr('Al año', 'Per year')} <strong>${dif >= 0 ? '+' : '−'}${euros(Math.abs(dif * 12))}</strong></span>
+    <span>${tr('Tipo total', 'Total rate')} <strong>${pct(Math.max(ultimo.valor + diferencial, 0))}</strong></span>
+    <span>${tr('Intereses el primer año', 'First-year interest')} <strong>${euros(intereses)}</strong></span>`;
   $('resumen').hidden = false;
 
   pintarEscenarios(capital, meses, diferencial, ultimo.valor, cuotaAhora);
@@ -77,7 +86,7 @@ function pintarEscenarios(capital, meses, diferencial, actual, cuotaAhora) {
     const cuota = cuotaMensual(capital, meses, e + diferencial);
     const cambio = cuota - cuotaAhora;
     return `<tr${d === 0 ? ' class="actual"' : ''}>
-      <td>${pct(e)}${d === 0 ? ' <small>(actual)</small>' : ''}</td>
+      <td>${pct(e)}${d === 0 ? ` <small>(${tr('actual', 'current')})</small>` : ''}</td>
       <td>${euros(cuota)}</td>
       <td>${d === 0 ? '—' : `${cambio > 0 ? '+' : '−'}${euros(Math.abs(cambio))}`}</td>
     </tr>`;
@@ -88,8 +97,11 @@ function pintarEscenarios(capital, meses, diferencial, actual, cuotaAhora) {
 
 const plazoTexto = (m) => {
   const a = Math.floor(m / 12), r = m % 12;
-  const partes = [a ? `${a} ${a === 1 ? 'año' : 'años'}` : '', r ? `${r} ${r === 1 ? 'mes' : 'meses'}` : ''].filter(Boolean);
-  return partes.join(' y ') || '0 meses';
+  const partes = [
+    a ? `${a} ${a === 1 ? tr('año', 'year') : tr('años', 'years')}` : '',
+    r ? `${r} ${r === 1 ? tr('mes', 'month') : tr('meses', 'months')}` : '',
+  ].filter(Boolean);
+  return partes.join(tr(' y ', ' and ')) || tr('0 meses', '0 months');
 };
 
 function pintarAmortizar(capital, meses, tipo) {
@@ -98,21 +110,28 @@ function pintarAmortizar(capital, meses, tipo) {
   bloque.hidden = false;
   if (!(extra > 0)) {
     $('op-cuota-dato').textContent = $('op-plazo-dato').textContent = '—';
-    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = 'Escribe cuánto dinero quieres adelantar.';
+    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = tr('Escribe cuánto dinero quieres adelantar.', 'Enter how much you want to pay off early.');
     return;
   }
   const r = amortizar(capital, meses, tipo, extra);
   if (r.liquida) {
-    $('op-cuota-dato').textContent = $('op-plazo-dato').textContent = 'Hipoteca pagada';
-    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = `Con ${euros(extra)} cancelas todo el capital pendiente y te ahorras ${euros(r.base.intereses)} de intereses.`;
+    $('op-cuota-dato').textContent = $('op-plazo-dato').textContent = tr('Hipoteca pagada', 'Mortgage paid off');
+    $('op-cuota-txt').textContent = $('op-plazo-txt').textContent = tr(
+      `Con ${euros(extra)} cancelas todo el capital pendiente y te ahorras ${euros(r.base.intereses)} de intereses.`,
+      `With ${euros(extra)} you clear the whole balance and save ${euros(r.base.intereses)} in interest.`
+    );
     return;
   }
-  $('op-cuota-dato').textContent = `${euros(r.reducirCuota.cuota)} al mes`;
-  $('op-cuota-txt').textContent =
-    `Pagas ${euros(r.base.cuota - r.reducirCuota.cuota)} menos cada mes durante el mismo plazo y te ahorras ${euros(r.reducirCuota.ahorro)} en intereses.`;
-  $('op-plazo-dato').textContent = `${plazoTexto(r.reducirPlazo.mesesMenos)} antes`;
-  $('op-plazo-txt').textContent =
-    `Sigues pagando ${euros(r.base.cuota)} al mes, terminas antes y te ahorras ${euros(r.reducirPlazo.ahorro)} en intereses: ${euros(r.reducirPlazo.ahorro - r.reducirCuota.ahorro)} más que reduciendo cuota.`;
+  $('op-cuota-dato').textContent = tr(`${euros(r.reducirCuota.cuota)} al mes`, `${euros(r.reducirCuota.cuota)} a month`);
+  $('op-cuota-txt').textContent = tr(
+    `Pagas ${euros(r.base.cuota - r.reducirCuota.cuota)} menos cada mes durante el mismo plazo y te ahorras ${euros(r.reducirCuota.ahorro)} en intereses.`,
+    `You pay ${euros(r.base.cuota - r.reducirCuota.cuota)} less every month over the same term and save ${euros(r.reducirCuota.ahorro)} in interest.`
+  );
+  $('op-plazo-dato').textContent = tr(`${plazoTexto(r.reducirPlazo.mesesMenos)} antes`, `${plazoTexto(r.reducirPlazo.mesesMenos)} sooner`);
+  $('op-plazo-txt').textContent = tr(
+    `Sigues pagando ${euros(r.base.cuota)} al mes, terminas antes y te ahorras ${euros(r.reducirPlazo.ahorro)} en intereses: ${euros(r.reducirPlazo.ahorro - r.reducirCuota.ahorro)} más que reduciendo cuota.`,
+    `You keep paying ${euros(r.base.cuota)} a month, finish sooner and save ${euros(r.reducirPlazo.ahorro)} in interest: ${euros(r.reducirPlazo.ahorro - r.reducirCuota.ahorro)} more than lowering the payment.`
+  );
 }
 
 function pintarHistoria(revision) {
@@ -152,11 +171,14 @@ function pintarHistoria(revision) {
   svg.innerHTML = g;
   const maximo = serie.reduce((a, b) => (b.valor > a.valor ? b : a));
   const minimo = serie.reduce((a, b) => (b.valor < a.valor ? b : a));
-  const resumen = `Máximo ${pct(maximo.valor)} en ${nombreMes(maximo.mes)}; mínimo ${pct(minimo.valor)} en ${nombreMes(minimo.mes)}.`;
-  svg.setAttribute('aria-label', `Evolución del Euríbor a un año desde ${nombreMes(serie[0].mes)}. ${resumen}`);
+  const resumen = tr(
+    `Máximo ${pct(maximo.valor)} en ${nombreMes(maximo.mes)}; mínimo ${pct(minimo.valor)} en ${nombreMes(minimo.mes)}.`,
+    `Highest ${pct(maximo.valor)} in ${nombreMes(maximo.mes)}; lowest ${pct(minimo.valor)} in ${nombreMes(minimo.mes)}.`
+  );
+  svg.setAttribute('aria-label', tr(`Evolución del Euríbor a un año desde ${nombreMes(serie[0].mes)}. ${resumen}`, `12-month Euribor since ${nombreMes(serie[0].mes)}. ${resumen}`));
   $('pie-historia').innerHTML =
-    `<span class="clave ahora-clave"></span>Último publicado (${nombreMes(serie[iAhora].mes)}) ` +
-    `<span class="clave revision-clave"></span>Tu última revisión. ${resumen}`;
+    `<span class="clave ahora-clave"></span>${tr('Último publicado', 'Latest published')} (${nombreMes(serie[iAhora].mes)}) ` +
+    `<span class="clave revision-clave"></span>${tr('Tu última revisión', 'Your last review')}. ${resumen}`;
 }
 
 async function iniciar() {
@@ -166,7 +188,7 @@ async function iniciar() {
     ({ serie } = await r.json());
     if (!serie?.length) throw new Error('vacío');
   } catch {
-    avisar('El Euríbor no está disponible ahora mismo. Vuelve a intentarlo en un rato.');
+    avisar(tr('El Euríbor no está disponible ahora mismo. Vuelve a intentarlo en un rato.', "The Euribor isn't available right now. Please try again shortly."));
     $('formulario').querySelectorAll('input, select').forEach((el) => (el.disabled = true));
     return;
   }
@@ -185,13 +207,12 @@ async function iniciar() {
   for (const id of ['capital', 'extra']) {
     $(id).addEventListener('blur', () => {
       const n = entero($(id).value);
-      if (n > 0) $(id).value = new Intl.NumberFormat('es-ES').format(n);
+      if (n > 0) $(id).value = new Intl.NumberFormat(LOCALE).format(n);
     });
   }
   $('formulario').addEventListener('submit', (e) => e.preventDefault());
 
-  const f = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-  $('actualizado').textContent = `Último Euríbor publicado: ${f.format(new Date(`${serie.at(-1).mes}-01T00:00:00Z`))}.`;
+  $('actualizado').textContent = tr(`Último Euríbor publicado: ${nombreMes(serie.at(-1).mes)}.`, `Latest Euribor published: ${nombreMes(serie.at(-1).mes)}.`);
   calcular();
 
   let espera;

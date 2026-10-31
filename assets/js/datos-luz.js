@@ -2,6 +2,7 @@
 // y si no tiene el día de hoy, la API de REE en directo.
 
 import { fechaMadrid, horaMadrid, descargarPvpc } from './ree.js';
+import { LOCALE } from './idioma.js';
 
 const FICHERO = new URL('../../data/luz.json', import.meta.url);
 
@@ -55,7 +56,7 @@ export async function cargarLuz() {
   };
 }
 
-export const formatoPrecio = (p) =>
-  new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(p);
+const FORMATO_PRECIO = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+export const formatoPrecio = (p) => FORMATO_PRECIO.format(p);
 
 export const horaTexto = (h) => `${String(h).padStart(2, '0')}:00`;

@@ -1,4 +1,5 @@
 import { COMBUSTIBLES, expandir, cercanas, centroCodigoPostal, provinciasCercanas, abierta, ahoraEnEspana, tendencia } from './carburantes.js';
+import { tr, idioma, numero, euros as eurosMoneda, formato, LOCALE } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
 const DATOS = new URL('../../data/', import.meta.url);
@@ -6,8 +7,21 @@ const RADIO_MAXIMO = 25; // se cargan las provincias para el radio mayor y así 
 const MAXIMO_LISTA = 25;
 const HORAS_ANTIGUEDAD = 14; // el Ministerio publica varias veces al día
 
-const euros = (p) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(p);
-const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(d)} km`);
+const euros = (p) => numero(p, 3);
+const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 }).format(d)} km`);
+
+// Nombre de cada combustible con su artículo («la gasolina 95», «el diésel»)
+const COMBUSTIBLES_EN = { g95: '95 petrol', g98: '98 petrol', diesel: 'Diesel', dieselPlus: 'Premium diesel', glp: 'LPG (autogas)' };
+const ARTICULO = { g95: 'la', g98: 'la', diesel: 'el', dieselPlus: 'el', glp: 'el' };
+const nombreCombustible = (c) => (idioma === 'en' ? COMBUSTIBLES_EN[c] : COMBUSTIBLES[c].nombre);
+const conArticulo = (c) => tr(`${ARTICULO[c]} ${COMBUSTIBLES[c].nombre.toLowerCase()}`.replace('glp', 'GLP'), COMBUSTIBLES_EN[c].replace(/^\w/, (x) => x.toLowerCase()).replace('lpg', 'LPG'));
+
+/** Horario del Ministerio («L-V: 07:00-22:00») en el idioma de la página. */
+const DIAS_EN = { L: 'Mon', M: 'Tue', X: 'Wed', J: 'Thu', V: 'Fri', S: 'Sat', D: 'Sun' };
+const horarioTexto = (h) =>
+  idioma === 'en'
+    ? String(h).replace(/\b([LMXJVSD])(?=[-:,\s])/g, (d) => DIAS_EN[d]).replace(/\b24H\b/gi, '24h').replace(/ y /g, ' and ')
+    : String(h);
 const escapar = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 // Preferencias del visitante (solo en su navegador)
@@ -34,33 +48,33 @@ async function historicoDe(prov) {
   return historicos.get(prov);
 }
 
-const centimos = (x) => new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(Math.abs(x) * 100);
-const FORMATO_DIA = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const centimos = (x) => new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 }).format(Math.abs(x) * 100);
+const FORMATO_DIA = formato({ day: 'numeric', month: 'long', timeZone: 'UTC' });
 const diaCorto = (f) => FORMATO_DIA.format(new Date(`${f}T12:00:00Z`));
 
 async function pintarTendencia(prov, c) {
   const bloque = $('bloque-tendencia');
   const serie = await historicoDe(prov);
-  const nombreProv = indice?.provincias?.[prov]?.nombre ?? 'tu provincia';
-  const combustibleTxt = COMBUSTIBLES[c].nombre.toLowerCase();
+  const nombreProv = indice?.provincias?.[prov]?.nombre ?? tr('tu provincia', 'your province');
+  const combustibleTxt = conArticulo(c);
   const t = tendencia(serie, c);
   if (!serie.length) { bloque.hidden = true; return; }
   if (!t) {
-    $('tendencia-frase').textContent = `Empezamos a guardar los precios de ${nombreProv} el ${diaCorto(serie[0].f)}.`;
-    $('tendencia-detalle').textContent = 'En unos días verás aquí si hoy está más caro o más barato que la semana pasada.';
+    $('tendencia-frase').textContent = tr(`Empezamos a guardar los precios de ${nombreProv} el ${diaCorto(serie[0].f)}.`, `We started recording prices for ${nombreProv} on ${diaCorto(serie[0].f)}.`);
+    $('tendencia-detalle').textContent = tr('En unos días verás aquí si hoy está más caro o más barato que la semana pasada.', "In a few days you'll see here whether today is cheaper or dearer than last week.");
     $('tendencia-caja').hidden = true;
     bloque.hidden = false;
     return;
   }
   const igual = Math.abs(t.diferencia) < 0.005;
   $('tendencia-frase').textContent = igual
-    ? `En ${nombreProv}, la ${combustibleTxt} está en la media de la última semana.`
+    ? tr(`En ${nombreProv}, ${combustibleTxt} está en la media de la última semana.`, `In ${nombreProv}, ${combustibleTxt} is at last week's average.`)
     : t.diferencia < 0
-      ? `Buen momento: en ${nombreProv}, la ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por debajo de la media de la semana.`
-      : `Si puedes, espera: en ${nombreProv}, la ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por encima de la media de la semana.`;
+      ? tr(`Buen momento: en ${nombreProv}, ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por debajo de la media de la semana.`, `Good time to fill up: in ${nombreProv}, ${combustibleTxt} is ${centimos(t.diferencia)} cents below the weekly average.`)
+      : tr(`Si puedes, espera: en ${nombreProv}, ${combustibleTxt} está ${centimos(t.diferencia)} céntimos por encima de la media de la semana.`, `Wait if you can: in ${nombreProv}, ${combustibleTxt} is ${centimos(t.diferencia)} cents above the weekly average.`);
   $('tendencia-detalle').textContent =
-    `Media de hoy: ${euros(t.hoy)} €/l. Media de los días anteriores: ${euros(t.media7)} €/l.` +
-    (t.hace7 !== null ? ` Hace una semana: ${euros(t.hace7)} €/l.` : '');
+    tr(`Media de hoy: ${euros(t.hoy)} €/l. Media de los días anteriores: ${euros(t.media7)} €/l.`, `Today's average: ${euros(t.hoy)} €/l. Previous days' average: ${euros(t.media7)} €/l.`) +
+    (t.hace7 !== null ? tr(` Hace una semana: ${euros(t.hace7)} €/l.`, ` A week ago: ${euros(t.hace7)} €/l.`) : '');
   pintarChispa(serie.slice(-30), c, nombreProv, combustibleTxt);
   bloque.hidden = false;
 }
@@ -78,7 +92,7 @@ function pintarChispa(serie, c, nombreProv, combustibleTxt) {
   const linea = puntos.map((p, i) => `${x(i).toFixed(1)},${y(p[c]).toFixed(1)}`).join(' ');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = `<polyline points="${linea}" class="linea"/><circle cx="${x(puntos.length - 1)}" cy="${y(vs.at(-1))}" r="4.5" class="punto"/>`;
-  svg.setAttribute('aria-label', `Precio medio de la ${combustibleTxt} en ${nombreProv} los últimos ${puntos.length} días: entre ${euros(min)} y ${euros(max)} €/l; hoy ${euros(vs.at(-1))} €/l.`);
+  svg.setAttribute('aria-label', tr(`Precio medio de ${combustibleTxt} en ${nombreProv} los últimos ${puntos.length} días: entre ${euros(min)} y ${euros(max)} €/l; hoy ${euros(vs.at(-1))} €/l.`, `Average price of ${combustibleTxt} in ${nombreProv} over the last ${puntos.length} days: between ${euros(min)} and ${euros(max)} €/l; today ${euros(vs.at(-1))} €/l.`));
 }
 
 async function cargarProvincias(ids) {
@@ -113,8 +127,8 @@ function radio() { return Number(document.querySelector('input[name=radio]:check
 
 function prepararFiltros() {
   const select = $('combustible');
-  for (const [clave, { nombre }] of Object.entries(COMBUSTIBLES)) {
-    select.add(new Option(nombre, clave));
+  for (const clave of Object.keys(COMBUSTIBLES)) {
+    select.add(new Option(nombreCombustible(clave), clave));
   }
   const c = leer('combustible');
   if (c && COMBUSTIBLES[c]) select.value = c;
@@ -146,14 +160,14 @@ function pintarMapa(lista, min, max) {
     mapa = L.map('mapa', { scrollWheelZoom: false });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; colaboradores de <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: tr('&copy; colaboradores de ', '&copy; ') + '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' + tr('', ' contributors'),
     }).addTo(mapa);
     capa = L.layerGroup().addTo(mapa);
   }
   capa.clearLayers();
   const c = combustible();
   L.circleMarker([centro.lat, centro.lon], { radius: 7, weight: 3, color: '#2b59c3', fillOpacity: 0.2 })
-    .bindTooltip('Tú').addTo(capa);
+    .bindTooltip(tr('Tú', 'You')).addTo(capa);
   const colores = { barata: '#1d8a5b', media: '#c98e0c', cara: '#b42318' };
   lista.forEach((e, i) => {
     L.circleMarker([e.lat, e.lon], {
@@ -178,14 +192,17 @@ function pintar() {
   const conEstado = estaciones.map((e) => ({ ...e, abierta: abierta(e.horario, momento) }));
   const filtradas = $('abiertas').checked ? conEstado.filter((e) => e.abierta !== false) : conEstado;
   const todas = cercanas(filtradas, centro, r, c);
-  const nombre = COMBUSTIBLES[c].nombre;
+  const nombre = nombreCombustible(c);
 
   if (!todas.length) {
-    const abiertas = $('abiertas').checked ? ' abiertas ahora' : '';
-    $('titular').textContent = `No hay gasolineras${abiertas} con ${nombre.toLowerCase()} a menos de ${r} km.`;
+    const abiertas = $('abiertas').checked;
+    $('titular').textContent = tr(
+      `No hay gasolineras${abiertas ? ' abiertas ahora' : ''} con ${nombre.toLowerCase().replace('glp', 'GLP')} a menos de ${r} km.`,
+      `No${abiertas ? ' open' : ''} petrol stations with ${nombre.toLowerCase().replace('lpg', 'LPG')} within ${r} km.`
+    );
     $('entradilla').textContent = abiertas
-      ? 'Prueba a ampliar la distancia, a elegir otro combustible o a ver también las cerradas.'
-      : 'Prueba a ampliar la distancia o a elegir otro combustible.';
+      ? tr('Prueba a ampliar la distancia, a elegir otro combustible o a ver también las cerradas.', 'Try a wider distance, another fuel, or include closed stations.')
+      : tr('Prueba a ampliar la distancia o a elegir otro combustible.', 'Try a wider distance or another fuel.');
     $('resumen').hidden = true;
     $('resultados').hidden = true;
     $('bloque-tendencia').hidden = true;
@@ -198,14 +215,20 @@ function pintar() {
   const max = Math.max(...precios);
   const mejor = todas[0];
 
-  $('titular').textContent = `La más barata a menos de ${r} km: ${mejor.rotulo || 'una gasolinera sin marca'}, a ${euros(mejor[c])} €/l.`;
-  $('entradilla').textContent = `${nombre} cerca ${centro.etiqueta}. A ${km(mejor.km)}, en ${mejor.direccion}.`;
+  $('titular').textContent = tr(
+    `La más barata a menos de ${r} km: ${mejor.rotulo || 'una gasolinera sin marca'}, a ${euros(mejor[c])} €/l.`,
+    `Cheapest within ${r} km: ${mejor.rotulo || 'an unbranded station'}, at ${euros(mejor[c])} €/l.`
+  );
+  $('entradilla').textContent = tr(
+    `${nombre} cerca ${centro.etiqueta}. A ${km(mejor.km)}, en ${mejor.direccion}.`,
+    `${nombre} near ${centro.etiquetaEn}. ${km(mejor.km)} away, at ${mejor.direccion}.`
+  );
 
   const ahorro50 = (max - min) * 50;
   $('resumen').innerHTML = `
-    <span><strong>${todas.length}</strong> gasolineras</span>
-    <span>Entre <strong>${euros(min)}</strong> y <strong>${euros(max)}</strong> €/l</span>
-    ${ahorro50 >= 0.5 ? `<span>En un depósito de 50 l ahorras hasta <strong>${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(ahorro50)}</strong></span>` : ''}`;
+    <span><strong>${todas.length}</strong> ${tr('gasolineras', 'stations')}</span>
+    <span>${tr('Entre', 'Between')} <strong>${euros(min)}</strong> ${tr('y', 'and')} <strong>${euros(max)}</strong> €/l</span>
+    ${ahorro50 >= 0.5 ? `<span>${tr('En un depósito de 50 l ahorras hasta', 'On a 50 l tank you save up to')} <strong>${eurosMoneda(ahorro50)}</strong></span>` : ''}`;
   $('resumen').hidden = false;
   $('resultados').hidden = false;
 
@@ -217,11 +240,11 @@ function pintar() {
         <li class="estacion">
           <span class="precio ${clase}">${euros(e[c])}<small>€/l</small></span>
           <div>
-            <h3>${escapar(e.rotulo || 'Gasolinera sin marca')}</h3>
+            <h3>${escapar(e.rotulo || tr('Gasolinera sin marca', 'Unbranded station'))}</h3>
             <p>${escapar(e.direccion)}, ${escapar(e.municipio)}</p>
-            <p class="meta"><span>A ${km(e.km)}</span><span class="estado ${e.abierta === true ? 'abierta' : e.abierta === false ? 'cerrada' : ''}">${e.abierta === true ? 'Abierta' : e.abierta === false ? 'Cerrada' : 'Horario'}</span><span>${escapar(e.horario)}</span></p>
+            <p class="meta"><span>${tr(`A ${km(e.km)}`, `${km(e.km)} away`)}</span><span class="estado ${e.abierta === true ? 'abierta' : e.abierta === false ? 'cerrada' : ''}">${e.abierta === true ? tr('Abierta', 'Open') : e.abierta === false ? tr('Cerrada', 'Closed') : tr('Horario', 'Hours')}</span><span>${escapar(horarioTexto(e.horario))}</span></p>
           </div>
-          <a class="llegar" href="${destino}" target="_blank" rel="noopener">Cómo llegar</a>
+          <a class="llegar" href="${destino}" target="_blank" rel="noopener">${tr('Cómo llegar', 'Directions')}</a>
         </li>`;
     })
     .join('');
@@ -234,16 +257,16 @@ function pintar() {
 
 function usarUbicacion() {
   if (!navigator.geolocation) {
-    avisar('Tu navegador no permite compartir la ubicación. Busca por código postal.');
+    avisar(tr('Tu navegador no permite compartir la ubicación. Busca por código postal.', "Your browser can't share your location. Search by postcode instead."));
     return;
   }
-  avisar('Buscando tu ubicación…');
+  avisar(tr('Buscando tu ubicación…', 'Finding your location…'));
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       avisar('');
-      fijarCentro({ lat: pos.coords.latitude, lon: pos.coords.longitude, etiqueta: 'de ti' });
+      fijarCentro({ lat: pos.coords.latitude, lon: pos.coords.longitude, etiqueta: 'de ti', etiquetaEn: 'you' });
     },
-    () => avisar('No hemos podido obtener tu ubicación. Busca por código postal.'),
+    () => avisar(tr('No hemos podido obtener tu ubicación. Busca por código postal.', "We couldn't get your location. Search by postcode instead.")),
     { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
   );
 }
@@ -252,7 +275,7 @@ async function buscarCodigoPostal(ev) {
   ev.preventDefault();
   const cp = $('cp').value.trim();
   if (!/^\d{5}$/.test(cp)) {
-    avisar('Escribe un código postal de 5 cifras, por ejemplo 28100.');
+    avisar(tr('Escribe un código postal de 5 cifras, por ejemplo 28100.', 'Enter a 5-digit Spanish postcode, for example 28100.'));
     return;
   }
   const prov = cp.slice(0, 2);
@@ -267,12 +290,12 @@ async function buscarCodigoPostal(ev) {
     lugar = centroCodigoPostal(estaciones, cp);
   }
   if (!lugar) {
-    avisar(`No encontramos el ${cp}. Comprueba que está bien escrito o usa tu ubicación.`);
+    avisar(tr(`No encontramos el ${cp}. Comprueba que está bien escrito o usa tu ubicación.`, `We couldn't find ${cp}. Check it's correct or use your location.`));
     return;
   }
   avisar('');
   guardar('cp', cp);
-  fijarCentro({ lat: lugar.lat, lon: lugar.lon, etiqueta: `del ${cp} (${lugar.municipio})` });
+  fijarCentro({ lat: lugar.lat, lon: lugar.lon, etiqueta: `del ${cp} (${lugar.municipio})`, etiquetaEn: `${cp} (${lugar.municipio})` });
 }
 
 async function iniciar() {
@@ -284,16 +307,16 @@ async function iniciar() {
     indice = await json('gasolina/indice.json');
     if (indice.fecha) {
       const fecha = new Date(indice.fecha);
-      const f = new Intl.DateTimeFormat('es-ES', { dateStyle: 'long', timeStyle: 'short' });
-      $('actualizado').textContent = `Precios del ${f.format(fecha)}.`;
+      const f = formato({ dateStyle: 'long', timeStyle: 'short' });
+      $('actualizado').textContent = tr(`Precios del ${f.format(fecha)}.`, `Prices as of ${f.format(fecha)}.`);
       const horas = (Date.now() - fecha.getTime()) / 3600000;
       if (horas > HORAS_ANTIGUEDAD) {
-        $('antiguedad').textContent = `Estos precios son del ${f.format(fecha)} y pueden haber cambiado. Estamos teniendo problemas para actualizarlos.`;
+        $('antiguedad').textContent = tr(`Estos precios son del ${f.format(fecha)} y pueden haber cambiado. Estamos teniendo problemas para actualizarlos.`, `These prices are from ${f.format(fecha)} and may have changed. We're having trouble updating them.`);
         $('antiguedad').hidden = false;
       }
     }
   } catch {
-    avisar('Los precios de carburantes no están disponibles ahora mismo. Vuelve a intentarlo en un rato.');
+    avisar(tr('Los precios de carburantes no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Fuel prices aren't available right now. Please try again shortly."));
     document.querySelectorAll('#buscador button, #buscador input').forEach((el) => (el.disabled = true));
   }
 }

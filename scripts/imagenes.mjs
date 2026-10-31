@@ -37,24 +37,19 @@ await captura(icono(512, 0.12), 512, 512, 'assets/img/icono-512.png');
 await captura(icono(512, 0.2), 512, 512, 'assets/img/icono-maskable-512.png');
 await captura(icono(180, 0.12), 180, 180, 'assets/img/apple-touch-icon.png');
 
-// Imagen para compartir en WhatsApp, redes, etc.
-await captura(
-  `<div style="width:1200px;height:630px;background:#eef1ee;color:#172033;font-family:Archivo,system-ui,sans-serif;padding:80px 90px;display:flex;flex-direction:column;justify-content:space-between">
+// Imagen para compartir en WhatsApp, redes, etc. (una por idioma)
+const compartir = (frase, pregunta1, pregunta2) => `<div style="width:1200px;height:630px;background:#eef1ee;color:#172033;font-family:Archivo,system-ui,sans-serif;padding:80px 90px;display:flex;flex-direction:column;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:28px">
       <div style="width:120px">${logo}</div>
       <div style="font-size:96px;font-weight:800;font-stretch:125%;letter-spacing:-0.03em">bolsillo</div>
     </div>
-    <div style="font-size:58px;font-weight:800;font-stretch:112%;line-height:1.08;letter-spacing:-0.02em;max-width:950px">
-      Luz, gasolina e hipoteca con datos oficiales.
-    </div>
+    <div style="font-size:58px;font-weight:800;font-stretch:112%;line-height:1.08;letter-spacing:-0.02em;max-width:980px">${frase}</div>
     <div style="display:flex;gap:18px;font-size:30px;font-weight:600">
-      <span style="background:#c98e0c;color:#1a1405;padding:10px 22px;border-radius:12px">¿Cuándo pongo la lavadora?</span>
-      <span style="background:#b42318;color:#fff;padding:10px 22px;border-radius:12px">¿Dónde echo gasolina?</span>
+      <span style="background:#c98e0c;color:#1a1405;padding:10px 22px;border-radius:12px">${pregunta1}</span>
+      <span style="background:#b42318;color:#fff;padding:10px 22px;border-radius:12px">${pregunta2}</span>
     </div>
-  </div>`,
-  1200,
-  630,
-  'assets/img/compartir.png'
-);
+  </div>`;
+await captura(compartir('Luz, gasolina e hipoteca con datos oficiales.', '¿Cuándo pongo la lavadora?', '¿Dónde echo gasolina?'), 1200, 630, 'assets/img/compartir.png');
+await captura(compartir('Electricity, fuel and mortgage costs in Spain, with official data.', 'When to run the washer?', 'Where to fill up?'), 1200, 630, 'assets/img/compartir-en.png');
 
 await navegador.close();

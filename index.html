@@ -42,6 +42,10 @@
       <a href="hipoteca/">Hipoteca</a>
       <a href="ipc/">Inflación</a>
     </nav>
+    <div class="idiomas" role="group" aria-label="Idioma">
+      <span aria-current="true">ES</span>
+      <a href="/en/" hreflang="en" lang="en" title="English">EN</a>
+    </div>
   </header>
 
   <main class="envoltorio">
@@ -105,43 +109,7 @@
     <p>Web sin anuncios ni cookies. <a href="fuentes/">Fuentes y condiciones</a>. Código en <a href="https://github.com/serbenda/bolsillo">GitHub</a>.</p>
   </footer>
 
-  <script type="module">
-    import { cargarLuz, formatoPrecio, horaTexto } from './assets/js/datos-luz.js';
-    import { horaMadrid } from './assets/js/ree.js';
-    import { mejorTramo } from './assets/js/ventana.js';
-    import { factorImpuestos } from './assets/js/impuestos.js';
-
-    const $ = (id) => document.getElementById(id);
-    const num = (n, d) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
-    $('recibo-fecha').textContent = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' }).format(new Date());
-
-    cargarLuz().then(({ hoy, manana, fechaHoy }) => {
-      if (!hoy) return;
-      const h = horaMadrid();
-      const actual = hoy.find((x) => x.hora === h);
-      if (actual) $('r-luz').textContent = `${formatoPrecio(actual.precio * factorImpuestos(fechaHoy))} €/kWh`;
-      const mejor = mejorTramo([...hoy.filter((x) => x.hora >= h), ...(manana ?? [])], 1);
-      if (mejor) $('r-hora').textContent = `${mejor.inicio.fecha === fechaHoy ? 'hoy' : 'mañana'}, ${horaTexto(mejor.inicio.hora)}`;
-    });
-
-    fetch('data/gasolina/indice.json', { cache: 'no-cache' }).then((r) => r.json()).then(({ medias }) => {
-      if (medias?.g95) $('r-g95').textContent = `${num(medias.g95, 3)} €/l`;
-      if (medias?.diesel) $('r-diesel').textContent = `${num(medias.diesel, 3)} €/l`;
-    }).catch(() => {});
-
-    fetch('data/ipc.json', { cache: 'no-cache' }).then((r) => r.json()).then(async ({ serie }) => {
-      const { interanual } = await import('./assets/js/ipc.js');
-      const t = interanual(serie).at(-1);
-      if (t) $('r-ipc').textContent = `${num(t.tasa * 100, 1)}\u00a0%`;
-    }).catch(() => {});
-
-    fetch('data/euribor.json', { cache: 'no-cache' }).then((r) => r.json()).then(({ serie }) => {
-      const u = serie?.at(-1);
-      if (!u) return;
-      const mes = new Intl.DateTimeFormat('es-ES', { month: 'short', timeZone: 'UTC' }).format(new Date(`${u.mes}-01T00:00:00Z`)).replace('.', '');
-      $('r-euribor').textContent = `${num(u.valor, 3)}\u00a0% (${mes})`;
-    }).catch(() => {});
-  </script>
+  <script type="module" src="assets/js/portada.js"></script>
   <script type="module" src="assets/js/comun.js"></script>
 </body>
 </html>
