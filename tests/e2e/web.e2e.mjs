@@ -175,6 +175,26 @@ test('compartir: copia el titular y el enlace cuando no se puede compartir', asy
   await contexto.close();
 });
 
+test('inflación: sueldo frente a los precios', async () => {
+  const { pagina, errores, contexto } = await abrir('ipc/');
+  await pagina.fill('#sueldo-antes', '1.500');
+  await pagina.fill('#sueldo-hoy', '1.000');
+  assert.match(await pagina.textContent('#resultado-sueldo'), /^Has perdido poder de compra: hoy puedes comprar un .+ menos que en \d{4}\.$/);
+  await pagina.fill('#sueldo-hoy', '5.000');
+  assert.match(await pagina.textContent('#resultado-sueldo'), /^Has ganado poder de compra/);
+  assert.match(await pagina.textContent('#detalle-sueldo'), /necesitarías cobrar .+ al mes/);
+  assert.deepEqual(errores, []);
+  await contexto.close();
+});
+
+test('gasolina: precio por provincia', async () => {
+  const { pagina, errores, contexto } = await abrir('gasolina/');
+  assert.match(await pagina.textContent('#provincias-frase'), /^Hoy .+ está más barat[ao] en .+ y más car[ao] en .+ Media de España: /);
+  assert.ok((await pagina.locator('#provincias .producto').count()) >= 40); // 52 provincias con datos
+  assert.deepEqual(errores, []);
+  await contexto.close();
+});
+
 test('fuentes y ficheros de la app', async () => {
   const { pagina, errores, contexto } = await abrir('fuentes/');
   assert.deepEqual(errores, []);

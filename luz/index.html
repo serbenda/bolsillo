@@ -139,6 +139,25 @@
       <p>Cada tarde, en cuanto Red Eléctrica publique los precios, te avisamos de la hora más barata y la más cara del día siguiente. Funciona con bolsillo instalado como app en Chrome o Edge.</p>
       <p class="compartir"><button type="button" class="boton" id="avisos-boton">Activar avisos</button><span class="estado-compartir" id="avisos-estado" aria-live="polite"></span></p>
     </section>
+    <section aria-labelledby="t-explicacion" class="explicacion">
+      <h2 id="t-explicacion">¿De dónde salen los datos?</h2>
+      <details>
+        <summary>¿De dónde sale el precio?</summary>
+        <p>Es el PVPC (precio voluntario para el pequeño consumidor), la tarifa regulada de la luz. Red Eléctrica publica cada tarde, hacia las 20:30, el precio de cada hora del día siguiente, y bolsillo lo descarga de su API pública.</p>
+      </details>
+      <details>
+        <summary>¿Por qué cambia cada hora?</summary>
+        <p>Porque sigue el precio del mercado mayorista, que se fija hora a hora según la demanda y cómo se produce la electricidad: con mucho sol y viento es más barata; cuando hacen falta centrales de gas, más cara. Por eso las horas centrales del día suelen ser las más baratas.</p>
+      </details>
+      <details>
+        <summary>¿Qué incluye el precio con impuestos?</summary>
+        <p>El precio de la energía con peajes y cargos, más el impuesto eléctrico y el IVA. No incluye la parte fija de la factura: la potencia contratada y el alquiler del contador.</p>
+      </details>
+      <details>
+        <summary>¿Y si no tengo PVPC?</summary>
+        <p>Si tienes una tarifa del mercado libre con precio fijo, pagas lo mismo a cualquier hora y estos precios no te afectan directamente. Tienes PVPC si tu factura dice «precio voluntario para el pequeño consumidor» y tu comercializadora es «de referencia».</p>
+      </details>
+    </section>
   </main>
 
   <footer class="envoltorio pie">

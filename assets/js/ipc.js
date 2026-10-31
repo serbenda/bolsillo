@@ -40,3 +40,21 @@ export function interanual(serie) {
     })
     .filter(Boolean);
 }
+
+/**
+ * ¿Ha subido tu sueldo más que los precios? Compara el IPC medio del año en que cobrabas `antes`
+ * con el de los últimos 12 meses publicados.
+ * Devuelve { necesario, diferencia, real, inflacion } o null:
+ * - necesario: lo que tendrías que cobrar hoy para comprar lo mismo que entonces
+ * - diferencia: lo que cobras de más (+) o de menos (−) frente a eso
+ * - real: variación de tu poder de compra (0,05 = puedes comprar un 5 % más)
+ */
+export function poderAdquisitivo(serie, anyo, antes, ahora) {
+  const delAnyo = serie.filter((p) => p.mes.startsWith(`${anyo}-`));
+  const ultimos = serie.slice(-12);
+  if (delAnyo.length < 12 || ultimos.length < 12 || !(antes > 0) || !(ahora >= 0)) return null;
+  const media = (l) => l.reduce((s, p) => s + p.valor, 0) / l.length;
+  const inflacion = media(ultimos) / media(delAnyo) - 1;
+  const necesario = antes * (1 + inflacion);
+  return { necesario, diferencia: ahora - necesario, real: ahora / necesario - 1, inflacion };
+}

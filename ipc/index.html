@@ -80,12 +80,50 @@
       </form>
     </section>
 
+    <section aria-labelledby="t-sueldo">
+      <form class="planificador formulario" id="form-sueldo" novalidate>
+        <h2 id="t-sueldo">¿Tu sueldo ha subido más que los precios?</h2>
+        <div class="campos">
+          <label class="campo">
+            <span>Lo que cobrabas al mes</span>
+            <span class="con-unidad"><input id="sueldo-antes" inputmode="decimal" autocomplete="off" value="1.500"><b>€</b></span>
+          </label>
+          <label class="campo">
+            <span>En el año</span>
+            <select id="anyo-sueldo"></select>
+          </label>
+          <label class="campo">
+            <span>Lo que cobras hoy al mes</span>
+            <span class="con-unidad"><input id="sueldo-hoy" inputmode="decimal" autocomplete="off" value="1.650"><b>€</b></span>
+          </label>
+        </div>
+        <p class="resultado" id="resultado-sueldo" aria-live="polite"></p>
+        <p id="detalle-sueldo"></p>
+        <p class="nota">Compara los precios medios de ese año con los de los últimos 12 meses publicados. Usa siempre el mismo tipo de sueldo (neto o bruto) en las dos casillas. Solo se guarda en tu navegador; no se envía a ningún sitio.</p>
+      </form>
+    </section>
+
     <section aria-labelledby="t-historia" id="bloque-historia" hidden>
       <h2 id="t-historia">La inflación, mes a mes</h2>
       <figure class="historia">
         <svg id="historia" role="img"></svg>
         <figcaption class="nota" id="pie-historia"></figcaption>
       </figure>
+    </section>
+    <section aria-labelledby="t-explicacion" class="explicacion">
+      <h2 id="t-explicacion">¿De dónde salen los datos?</h2>
+      <details>
+        <summary>¿De dónde sale la inflación?</summary>
+        <p>Del Índice de Precios de Consumo (IPC) del INE. Cada mes mide los precios de una cesta con cientos de productos y servicios que representan lo que gastan los hogares (comida, vivienda, transporte, ocio…), y cada cosa pesa según cuánto se gasta en ella. bolsillo descarga el índice general desde 2002 con la API pública del INE.</p>
+      </details>
+      <details>
+        <summary>¿Por qué no coincide con lo que noto?</summary>
+        <p>Porque es una media de todos los hogares. Si gastas mucho en algo que ha subido más (el alquiler o la comida, por ejemplo), notarás más inflación que la oficial; si gastas en cosas que suben menos, notarás menos.</p>
+      </details>
+      <details>
+        <summary>¿Cómo se calcula lo de mi sueldo?</summary>
+        <p>Se compara el IPC medio del año que eliges con el de los últimos 12 meses publicados. Si los precios han subido un 20 %, necesitas cobrar un 20 % más para comprar lo mismo; si tu sueldo ha subido menos, has perdido poder de compra.</p>
+      </details>
     </section>
   </main>
 

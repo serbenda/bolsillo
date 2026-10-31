@@ -41,3 +41,18 @@ test('inflación interanual', () => {
 test('URL de la serie vigente', () => {
   assert.match(urlIpc(), /IPC290751\?nult=1000$/);
 });
+
+test('sueldo frente a la inflación', async () => {
+  const { poderAdquisitivo } = await import('../assets/js/ipc.js');
+  // 2024 todo el año a 100, últimos 12 meses a 110
+  const serie = [
+    ...Array.from({ length: 12 }, (_, i) => ({ mes: `2024-${String(i + 1).padStart(2, '0')}`, valor: 100 })),
+    ...Array.from({ length: 12 }, (_, i) => ({ mes: `2025-${String(i + 1).padStart(2, '0')}`, valor: 110 })),
+  ];
+  const r = poderAdquisitivo(serie, 2024, 2000, 2100);
+  assert.ok(Math.abs(r.necesario - 2200) < 1e-9);
+  assert.ok(Math.abs(r.diferencia + 100) < 1e-9);
+  assert.ok(Math.abs(r.real - (2100 / 2200 - 1)) < 1e-9);
+  assert.equal(poderAdquisitivo(serie, 2010, 2000, 2100), null); // año sin datos
+  assert.equal(poderAdquisitivo(serie, 2024, 0, 2100), null);
+});

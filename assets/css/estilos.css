@@ -625,3 +625,11 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .leyenda i { display: inline-block; width: 1.2rem; height: 3px; vertical-align: middle; margin-right: 0.4rem; background: var(--tinta); }
 .leyenda i.producto-sel { background: var(--punta); }
 .leyenda i.general { background: repeating-linear-gradient(90deg, var(--tenue) 0 5px, transparent 5px 9px); }
+.chispa .linea.general { stroke: var(--tenue); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.tendencia .leyenda { margin: 0.5rem 0 0; }
+.todas-provincias { margin-top: 1rem; }
+.todas-provincias summary { cursor: pointer; font-weight: 600; }
+.productos.provincias .producto { grid-template-columns: minmax(8rem, 13rem) 1fr 5.5rem; }
+.productos .producto.tuya .nombre { font-weight: 800; }
+.productos .producto.tuya { background: color-mix(in srgb, var(--foco) 10%, transparent); }
+#bloque-provincias .resultado { margin-top: 0.75rem; max-width: 60ch; }

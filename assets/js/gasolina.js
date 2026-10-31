@@ -29,6 +29,7 @@ const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.${k}`, v); } ca
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.${k}`); } catch { return null; } };
 
 let indice = null; // fecha, medias y caja de cada provincia
+let provinciaElegida = null; // la de la última búsqueda, para destacarla
 const cargadas = new Map(); // provincia → estaciones
 let estaciones = [];
 let centro = null; // { lat, lon, etiqueta }
@@ -75,24 +76,74 @@ async function pintarTendencia(prov, c) {
   $('tendencia-detalle').textContent =
     tr(`Media de hoy: ${euros(t.hoy)} €/l. Media de los días anteriores: ${euros(t.media7)} €/l.`, `Today's average: ${euros(t.hoy)} €/l. Previous days' average: ${euros(t.media7)} €/l.`) +
     (t.hace7 !== null ? tr(` Hace una semana: ${euros(t.hace7)} €/l.`, ` A week ago: ${euros(t.hace7)} €/l.`) : '');
-  pintarChispa(serie.slice(-30), c, nombreProv, combustibleTxt);
+  pintarChispa(serie.slice(-30), (await historicoDe('nacional')).slice(-30), c, nombreProv, combustibleTxt);
   bloque.hidden = false;
 }
 
-function pintarChispa(serie, c, nombreProv, combustibleTxt) {
+function pintarChispa(serie, nacional, c, nombreProv, combustibleTxt) {
   const svg = $('tendencia-grafico');
   const puntos = serie.filter((x) => typeof x[c] === 'number');
   if (puntos.length < 3) { $('tendencia-caja').hidden = true; return; }
   $('tendencia-caja').hidden = false;
+  // La media de España, en los mismos días, para comparar
+  const espana = new Map(nacional.filter((x) => typeof x[c] === 'number').map((x) => [x.f, x[c]]));
   const W = Math.max(svg.clientWidth || 600, 280), H = 90, M = 8;
   const vs = puntos.map((x) => x[c]);
-  const min = Math.min(...vs), max = Math.max(...vs) || min + 0.01;
+  const todos = [...vs, ...puntos.map((p) => espana.get(p.f)).filter((v) => v != null)];
+  const min = Math.min(...todos), max = Math.max(...todos) || min + 0.01;
   const x = (i) => M + (i / (puntos.length - 1)) * (W - 2 * M);
   const y = (v) => M + (max === min ? 0.5 : (max - v) / (max - min)) * (H - 2 * M);
   const linea = puntos.map((p, i) => `${x(i).toFixed(1)},${y(p[c]).toFixed(1)}`).join(' ');
+  const lineaEs = puntos.map((p, i) => (espana.has(p.f) ? `${x(i).toFixed(1)},${y(espana.get(p.f)).toFixed(1)}` : null)).filter(Boolean).join(' ');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.innerHTML = `<polyline points="${linea}" class="linea"/><circle cx="${x(puntos.length - 1)}" cy="${y(vs.at(-1))}" r="4.5" class="punto"/>`;
-  svg.setAttribute('aria-label', tr(`Precio medio de ${combustibleTxt} en ${nombreProv} los últimos ${puntos.length} días: entre ${euros(min)} y ${euros(max)} €/l; hoy ${euros(vs.at(-1))} €/l.`, `Average price of ${combustibleTxt} in ${nombreProv} over the last ${puntos.length} days: between ${euros(min)} and ${euros(max)} €/l; today ${euros(vs.at(-1))} €/l.`));
+  svg.innerHTML = (lineaEs ? `<polyline points="${lineaEs}" class="linea general"/>` : '') +
+    `<polyline points="${linea}" class="linea"/><circle cx="${x(puntos.length - 1)}" cy="${y(vs.at(-1))}" r="4.5" class="punto"/>`;
+  $('leyenda-provincia').textContent = nombreProv;
+  svg.setAttribute('aria-label', tr(`Precio medio de ${combustibleTxt} en ${nombreProv} los últimos ${puntos.length} días, frente a la media de España: entre ${euros(min)} y ${euros(max)} €/l; hoy ${euros(vs.at(-1))} €/l.`, `Average price of ${combustibleTxt} in ${nombreProv} over the last ${puntos.length} days, compared with Spain's average: between ${euros(min)} and ${euros(max)} €/l; today ${euros(vs.at(-1))} €/l.`));
+}
+
+/** Precio medio de hoy en cada provincia, de más barata a más cara, frente a la media de España. */
+function pintarProvincias() {
+  const c = combustible();
+  const media = indice?.medias?.[c];
+  const lista = Object.entries(indice?.provincias ?? {})
+    .map(([id, p]) => ({ id, nombre: p.nombre, precio: p.medias?.[c] }))
+    .filter((p) => typeof p.precio === 'number')
+    .sort((a, b) => a.precio - b.precio);
+  if (lista.length < 5 || typeof media !== 'number') { $('bloque-provincias').hidden = true; return; }
+  const barata = lista[0];
+  const cara = lista.at(-1);
+  const maximo = Math.max(0.005, ...lista.map((p) => Math.abs(p.precio - media)));
+  const nombreC = conArticulo(c);
+  $('t-provincias').textContent = tr(`Precio por provincia: ${COMBUSTIBLES[c].nombre.toLowerCase().replace('glp', 'GLP')}`, `Price by province: ${COMBUSTIBLES_EN[c].replace(/^\w/, (x) => x.toLowerCase()).replace('lpg', 'LPG')}`);
+  const tuya = lista.find((p) => p.id === provinciaElegida);
+  const [bar, car] = ARTICULO[c] === 'la' ? ['barata', 'cara'] : ['barato', 'caro'];
+  const frase = tr(
+    `Hoy ${nombreC} está más ${bar} en ${barata.nombre} (${euros(barata.precio)} €/l) y más ${car} en ${cara.nombre} (${euros(cara.precio)} €/l). Media de España: ${euros(media)} €/l.`,
+    `Today ${nombreC} is cheapest in ${barata.nombre} (${euros(barata.precio)} €/l) and most expensive in ${cara.nombre} (${euros(cara.precio)} €/l). Spain's average: ${euros(media)} €/l.`
+  );
+  let tuyaTxt = '';
+  if (tuya) {
+    const dif = tuya.precio - media;
+    const puesto = lista.indexOf(tuya) + 1;
+    tuyaTxt = Math.abs(dif) < 0.0005
+      ? tr(` ${tuya.nombre} está en la media.`, ` ${tuya.nombre} is at the average.`)
+      : tr(` ${tuya.nombre}: ${centimos(dif)} céntimos ${dif > 0 ? 'por encima' : 'por debajo'} de la media, la ${puesto}.ª más barata de ${lista.length}.`,
+          ` ${tuya.nombre}: ${centimos(dif)} cents ${dif > 0 ? 'above' : 'below'} average, number ${puesto} of ${lista.length} from cheapest.`);
+  }
+  $('provincias-frase').textContent = frase + tuyaTxt;
+  $('provincias').innerHTML = lista
+    .map((p) => {
+      const dif = p.precio - media;
+      const clase = dif > 0.0005 ? 'sube' : dif < -0.0005 ? 'baja' : '';
+      return `<li class="producto${p.id === provinciaElegida ? ' tuya' : ''}">
+        <span class="nombre">${escapar(p.nombre)}</span>
+        <span class="eje-barra ${clase}" aria-hidden="true"><span class="barra-var" style="width:${((Math.abs(dif) / maximo) * 50).toFixed(1)}%"></span></span>
+        <span class="cifra ${clase}">${euros(p.precio)} €</span>
+      </li>`;
+    })
+    .join('');
+  $('bloque-provincias').hidden = false;
 }
 
 async function cargarProvincias(ids) {
@@ -142,7 +193,7 @@ function prepararFiltros() {
   soloAbiertas.checked = leer('abiertas') !== 'no';
   soloAbiertas.addEventListener('change', () => { guardar('abiertas', soloAbiertas.checked ? 'si' : 'no'); pintar(); });
 
-  select.addEventListener('change', () => { guardar('combustible', combustible()); pintar(); });
+  select.addEventListener('change', () => { guardar('combustible', combustible()); pintar(); pintarProvincias(); });
   document.querySelectorAll('input[name=radio]').forEach((i) =>
     i.addEventListener('change', () => { guardar('radio', String(radio())); pintar(); })
   );
@@ -253,6 +304,8 @@ function pintar() {
 
   // Provincia de referencia para la tendencia: la de la gasolinera más barata
   if (mejor.prov) pintarTendencia(mejor.prov, c);
+  provinciaElegida = mejor.prov ?? provinciaElegida;
+  pintarProvincias();
 }
 
 function usarUbicacion() {
@@ -315,6 +368,7 @@ async function iniciar() {
         $('antiguedad').hidden = false;
       }
     }
+    pintarProvincias();
   } catch {
     avisar(tr('Los precios de carburantes no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Fuel prices aren't available right now. Please try again shortly."));
     document.querySelectorAll('#buscador button, #buscador input').forEach((el) => (el.disabled = true));
