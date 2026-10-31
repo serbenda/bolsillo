@@ -210,7 +210,33 @@ export const TRADUCCIONES = {
   '© 2026 Bendi. Todos los derechos reservados. El código se puede ver en': '© 2026 Bendi. All rights reserved. The code can be viewed on',
   ', pero no se puede copiar, modificar ni reutilizar sin permiso. Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones. bolsillo no está vinculado a ninguno de estos organismos.':
     ', but may not be copied, modified or reused without permission. The data belongs to its sources and is reused under their terms. bolsillo is not affiliated with any of these organisations.',
+  // Compartir
+  Compartir: 'Share',
+  'Avísame de la luz de mañana': "Alert me about tomorrow's electricity",
+  'Cada tarde, en cuanto Red Eléctrica publique los precios, te avisamos de la hora más barata y la más cara del día siguiente. Funciona con bolsillo instalado como app en Chrome o Edge.':
+    "Every evening, as soon as Red Eléctrica publishes the prices, we'll tell you the cheapest and most expensive hours for the next day. Works with bolsillo installed as an app in Chrome or Edge.",
+  'Activar avisos': 'Turn on alerts',
+
   // Compra
+  'Hace 10 años': '10 years ago',
+  'Año a año': 'Year by year',
+  Producto: 'Product',
+  'Toda la comida': 'All food',
+  'Variación de precio de cada año, de diciembre a diciembre. El año en curso, desde diciembre hasta el último mes publicado.':
+    'Price change each year, from December to December. The current year runs from December to the latest month published.',
+  'Cómo leer estos datos': 'How to read these figures',
+  '¿Qué significa que algo sube un 10 %?': 'What does a 10% rise mean?',
+  'Que lo que costaba 1 € cuesta ahora 1,10 €. Si baja un 10 %, cuesta 0,90 €. Los porcentajes no se suman: dos años seguidos al 10 % son un 21 %, no un 20 %.':
+    "That what cost €1 now costs €1.10. If it falls 10%, it costs €0.90. Percentages don't add up: two years in a row at 10% make 21%, not 20%.",
+  '¿Por qué no coincide con mi tique del súper?': "Why doesn't it match my supermarket receipt?",
+  'El IPC es una media de toda España, de muchas tiendas, marcas y formatos. Tu compra depende de qué compras y dónde: si comes mucha fruta o huevos, la notarás más cara que la media; si compras marca blanca o en otra cadena, puede salirte más barata.':
+    "CPI is an average for all of Spain, across many shops, brands and pack sizes. Your shop depends on what you buy and where: if you eat lots of fruit or eggs, it will feel pricier than average; if you buy own-brand or at another chain, it may come out cheaper.",
+  '¿Por qué subió tanto la comida en 2022 y 2023?': 'Why did food go up so much in 2022 and 2023?',
+  'Se encarecieron la energía, los fertilizantes, los piensos y el transporte tras la invasión rusa de Ucrania, y la sequía redujo cosechas como la del aceite de oliva. Entre 2023 y 2024 se rebajó el IVA de los alimentos básicos, lo que frenó algo los precios hasta que el IVA volvió a su nivel normal.':
+    "Energy, fertiliser, animal feed and transport became more expensive after Russia's invasion of Ukraine, and drought cut harvests such as olive oil. In 2023 and 2024 VAT on basic foods was cut, which held prices back a little until VAT returned to its usual level.",
+  '¿Qué es «Toda la comida»?': 'What is "All food"?',
+  'El grupo de alimentos del IPC: todo lo que se come, de la carne al pan. No incluye las bebidas alcohólicas ni los productos de limpieza, que aparecen aparte en la lista.':
+    "CPI's food group: everything you eat, from meat to bread. It doesn't include alcoholic drinks or cleaning products, which are listed separately.",
   'Rúbricas del': 'Price headings from',
   '(base 2025): el grupo de alimentos (serie IPC290811) y una veintena de productos, del pan a los productos de limpieza. Miden cómo cambian los precios en toda España; no hay datos oficiales de precios por supermercado.':
     "(base 2025): the food group (series IPC290811) and about twenty products, from bread to cleaning products. They measure how prices change across Spain; there's no official data on prices by supermarket.",
