@@ -3,7 +3,7 @@
 //   si no hay conexión, lo último guardado.
 // - Fuente, mapa e imágenes, que casi nunca cambian: lo guardado, y se actualiza en segundo plano.
 
-const VERSION = 'bolsillo-v4';
+const VERSION = 'bolsillo-v5';
 const BASICOS = [
   './',
   'luz/',
@@ -38,6 +38,9 @@ const BASICOS = [
   'assets/js/ipc-pagina.js',
   'assets/js/compra.js',
   'assets/js/compra-pagina.js',
+  'assets/js/compartir.js',
+  'assets/js/avisos.js',
+  'assets/js/aviso-luz.js',
   'assets/img/favicon.svg',
   'manifest.webmanifest',
 ];
@@ -51,7 +54,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys()
-      .then((claves) => Promise.all(claves.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then((claves) => Promise.all(claves.filter((k) => k !== VERSION && k !== 'bolsillo-avisos').map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -82,4 +85,42 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || url.origin !== location.origin) return; // mapas y visitas: siempre a la red
   const estable = url.pathname.includes('/vendor/') || url.pathname.includes('/assets/img/');
   e.respondWith(estable ? primeroCache(e.request, e) : primeroRed(e.request));
+});
+
+// Avisos: con la app instalada, el navegador despierta al service worker cada pocas horas
+// (sincronización periódica). Si ya están los precios de mañana, avisa una vez de la hora más barata.
+importScripts('assets/js/aviso-luz.js');
+const AVISOS = 'bolsillo-avisos';
+
+async function ajustesAvisos() {
+  const r = await (await caches.open(AVISOS)).match('ajustes');
+  return r ? r.json() : null;
+}
+
+async function avisarLuz() {
+  const ajustes = await ajustesAvisos();
+  if (!ajustes?.luz) return;
+  const manana = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() + 86400000));
+  if (ajustes.ultimo === manana) return; // ya avisado
+  const r = await fetch('data/luz.json', { cache: 'no-cache' });
+  if (!r.ok) return;
+  const texto = self.avisoLuz(await r.json(), manana, ajustes.idioma);
+  if (!texto) return;
+  await self.registration.showNotification(texto.titulo, {
+    body: texto.cuerpo,
+    icon: 'assets/img/icono-192.png',
+    badge: 'assets/img/icono-192.png',
+    tag: 'luz-manana',
+    data: { url: ajustes.idioma === 'en' ? 'en/luz/' : 'luz/' },
+  });
+  await (await caches.open(AVISOS)).put('ajustes', new Response(JSON.stringify({ ...ajustes, ultimo: manana })));
+}
+
+self.addEventListener('periodicsync', (e) => {
+  if (e.tag === 'luz-manana') e.waitUntil(avisarLuz().catch(() => {}));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.openWindow(new URL(e.notification.data?.url ?? './', self.registration.scope).href));
 });

@@ -1,6 +1,6 @@
 // Página «¿Cuánto ha subido la compra?».
 
-import { PRODUCTOS, ranking, compraHoy, variacion } from './compra.js';
+import { ALIMENTOS, PRODUCTOS, ranking, compraHoy, variacion, anual } from './compra.js';
 import { tr, idioma, euros, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
@@ -30,6 +30,7 @@ const hace = (m) =>
     12: tr('hace un año', 'a year ago'),
     24: tr('hace 2 años', '2 years ago'),
     60: tr('hace 5 años', '5 years ago'),
+    120: tr('hace 10 años', '10 years ago'),
   })[m];
 
 const enElPeriodo = (m) =>
@@ -38,6 +39,7 @@ const enElPeriodo = (m) =>
     12: tr('en el último año', 'over the past year'),
     24: tr('en los últimos 2 años', 'over the past 2 years'),
     60: tr('en los últimos 5 años', 'over the past 5 years'),
+    120: tr('en los últimos 10 años', 'over the past 10 years'),
   })[m];
 
 function avisar(texto) {
@@ -104,6 +106,47 @@ function pintarProductos() {
     .join('');
 }
 
+const nombreDe = (p) => (idioma === 'en' ? p.en : p.es);
+const anyoTexto = (a) => (a.parcial ? tr(`${a.anyo} (hasta ${nombreMes(a.hasta).split(' ')[0]})`, `${a.anyo} (to ${nombreMes(a.hasta).split(' ')[0]})`) : String(a.anyo));
+
+function pintarAnual() {
+  const id = $('producto-anual').value;
+  const p = id === 'alimentos' ? { ...ALIMENTOS, es: tr('la comida', 'food'), en: 'food', serie: datos.alimentos } : datos.productos.find((x) => x.id === id);
+  if (!p) return;
+  const anos = anual(p.serie);
+  if (!anos.length) return;
+  const maximo = Math.max(0.01, ...anos.map((a) => Math.abs(a.variacion)));
+  $('anual').innerHTML = anos
+    .slice()
+    .reverse()
+    .map((a) => {
+      const clase = a.variacion > 0.0005 ? 'sube' : a.variacion < -0.0005 ? 'baja' : '';
+      return `<li class="producto">
+        <span class="nombre">${anyoTexto(a)}</span>
+        <span class="eje-barra ${clase}" aria-hidden="true"><span class="barra-var" style="width:${((Math.abs(a.variacion) / maximo) * 50).toFixed(1)}%"></span></span>
+        <span class="cifra ${clase}">${conSigno(a.variacion)}</span>
+      </li>`;
+    })
+    .join('');
+
+  // Resumen: total desde el primer dato, y el peor y el mejor año completos
+  const serie = p.serie;
+  const total = serie.at(-1).valor / serie[0].valor - 1;
+  const completos = anos.filter((a) => !a.parcial);
+  const peor = completos.reduce((m, a) => (a.variacion > m.variacion ? a : m), completos[0]);
+  const mejor = completos.reduce((m, a) => (a.variacion < m.variacion ? a : m), completos[0]);
+  const nombre = id === 'alimentos' ? tr('Toda la comida', 'All food') : nombreDe(p);
+  const desde = nombreMes(serie[0].mes);
+  const cienHoy = euros(100 * (1 + total), 0);
+  const extremo = mejor.variacion < 0
+    ? tr(`y el que más bajó, ${mejor.anyo} (${conSigno(mejor.variacion)})`, `and the biggest fall in ${mejor.anyo} (${conSigno(mejor.variacion)})`)
+    : tr(`y el más tranquilo, ${mejor.anyo} (${conSigno(mejor.variacion)})`, `and the calmest year was ${mejor.anyo} (${conSigno(mejor.variacion)})`);
+  $('resumen-anual').textContent = tr(
+    `${nombre}: ${conSigno(total, 0)} desde ${desde}. Lo que costaba 100 € cuesta hoy ${cienHoy}. El año que más subió fue ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`,
+    `${nombre}: ${conSigno(total, 0)} since ${desde}. What cost €100 now costs ${cienHoy}. The biggest rise was in ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`
+  );
+}
+
 function pintarTodo() {
   pintarCalculadora();
   pintarProductos();
@@ -125,6 +168,7 @@ async function iniciar() {
     avisar(tr('Los precios de la compra no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Grocery prices aren't available right now. Please try again shortly."));
     $('formulario').querySelectorAll('input').forEach((el) => (el.disabled = true));
     $('bloque-productos').hidden = true;
+    $('bloque-anual').hidden = true;
     return;
   }
 
@@ -140,8 +184,16 @@ async function iniciar() {
   $('gasto').addEventListener('input', pintarCalculadora);
   $('formulario').addEventListener('submit', (e) => e.preventDefault());
 
+  // Selector del año a año: toda la comida y cada producto, por orden alfabético
+  const opciones = [...datos.productos].sort((a, b) => nombreDe(a).localeCompare(nombreDe(b), idioma));
+  $('producto-anual').insertAdjacentHTML('beforeend', opciones.map((x) => `<option value="${x.id}">${nombreDe(x)}</option>`).join(''));
+  const guardado = leer('producto');
+  if (guardado && opciones.some((x) => x.id === guardado)) $('producto-anual').value = guardado;
+  $('producto-anual').addEventListener('change', () => { guardar('producto', $('producto-anual').value); pintarAnual(); });
+
   pintarCabecera();
   pintarTodo();
+  pintarAnual();
   $('actualizado').textContent = tr(`Último dato: ${nombreMes(datos.alimentos.at(-1).mes)}.`, `Latest figure: ${nombreMes(datos.alimentos.at(-1).mes)}.`);
 }
 

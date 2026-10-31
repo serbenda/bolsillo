@@ -28,7 +28,7 @@ export const PRODUCTOS = [
   { id: 'hogar', cod: 'IPC292323', es: 'Limpieza y droguería', en: 'Cleaning and household products' },
 ];
 
-export const urlSerie = (cod, meses = 130) => `https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/${cod}?nult=${meses}`;
+export const urlSerie = (cod, meses = 300) => `https://servicios.ine.es/wstempus/js/ES/DATOS_SERIE/${cod}?nult=${meses}`;
 
 /** Mes (YYYY-MM) que queda `n` meses antes de `mes`. */
 export function mesesAntes(mes, n) {
@@ -62,4 +62,23 @@ export function ranking(productos, meses) {
 export function compraHoy(serieAlimentos, gasto, meses) {
   const v = variacion(serieAlimentos, meses);
   return v ? { ...v, gasto, hoy: gasto * (1 + v.variacion) } : null;
+}
+
+/**
+ * Variación de cada año natural, de diciembre a diciembre: [{ anyo, variacion, hasta, parcial }].
+ * El año en curso va del diciembre anterior al último mes publicado (parcial: true).
+ */
+export function anual(serie) {
+  const valor = new Map((serie ?? []).map((p) => [p.mes, p.valor]));
+  const ultimo = serie?.at(-1)?.mes;
+  if (!ultimo) return [];
+  const salida = [];
+  const primero = Number(serie[0].mes.slice(0, 4));
+  for (let anyo = primero + 1; anyo <= Number(ultimo.slice(0, 4)); anyo++) {
+    const antes = valor.get(`${anyo - 1}-12`);
+    const hasta = `${anyo}-12` <= ultimo ? `${anyo}-12` : ultimo;
+    const despues = valor.get(hasta);
+    if (antes > 0 && despues > 0) salida.push({ anyo, variacion: despues / antes - 1, hasta, parcial: hasta !== `${anyo}-12` });
+  }
+  return salida;
 }

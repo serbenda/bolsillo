@@ -44,6 +44,7 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 - **Qué vas a poner** (lavadora, lavavajillas, secadora, horno o coche eléctrico) y cuándo sale más barato.
 - **Cuánto cuesta en euros** cada aparato ahora y en el mejor momento.
 - **Por qué está cara o barata**: de dónde sale la electricidad y cuánto más barata es los días con más renovables.
+- **Avisos**: con la app instalada (Chrome o Edge), cada tarde te dice la hora más barata de mañana.
 
 </td>
 <td width="50%" valign="top">
@@ -114,7 +115,8 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 
 - Cuánto **más cara está la compra** que hace un año, en una frase.
 - **Lo que sube y lo que baja**: huevos, aceite, carne, fruta, café… con el IPC por producto.
-- **Tu compra de entonces, hoy**: hace un mes, un año, 2 o 5 años.
+- **Tu compra de entonces, hoy**: hace un mes, un año, 2, 5 o 10 años.
+- **Año a año desde 2002**, de toda la comida o de cada producto, y cómo leer los datos.
 - Enlaces a comparadores de **supermercados** independientes.
 
 </td>
@@ -125,6 +127,8 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 </td>
 </tr>
 </table>
+
+En cada sección, **Compartir** manda el resultado (tu cuota, tu compra, la hora más barata) con una imagen lista para WhatsApp; si el navegador no sabe compartir, copia el texto y el enlace.
 
 <div align="center">
 <img src="https://bolsillo.bendi.dev/capturas/movil.png" width="260" alt="Portada en el móvil, en modo oscuro">

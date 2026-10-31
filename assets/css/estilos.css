@@ -598,3 +598,18 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .enlaces-super { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.75rem; }
 .enlaces-super a { font-weight: 700; }
 .enlaces-super span { display: block; color: var(--tenue); font-size: 0.92rem; }
+
+/* Compartir */
+.compartir { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0 0; }
+.compartir .boton { display: inline-flex; align-items: center; gap: 0.5rem; }
+.estado-compartir { color: var(--tenue); font-size: 0.9rem; }
+.avisos { border: 1px solid var(--linea); border-radius: var(--radio); background: var(--superficie); padding: 1.25rem 1.5rem; }
+.avisos p { max-width: var(--medida); }
+.campo-producto { max-width: 22rem; margin-top: 1rem; }
+.campo-producto select { width: 100%; }
+.resumen-anual { max-width: var(--medida); font-size: 1.1rem; margin: 1.25rem 0 0; }
+.productos.anual .producto { grid-template-columns: minmax(6rem, 11rem) 1fr 4.5rem; }
+.explicacion details { border-top: 1px solid var(--linea); padding: 0.85rem 0; max-width: var(--medida); }
+.explicacion details:last-of-type { border-bottom: 1px solid var(--linea); }
+.explicacion summary { cursor: pointer; font-weight: 600; }
+.explicacion details p { margin: 0.6rem 0 0; color: var(--tenue); }

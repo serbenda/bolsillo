@@ -139,7 +139,32 @@ test('compra: lo que sube y lo que baja', async () => {
   await pagina.check('input[name=periodo][value="60"]');
   assert.match(await pagina.textContent('#t-productos'), /5 años/);
   assert.match(await pagina.textContent('#etiqueta-gasto'), /hace 5 años/);
+  // Año a año, de la comida y de un producto
+  assert.ok((await pagina.locator('#anual .producto').count()) >= 10);
+  assert.match(await pagina.textContent('#resumen-anual'), /^Toda la comida: [+−].+ desde .+ cuesta hoy/);
+  await pagina.selectOption('#producto-anual', 'huevos');
+  assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: /);
   await accesible(pagina);
+  await contexto.close();
+});
+
+test('compartir: copia el titular y el enlace cuando no se puede compartir', async () => {
+  const { pagina, errores, contexto } = await abrir('compra/', { permissions: ['clipboard-read', 'clipboard-write'] });
+  await pagina.evaluate(() => { delete Navigator.prototype.share; });
+  await pagina.click('[data-compartir]');
+  await pagina.waitForFunction(() => document.querySelector('.estado-compartir').textContent);
+  assert.match(await pagina.textContent('.estado-compartir'), /^Copiado/);
+  const copiado = await pagina.evaluate(() => navigator.clipboard.readText());
+  assert.match(copiado, /^La compra cuesta hoy un .+\n.+\/compra\/$/);
+  // La imagen para WhatsApp se genera con el tamaño de las tarjetas de redes
+  const tam = await pagina.evaluate(async () => {
+    const { imagen } = await import('../assets/js/compartir.js');
+    const b = await imagen('Titular de prueba bastante largo para ver que se parte en varias líneas', 'Detalle');
+    const i = await createImageBitmap(b);
+    return [i.width, i.height];
+  });
+  assert.deepEqual(tam, [1200, 630]);
+  assert.deepEqual(errores, []);
   await contexto.close();
 });
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PRODUCTOS, ALIMENTOS, mesesAntes, variacion, ranking, compraHoy, urlSerie } from '../assets/js/compra.js';
+import { PRODUCTOS, ALIMENTOS, mesesAntes, variacion, ranking, compraHoy, urlSerie, anual } from '../assets/js/compra.js';
 
 const serie = (valores, ultimo = '2026-09') =>
   valores.map((valor, i) => ({ mes: mesesAntes(ultimo, valores.length - 1 - i), valor }));
@@ -47,4 +47,16 @@ test('lista de productos coherente', () => {
     ids.add(p.id);
   }
   assert.match(urlSerie('IPC290811'), /DATOS_SERIE\/IPC290811\?nult=\d+$/);
+});
+
+test('variación de cada año, de diciembre a diciembre', () => {
+  // De 2024-12 a 2026-09: 100 en dic. 2024, 110 en dic. 2025, 121 en sep. 2026
+  const s = serie([100, ...Array(11).fill(105), 110, ...Array(8).fill(115), 121], '2026-09');
+  const a = anual(s);
+  assert.deepEqual(a.map((x) => x.anyo), [2025, 2026]);
+  assert.ok(Math.abs(a[0].variacion - 0.1) < 1e-9);
+  assert.equal(a[0].parcial, false);
+  assert.equal(a[1].hasta, '2026-09');
+  assert.equal(a[1].parcial, true);
+  assert.deepEqual(anual([]), []);
 });
