@@ -23,10 +23,12 @@ export function numero(texto) {
   return Number.isFinite(n) ? n : null;
 }
 
-/** "30/10/2026 21:10:33" → "2026-10-30T21:10:33" (hora peninsular). */
-function fechaIso(texto) {
-  const m = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2}:\d{2})$/.exec(texto ?? '');
-  return m ? `${m[3]}-${m[2]}-${m[1]}T${m[4]}` : null;
+/** "30/10/2026 21:10:33" o "31/10/2026 8:19:13" → "2026-10-31T08:19:13" (hora peninsular). */
+export function fechaIso(texto) {
+  const m = /^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$/.exec(texto ?? '');
+  if (!m) return null;
+  const dos = (x) => String(x ?? '00').padStart(2, '0');
+  return `${m[3]}-${dos(m[2])}-${dos(m[1])}T${dos(m[4])}:${m[5]}:${dos(m[6])}`;
 }
 
 /** Algunas gasolineras sin marca tienen como rótulo su número de registro ("Nº 10.935"). */

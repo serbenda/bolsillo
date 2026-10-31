@@ -6,8 +6,8 @@ const FICHERO = new URL('../../data/euribor.json', import.meta.url);
 const euros = (n, dec = 0) =>
   new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: 'always' }).format(n);
 const pct = (n) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format(n)}\u00a0%`;
-const nombreMes = (mes) =>
-  new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${mes}-01T00:00:00Z`));
+const FORMATO_MES = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const nombreMes = (mes) => FORMATO_MES.format(new Date(`${mes}-01T00:00:00Z`));
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.hipoteca.${k}`, v); } catch {} };
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.hipoteca.${k}`); } catch { return null; } };

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal, porProvincias, provinciasCercanas, abierta, codigosPostales, actualizarHistorico, tendencia } from '../assets/js/carburantes.js';
+import { numero, compactar, expandir, distanciaKm, cercanas, centroCodigoPostal, porProvincias, provinciasCercanas, abierta, codigosPostales, actualizarHistorico, tendencia, fechaIso } from '../assets/js/carburantes.js';
 
 const estacion = (extra) => ({
   'C.P.': '28100',
@@ -140,4 +140,12 @@ test('tendencia frente a la semana anterior', () => {
   assert.equal(t.hace7, 1.55);
   assert.equal(tendencia(serie.slice(0, 1), 'g95'), null);
   assert.equal(tendencia(serie, 'g98'), null);
+});
+
+test('fecha del Ministerio con hora de una o dos cifras', () => {
+  assert.equal(fechaIso('30/10/2026 21:10:33'), '2026-10-30T21:10:33');
+  assert.equal(fechaIso('31/10/2026 8:19:13'), '2026-10-31T08:19:13');
+  assert.equal(fechaIso('1/11/2026 0:05'), '2026-11-01T00:05:00');
+  assert.equal(fechaIso('raro'), null);
+  assert.equal(fechaIso(undefined), null);
 });
