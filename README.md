@@ -106,6 +106,24 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🛒 ¿Cuánto ha subido la compra?
+**[bolsillo.bendi.dev/compra](https://bolsillo.bendi.dev/compra/)**
+
+- Cuánto **más cara está la compra** que hace un año, en una frase.
+- **Lo que sube y lo que baja**: huevos, aceite, carne, fruta, café… con el IPC por producto.
+- **Tu compra de entonces, hoy**: hace un mes, un año, 2 o 5 años.
+- Enlaces a comparadores de **supermercados** independientes.
+
+</td>
+<td width="50%" valign="top">
+
+<img src="https://bolsillo.bendi.dev/capturas/compra.png" alt="Cuánto ha subido la compra: variación de precio por producto y calculadora">
+
+</td>
+</tr>
 </table>
 
 <div align="center">
@@ -130,6 +148,7 @@ Todo es público y oficial. bolsillo no guarda nada en el repositorio: los datos
 | ⛽ | [Ministerio para la Transición Ecológica](https://datos.gob.es/es/catalogo/e05068001-precio-de-carburantes-en-las-gasolineras-espanolas) | Precio de cada gasolinera de venta al público (~11.000) | Varias veces al día |
 | 📮 | [GeoNames](https://www.geonames.org/) (CC BY 4.0) | Coordenadas de los códigos postales | En cada publicación |
 | 🏠 | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html) | Euríbor a un año, serie `D_1NBAF472`, desde 1999 | Mensual |
+| 🛒 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | Rúbricas del IPC: alimentos (`IPC290811`) y una veintena de productos | Mensual |
 | 📈 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | IPC general nacional, serie `IPC290751` (base 2025), desde 2002 | Mensual |
 | 🗺️ | [OpenStreetMap](https://www.openstreetmap.org/copyright) | Mapa de gasolineras | Solo al buscar |
 
@@ -208,7 +227,7 @@ Toda la web está en castellano y en inglés (**[bolsillo.bendi.dev/en](https://
 ```
 bolsillo/
 ├── index.html                Portada con el recibo del día
-├── luz/  gasolina/  hipoteca/  ipc/  fuentes/
+├── luz/  gasolina/  compra/  hipoteca/  ipc/  fuentes/
 │                             (la versión en inglés, en/, se genera al publicar)
 ├── assets/
 │   ├── css/estilos.css       Un solo fichero de estilos, con modo oscuro
@@ -221,6 +240,7 @@ bolsillo/
 │       ├── carburantes.js    Ministerio, provincias, horarios, códigos postales, histórico
 │       ├── euribor.js        Euríbor, cuotas y amortización anticipada
 │       ├── ipc.js            IPC, equivalencias e inflación interanual
+│       ├── compra.js         Productos de la compra y su variación de precio
 │       ├── idioma.js         Idioma de la página y formatos de números y fechas
 │       └── …                 Un script por página y comun.js (sin conexión y visitas)
 ├── scripts/                  Lo que ejecuta la Action: datos, fuente, imágenes, Lighthouse, capturas

@@ -3,17 +3,19 @@
 //   si no hay conexión, lo último guardado.
 // - Fuente, mapa e imágenes, que casi nunca cambian: lo guardado, y se actualiza en segundo plano.
 
-const VERSION = 'bolsillo-v3';
+const VERSION = 'bolsillo-v4';
 const BASICOS = [
   './',
   'luz/',
   'gasolina/',
+  'compra/',
   'hipoteca/',
   'ipc/',
   'fuentes/',
   'en/',
   'en/luz/',
   'en/gasolina/',
+  'en/compra/',
   'en/hipoteca/',
   'en/ipc/',
   'en/fuentes/',
@@ -34,6 +36,8 @@ const BASICOS = [
   'assets/js/luz-generacion.js',
   'assets/js/ipc.js',
   'assets/js/ipc-pagina.js',
+  'assets/js/compra.js',
+  'assets/js/compra-pagina.js',
   'assets/img/favicon.svg',
   'manifest.webmanifest',
 ];

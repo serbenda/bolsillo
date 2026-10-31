@@ -124,6 +124,7 @@ section + section { margin-top: 3.5rem; }
 .icono.gasolina { background: var(--punta); }
 .icono.hipoteca { background: var(--valle); }
 .icono.ipc { background: var(--tinta); fill: var(--papel); }
+.icono.compra { background: #2b59c3; }
 .secciones h2 { grid-column: 2; }
 .secciones a:hover h2 { text-decoration: underline; text-underline-offset: 5px; }
 .secciones p { grid-column: 2; margin: 0; color: var(--tenue); max-width: 60ch; }
@@ -559,8 +560,41 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .icono-nav.gasolina { background: var(--punta); }
 .icono-nav.hipoteca { background: var(--valle); }
 .icono-nav.ipc { background: var(--tinta); fill: var(--papel); }
+.icono-nav.compra { background: #2b59c3; }
 @media (max-width: 640px) {
   /* En el móvil, el icono encima del nombre para que quepan las cuatro secciones */
   .nav a { flex-direction: column; gap: 0.2rem; font-size: 0.8rem; }
   .icono-nav { width: 1.6rem; height: 1.6rem; padding: 0.3rem; border-radius: 8px; }
 }
+
+/* Compra */
+.periodos { margin: 1.25rem 0 0; }
+.campo-gasto { max-width: 22rem; }
+.campo-gasto input { width: 100%; box-sizing: border-box; }
+.productos { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 0.15rem; }
+.producto {
+  display: grid;
+  grid-template-columns: minmax(9rem, 15rem) 1fr 4.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+.producto .nombre { font-weight: 600; }
+.producto .eje-barra { position: relative; height: 1.1rem; }
+.producto .eje-barra::before { content: ''; position: absolute; left: 50%; top: -0.3rem; bottom: -0.3rem; width: 1px; background: var(--tenue); opacity: 0.6; }
+.producto .barra-var { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.producto .sube .barra-var { left: 50%; background: var(--punta); }
+.producto .baja .barra-var { right: 50%; background: var(--valle); }
+.producto .cifra { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.producto .cifra.sube { color: var(--punta); }
+.producto .cifra.baja { color: var(--valle); }
+@media (max-width: 560px) {
+  .producto { grid-template-columns: 1fr 4rem; }
+  .producto .eje-barra { grid-column: 1 / -1; grid-row: 2; }
+}
+.super { background: var(--superficie); border: 1px solid var(--linea); border-radius: var(--radio); padding: clamp(1.25rem, 3vw, 2rem); }
+.super p { max-width: var(--medida); }
+.enlaces-super { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.75rem; }
+.enlaces-super a { font-weight: 700; }
+.enlaces-super span { display: block; color: var(--tenue); font-size: 0.92rem; }

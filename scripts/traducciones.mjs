@@ -210,6 +210,47 @@ export const TRADUCCIONES = {
   '© 2026 Bendi. Todos los derechos reservados. El código se puede ver en': '© 2026 Bendi. All rights reserved. The code can be viewed on',
   ', pero no se puede copiar, modificar ni reutilizar sin permiso. Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones. bolsillo no está vinculado a ninguno de estos organismos.':
     ', but may not be copied, modified or reused without permission. The data belongs to its sources and is reused under their terms. bolsillo is not affiliated with any of these organisations.',
+  // Compra
+  'Rúbricas del': 'Price headings from',
+  '(base 2025): el grupo de alimentos (serie IPC290811) y una veintena de productos, del pan a los productos de limpieza. Miden cómo cambian los precios en toda España; no hay datos oficiales de precios por supermercado.':
+    "(base 2025): the food group (series IPC290811) and about twenty products, from bread to cleaning products. They measure how prices change across Spain; there's no official data on prices by supermarket.",
+  Compra: 'Groceries',
+  'bolsillo · luz, gasolina, compra e hipoteca con datos públicos': 'bolsillo · electricity, fuel, groceries and mortgage costs in Spain',
+  'Precio de la luz hora a hora, gasolineras más baratas, lo que sube en el súper y simulador de hipoteca con datos públicos de España.':
+    "Hourly electricity prices, the cheapest petrol stations, what's going up at the supermarket and a mortgage calculator, using Spain's official open data.",
+  'Compra, último año': 'Groceries, past year',
+  '¿Cuánto ha subido la compra?': 'How much have groceries gone up?',
+  'Qué productos del súper suben y cuáles bajan, y cuánto cuesta hoy tu compra de hace un año, con el IPC del INE.':
+    "Which supermarket products are going up and down, and what last year's shop costs today, using INE's CPI.",
+  '¿Cuánto ha subido la compra? · bolsillo': 'How much have groceries gone up in Spain? · bolsillo',
+  'Qué productos del súper suben y cuáles bajan (huevos, aceite, carne, fruta…) con el IPC oficial del INE, y cuánto cuesta hoy tu compra de hace un año.':
+    "Which supermarket products are going up and down in Spain (eggs, oil, meat, fruit…) with INE's official CPI, and what last year's shop costs today.",
+  '¿Cuánto ha subido la compra? Lo que sube y baja en el súper': "How much have groceries gone up? What's rising and falling at the supermarket",
+  'La compra cuesta hoy un': 'Groceries cost',
+  'Dato del último mes publicado por el INE. Mira qué productos suben, cuáles bajan y cuánto cuesta hoy tu compra.':
+    "Latest monthly figure published by INE. See which products are going up and down, and what your shop costs today.",
+  'Comparar con': 'Compare with',
+  'Hace un mes': 'A month ago',
+  'Hace un año': 'A year ago',
+  'Hace 2 años': '2 years ago',
+  'Hace 5 años': '5 years ago',
+  'Tu compra': 'Your shop',
+  'Lo que gastabas en la compra entonces': 'What you spent on groceries then',
+  'Lo que ha subido y bajado en el último año': "What's gone up and down over the past year",
+  'Variación del precio de cada tipo de producto en el periodo elegido. En rojo, lo que se ha encarecido; en verde, lo que se ha abaratado.':
+    'Price change for each type of product over the chosen period. Red means it has gone up; green, that it has come down.',
+  '¿Y en qué supermercado es más barato?': 'And which supermarket is cheapest?',
+  'No hay datos oficiales de precios por supermercado: el INE mide cómo cambian los precios en toda España, no cuánto cuesta cada producto en cada cadena. Para comparar tiendas, estas webs independientes recogen los precios de los supermercados:':
+    "There's no official data on prices by supermarket: INE measures how prices change across Spain, not what each product costs at each chain. To compare shops, these independent websites collect supermarket prices (in Spanish):",
+  'OCU: supermercados más baratos de 2026': "OCU: Spain's cheapest supermarkets in 2026",
+  'Estudio anual por cadena y ciudad': 'Annual study by chain and city',
+  'POY': 'POY',
+  'Compara la misma compra en una decena de supermercados': 'Compares the same shop across about ten supermarkets',
+  'Supersupers': 'Supersupers',
+  'Evolución diaria de precios en varias cadenas': 'Daily price changes at several chains',
+  'bolsillo no está vinculado a ninguna de estas webs.': 'bolsillo is not affiliated with any of these websites.',
+  'Índices de precios de consumo por producto (rúbricas del IPC, base 2025) publicados por el INE. Miden cómo cambian los precios de cada tipo de producto en toda España, no el precio en una tienda concreta. El dato de cada mes se publica a mediados del mes siguiente.':
+    "Consumer price indices by product (CPI headings, base 2025) published by INE. They measure how prices for each type of product change across Spain, not the price in a particular shop. Each month's figure is published in the middle of the following month.",
 };
 
 /** Textos que no se traducen (nombres propios, unidades, números…). */

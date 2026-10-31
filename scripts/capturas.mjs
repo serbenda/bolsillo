@@ -48,6 +48,7 @@ await captura('gasolina', 'gasolina/', {
 });
 await captura('hipoteca', 'hipoteca/');
 await captura('ipc', 'ipc/');
+await captura('compra', 'compra/');
 await captura('movil', '', { ancho: 390, alto: 844, tema: 'dark', isMobile: true, hasTouch: true });
 await captura('movil-luz', 'luz/', { ancho: 390, alto: 844, tema: 'dark', isMobile: true, hasTouch: true });
 
