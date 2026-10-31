@@ -10,7 +10,7 @@ import { TRADUCCIONES, SIN_TRADUCIR } from './traducciones.mjs';
 
 const SITIO = 'https://bolsillo.bendi.dev';
 const raiz = new URL('../_site/', import.meta.url);
-const PAGINAS = ['', 'luz/', 'gasolina/', 'compra/', 'alquiler/', 'hipoteca/', 'ahorro/', 'ipc/', 'fuentes/'];
+const PAGINAS = ['', 'luz/', 'gasolina/', 'compra/', 'alquiler/', 'hipoteca/', 'ahorro/', 'calefaccion/', 'ipc/', 'fuentes/', 'quien/'];
 
 const sinTraducir = [];
 const traducir = (texto, donde) => {

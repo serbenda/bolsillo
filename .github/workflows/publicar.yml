@@ -71,13 +71,20 @@ jobs:
       - name: Preparar la web
         run: |
           mkdir -p _site vendor
-          cp -r index.html luz gasolina compra alquiler hipoteca ahorro ipc fuentes assets data vendor \
+          cp -r index.html luz gasolina compra alquiler hipoteca ahorro calefaccion ipc fuentes quien assets data vendor \
             manifest.webmanifest sw.js sitemap.xml robots.txt .nojekyll _site/
           # Versión en inglés en /en/ (falla si queda texto sin traducir)
           node scripts/ingles.mjs
+          # Páginas de gasolina por provincia, con los precios del momento, para los buscadores
+          node scripts/provincias.mjs
           # Versión en los estilos y scripts de cada página: al publicar, nadie ve HTML nuevo con CSS viejo
           v="${GITHUB_SHA::8}"
           find _site -name '*.html' -exec sed -i -E "s#(href=\"[^\"]+\.css)\"#\1?v=$v\"#g; s#(src=\"[^\"]+\.js)\"#\1?v=$v\"#g" {} +
+
+      - name: Imagen para compartir de cada sección, con el dato del día
+        # Si falla, las páginas se quedan con la imagen genérica
+        continue-on-error: true
+        run: node scripts/tarjetas.mjs
 
       - name: Estado de las fuentes
         if: always()

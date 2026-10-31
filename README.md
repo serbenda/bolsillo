@@ -150,6 +150,26 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🔥 ¿Cuánto cuesta la calefacción?
+**[bolsillo.bendi.dev/calefaccion](https://bolsillo.bendi.dev/calefaccion/)**
+
+- El precio de la **bombona de butano** y su evolución.
+- La **tarifa regulada del gas (TUR)**: cuánto pagarías al año según tu consumo.
+- **¿Butano o gas?**: precio de cada kWh de calor.
+
+</td>
+<td width="50%" valign="top">
+
+### 🧾 Y además
+- **Tu bolsillo hoy** en la portada, con lo que has escrito en cada sección.
+- **Gasolina por provincia**: una página para cada una, con las 10 más baratas.
+- **Imagen para compartir** de cada sección con el dato del día.
+
+</td>
+</tr>
 </table>
 
 En cada sección, **Compartir** manda el resultado (tu cuota, tu compra, la hora más barata) con una imagen lista para WhatsApp; si el navegador no sabe compartir, copia el texto y el enlace.
@@ -179,6 +199,7 @@ Todo es público y oficial. bolsillo no guarda nada en el repositorio: los datos
 | 🛒 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | Rúbricas del IPC: alimentos (`IPC290811`) y una veintena de productos | Mensual |
 | 🔑 | [INE](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177110&idp=1254735976607) | Índice de Referencia de Arrendamientos de Vivienda, serie `IRAV1` | Mensual |
 | 🐷 | [Banco de España](https://www.bde.es/webbe/es/estadisticas/recursos/api-estadisticas-bde.html) | Subastas de Letras del Tesoro (`D_DTED0C0G`, `D_DTED0E0G`, `D_DTED0I0G`, `D_DTED0G0G`) y bono a 10 años (`D_G0B1F0ZP`) | Mensual / diaria |
+| 🔥 | [BOE](https://www.boe.es/) y [MITECO](https://www.miteco.gob.es/es/energia/hidrocarburos-nuevos-combustibles/glp/precios.html) | Precio máximo del butano envasado y tarifa de último recurso del gas natural (a mano, con aviso cuando caducan) | Bimestral / trimestral |
 | 📈 | [INE](https://www.ine.es/dyngs/IPC/es/index.htm) | IPC general nacional, serie `IPC290751` (base 2025), desde 2002 | Mensual |
 | 🗺️ | [OpenStreetMap](https://www.openstreetmap.org/copyright) | Mapa de gasolineras | Solo al buscar |
 

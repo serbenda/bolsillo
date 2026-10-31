@@ -69,6 +69,7 @@
           <div><dt>Gasolina 95, media</dt><dd id="r-g95">—</dd></div>
           <div><dt>Diésel, media</dt><dd id="r-diesel">—</dd></div>
           <div><dt>Compra, último año</dt><dd id="r-compra">—</dd></div>
+          <div><dt>Bombona de butano</dt><dd id="r-butano">—</dd></div>
           <div><dt>Euríbor a un año</dt><dd id="r-euribor">—</dd></div>
           <div><dt>Letras a 12 meses</dt><dd id="r-letras">—</dd></div>
           <div><dt>Subida máx. del alquiler</dt><dd id="r-alquiler">—</dd></div>
@@ -76,6 +77,12 @@
         </dl>
         <p class="recibo-pie">Datos oficiales, actualizados cada día</p>
       </figure>
+    </section>
+
+    <section class="mi-bolsillo" id="mi-bolsillo" aria-labelledby="t-mi" hidden>
+      <h2 id="t-mi">Tu bolsillo hoy</h2>
+      <ul id="mi-lista"></ul>
+      <p class="nota">Con lo que has escrito en cada sección. Solo se guarda en tu navegador.</p>
     </section>
 
     <ul class="secciones">
@@ -108,6 +115,13 @@
         </a>
       </li>
       <li>
+        <a href="calefaccion/">
+          <svg class="icono calefaccion" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c1 4.5 6 7.5 6 13.5a6 6 0 0 1-12 0c0-2.6 1.3-4.6 3-6 .1 2.3 1.2 3.8 3 4.5-.8-4 0-8 0-12zM8 26h16v3H8z"/></svg>
+          <h2>¿Cuánto cuesta la calefacción?</h2>
+          <p>La bombona de butano y el gas natural con tarifa regulada: precio de hoy, lo que pagarías al año y qué sale más barato.</p>
+        </a>
+      </li>
+      <li>
         <a href="hipoteca/">
           <svg class="icono hipoteca" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 2 15h4v13h8v-8h4v8h8V15h4z"/></svg>
           <h2>¿Cuánto me sube la hipoteca?</h2>
@@ -133,7 +147,7 @@
 
   <footer class="envoltorio pie">
     <p class="apoyo"><a href="https://github.com/sponsors/serbenda" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.2 6.9 13.2C3 9.7.5 7.4.5 4.6.5 2.3 2.3.5 4.6.5c1.3 0 2.5.6 3.4 1.6C8.9 1.1 10.1.5 11.4.5c2.3 0 4.1 1.8 4.1 4.1 0 2.8-2.5 5.1-6.4 8.6Z"/></svg>¿Te ahorra dinero? Apoya bolsillo en GitHub Sponsors</a></p>
-    <p>Web sin anuncios ni cookies. <a href="fuentes/">Fuentes y condiciones</a>. Código en <a href="https://github.com/serbenda/bolsillo">GitHub</a>.</p>
+    <p>Web sin anuncios ni cookies. <a href="fuentes/">Fuentes y condiciones</a>. <a href="quien/">Quién hace bolsillo</a>. Código en <a href="https://github.com/serbenda/bolsillo">GitHub</a>.</p>
   </footer>
 
   <script type="module" src="assets/js/portada.js"></script>

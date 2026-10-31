@@ -3,7 +3,7 @@
 //   si no hay conexión, lo último guardado.
 // - Fuente, mapa e imágenes, que casi nunca cambian: lo guardado, y se actualiza en segundo plano.
 
-const VERSION = 'bolsillo-v6';
+const VERSION = 'bolsillo-v7';
 const BASICOS = [
   './',
   'luz/',
@@ -11,15 +11,18 @@ const BASICOS = [
   'compra/',
   'alquiler/',
   'ahorro/',
+  'calefaccion/',
   'hipoteca/',
   'ipc/',
   'fuentes/',
+  'quien/',
   'en/',
   'en/luz/',
   'en/gasolina/',
   'en/compra/',
   'en/alquiler/',
   'en/ahorro/',
+  'en/calefaccion/',
   'en/hipoteca/',
   'en/ipc/',
   'en/fuentes/',
@@ -48,6 +51,8 @@ const BASICOS = [
   'assets/js/ahorro.js',
   'assets/js/ahorro-pagina.js',
   'assets/js/grafico-lineas.js',
+  'assets/js/calefaccion.js',
+  'assets/js/calefaccion-pagina.js',
   'assets/js/avisos.js',
   'assets/js/aviso-luz.js',
   'assets/img/favicon.svg',
