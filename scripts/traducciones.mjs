@@ -277,6 +277,7 @@ export const TRADUCCIONES = {
   "¿Cuánto cuesta la calefacción? Butano y gas · bolsillo": "How much does heating cost in Spain? Butane and gas · bolsillo",
   "Precio de la bombona de butano y de la tarifa regulada del gas natural (TUR) según el BOE, cuánto pagarías al año y qué sale más barato.": "The price of a butane cylinder and Spain's regulated natural gas tariff (TUR) according to the BOE, what you'd pay a year and which is cheaper.",
   "¿Cuánto cuesta la calefacción? Butano y gas hoy": "How much does heating cost? Butane and gas today",
+  "hasta el": "until",
   "La bombona de butano cuesta": "A butane cylinder costs",
   "Precio máximo con impuestos que fija el Gobierno en el BOE.": "Maximum price including taxes, set by the government in the BOE (official gazette).",
   "Bombona de butano": "Butane cylinder",
