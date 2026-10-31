@@ -213,7 +213,7 @@ const CASTELLANO = /¿|¡|\b(de|del|los|las|que|con|para|más|hoy|mañana|precio
 async function textoEnCastellano(pagina) {
   return pagina.evaluate((patron) => {
     const re = new RegExp(patron, 'i');
-    const fuera = 'script, style, .estacion, #mapa, .idiomas, option, select';
+    const fuera = 'script, style, .estacion, #mapa, .idiomas, option, select, #bloque-provincias, #leyenda-provincia';
     const malos = [];
     const recorrer = (n) => {
       if (n.nodeType === 3) {

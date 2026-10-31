@@ -29,6 +29,8 @@ const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.${k}`, v); } ca
 const leer = (k) => { try { return localStorage.getItem(`bolsillo.${k}`); } catch { return null; } };
 
 let indice = null; // fecha, medias y caja de cada provincia
+// «Palmas (Las)» → «Las Palmas», como se escriben normalmente
+const nombreProvincia = (n) => String(n ?? '').replace(/^(.+?)\s*\(([^)]+)\)$/, (_, nombre, art) => `${art.charAt(0).toUpperCase()}${art.slice(1).toLowerCase()} ${nombre}`);
 let provinciaElegida = null; // la de la última búsqueda, para destacarla
 const cargadas = new Map(); // provincia → estaciones
 let estaciones = [];
@@ -56,7 +58,7 @@ const diaCorto = (f) => FORMATO_DIA.format(new Date(`${f}T12:00:00Z`));
 async function pintarTendencia(prov, c) {
   const bloque = $('bloque-tendencia');
   const serie = await historicoDe(prov);
-  const nombreProv = indice?.provincias?.[prov]?.nombre ?? tr('tu provincia', 'your province');
+  const nombreProv = nombreProvincia(indice?.provincias?.[prov]?.nombre) || tr('tu provincia', 'your province');
   const combustibleTxt = conArticulo(c);
   const t = tendencia(serie, c);
   if (!serie.length) { bloque.hidden = true; return; }
@@ -107,7 +109,7 @@ function pintarProvincias() {
   const c = combustible();
   const media = indice?.medias?.[c];
   const lista = Object.entries(indice?.provincias ?? {})
-    .map(([id, p]) => ({ id, nombre: p.nombre, precio: p.medias?.[c] }))
+    .map(([id, p]) => ({ id, nombre: nombreProvincia(p.nombre), precio: p.medias?.[c] }))
     .filter((p) => typeof p.precio === 'number')
     .sort((a, b) => a.precio - b.precio);
   if (lista.length < 5 || typeof media !== 'number') { $('bloque-provincias').hidden = true; return; }
