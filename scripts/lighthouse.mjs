@@ -34,7 +34,16 @@ for (const [nombre, ruta] of Object.entries(PAGINAS)) {
     blockedUrlPatterns: ['*goatcounter*', '*gc.zgo.at*', '*tile.openstreetmap.org*'],
   });
   resultados[nombre] = Object.fromEntries(Object.keys(CATEGORIAS).map((c) => [c, lhr.categories[c]?.score ?? 0]));
-  const linea = Object.entries(resultados[nombre]).map(([c, v]) => `${CATEGORIAS[c].nombre} ${Math.round(v * 100)}`).join(', ');
+  let linea = Object.entries(resultados[nombre]).map(([c, v]) => `${CATEGORIAS[c].nombre} ${Math.round(v * 100)}`).join(', ');
+  // Si el rendimiento no llega a 90, se dice qué métrica lo baja
+  if (resultados[nombre].performance < 0.9) {
+    const a = lhr.audits;
+    const ms = (id) => `${Math.round(a[id]?.numericValue ?? 0)} ms (${Math.round((a[id]?.score ?? 0) * 100)})`;
+    linea += `. LCP ${ms('largest-contentful-paint')}, FCP ${ms('first-contentful-paint')}, TBT ${ms('total-blocking-time')}, SI ${ms('speed-index')}, CLS ${(a['cumulative-layout-shift']?.numericValue ?? 0).toFixed(3)}`;
+    linea += `, elemento LCP: ${a['largest-contentful-paint-element']?.details?.items?.[0]?.items?.[0]?.node?.snippet ?? a['largest-contentful-paint-element']?.details?.items?.[0]?.node?.snippet ?? '?'}`;
+    const cls = a['layout-shifts']?.details?.items ?? [];
+    if (cls.length) linea += `, desplazamientos: ${cls.slice(0, 3).map((x) => `${x.node?.snippet ?? '?'} ${x.score?.toFixed?.(3)}`).join(' | ')}`;
+  }
   // En la Action, cada página sale como anotación en la PR
   console.log(process.env.GITHUB_ACTIONS ? `::notice title=Lighthouse ${nombre}::${linea}` : `${nombre}: ${linea}`);
 }
