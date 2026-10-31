@@ -511,3 +511,20 @@ table.costes { width: min(100%, 640px); }
 /* Huecos reservados mientras llegan los datos: así la página no salta al cargar */
 .reservado { visibility: hidden; }
 main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
+
+/* Apoyo en GitHub Sponsors */
+.pie .apoyo { margin: 0 0 0.9rem; }
+.apoyo a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--tinta);
+  font-weight: 600;
+  text-decoration: none;
+}
+.apoyo a:hover { border-color: var(--punta); }
+.apoyo svg { width: 1rem; height: 1rem; fill: #bf3989; flex: none; }
