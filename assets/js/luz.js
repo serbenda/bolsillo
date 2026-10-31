@@ -47,7 +47,7 @@ function pintarCabecera() {
       ${actual ? `<span class="chapa ${claseActual}">${ETIQUETA[claseActual]}</span>` : ''}</span>
     <span>Media de hoy <strong>${formatoPrecio(mediaHoy)}</strong></span>
     <span>Entre <strong>${formatoPrecio(Math.min(...precios))}</strong> y <strong>${formatoPrecio(Math.max(...precios))}</strong></span>`;
-  $('ahora').hidden = false;
+  $('ahora').classList.remove('reservado');
 }
 
 function pintarGrafico() {
@@ -179,6 +179,8 @@ function prepararAparatos() {
 
 if (!datos.hoy) {
   $('titular').textContent = 'El precio de la luz no está disponible ahora mismo.';
+  $('ahora').hidden = true;
+  $('interruptor').hidden = true;
   $('error').hidden = false;
 } else {
   const { iee, iva } = impuestosEn(datos.fechaHoy);
@@ -192,7 +194,7 @@ if (!datos.hoy) {
     guardar('impuestos', conImpuestos ? 'si' : 'no');
     pintarTodo();
   });
-  $('interruptor').hidden = false;
+  $('interruptor').classList.remove('reservado');
 
   $('bloque-grafico').hidden = false;
   $('bloque-plan').hidden = false;

@@ -7,7 +7,10 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 }
 
 // Visitas con GoatCounter: sin cookies ni datos personales. Solo en la web publicada.
-if (location.hostname === 'bendi.dev') {
+// Las rutas se cuentan como /bolsillo/… para que no se mezclen con las de bendi.dev en el panel de visitas
+// y sigan la serie que había cuando la web estaba en bendi.dev/bolsillo.
+if (location.hostname.endsWith('bendi.dev')) {
+  window.goatcounter = { ...(window.goatcounter ?? {}), path: (p) => (p.startsWith('/bolsillo') ? p : `/bolsillo${p}`) };
   const s = document.createElement('script');
   s.async = true;
   s.src = 'https://gc.zgo.at/count.js';

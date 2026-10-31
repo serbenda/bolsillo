@@ -38,7 +38,7 @@ jobs:
 
       - name: Recuperar los datos publicados (por si alguna fuente falla ahora)
         env:
-          BASE: ${{ steps.pages.outputs.base_url || 'https://bendi.dev/bolsillo' }}
+          BASE: ${{ steps.pages.outputs.base_url || 'https://bolsillo.bendi.dev' }}
         run: |
           mkdir -p data
           for f in luz generacion gasolina gasolina-historico euribor ipc; do
@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p _site vendor
           cp -r index.html luz gasolina hipoteca ipc fuentes assets data vendor \
-            manifest.webmanifest sw.js sitemap.xml .nojekyll _site/
+            manifest.webmanifest sw.js sitemap.xml robots.txt .nojekyll _site/
 
       - name: Estado de las fuentes
         if: always()

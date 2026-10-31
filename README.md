@@ -1,26 +1,26 @@
 <div align="center">
 
-<a href="https://bendi.dev/bolsillo/"><img src="assets/img/favicon.svg" width="112" alt="Logo de bolsillo: un bolsillo vaquero con tres barras de precio"></a>
+<a href="https://bolsillo.bendi.dev/"><img src="assets/img/favicon.svg" width="112" alt="Logo de bolsillo: un bolsillo vaquero con tres barras de precio"></a>
 
 # bolsillo
 
 **Lo que cuesta el día a día, con datos oficiales.**<br>
 Luz hora a hora, gasolineras más baratas, hipoteca e inflación. Sin cookies, sin anuncios, sin registro.
 
-[![Abrir la web](https://img.shields.io/badge/abrir_la_web-bendi.dev%2Fbolsillo-17784e?style=for-the-badge)](https://bendi.dev/bolsillo/)
+[![Abrir la web](https://img.shields.io/badge/abrir_la_web-bolsillo.bendi.dev-17784e?style=for-the-badge)](https://bolsillo.bendi.dev/)
 
 [![Publicación](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml/badge.svg)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
-[![Rendimiento](https://img.shields.io/endpoint?url=https%3A%2F%2Fbendi.dev%2Fbolsillo%2Finsignias%2Frendimiento.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
-[![Accesibilidad](https://img.shields.io/endpoint?url=https%3A%2F%2Fbendi.dev%2Fbolsillo%2Finsignias%2Faccesibilidad.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
-[![Buenas prácticas](https://img.shields.io/endpoint?url=https%3A%2F%2Fbendi.dev%2Fbolsillo%2Finsignias%2Fbuenas-practicas.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
-[![SEO](https://img.shields.io/endpoint?url=https%3A%2F%2Fbendi.dev%2Fbolsillo%2Finsignias%2Fseo.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
+[![Rendimiento](https://img.shields.io/endpoint?url=https%3A%2F%2Fbolsillo.bendi.dev%2Finsignias%2Frendimiento.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
+[![Accesibilidad](https://img.shields.io/endpoint?url=https%3A%2F%2Fbolsillo.bendi.dev%2Finsignias%2Faccesibilidad.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
+[![Buenas prácticas](https://img.shields.io/endpoint?url=https%3A%2F%2Fbolsillo.bendi.dev%2Finsignias%2Fbuenas-practicas.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
+[![SEO](https://img.shields.io/endpoint?url=https%3A%2F%2Fbolsillo.bendi.dev%2Finsignias%2Fseo.json&logo=lighthouse&logoColor=white)](https://github.com/serbenda/bolsillo/actions/workflows/publicar.yml)
 <br>
 ![Sin dependencias](https://img.shields.io/badge/dependencias-0-17784e)
 ![Sin cookies](https://img.shields.io/badge/cookies-0-17784e)
 ![Funciona sin conexión](https://img.shields.io/badge/sin_conexión-sí-17784e)
 [![Todos los derechos reservados](https://img.shields.io/badge/licencia-todos_los_derechos_reservados-172033)](LICENSE)
 
-<a href="https://bendi.dev/bolsillo/"><img src="https://bendi.dev/bolsillo/capturas/portada.png" width="860" alt="Portada de bolsillo con el recibo del día: luz, hora más barata, gasolina, diésel, Euríbor e inflación"></a>
+<a href="https://bolsillo.bendi.dev/"><img src="https://bolsillo.bendi.dev/capturas/portada.png" width="860" alt="Portada de bolsillo con el recibo del día: luz, hora más barata, gasolina, diésel, Euríbor e inflación"></a>
 
 </div>
 
@@ -35,7 +35,7 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 <td width="50%" valign="top">
 
 ### ⚡ ¿Cuándo pongo la lavadora?
-**[bendi.dev/bolsillo/luz](https://bendi.dev/bolsillo/luz/)**
+**[bolsillo.bendi.dev/luz](https://bolsillo.bendi.dev/luz/)**
 
 - Precio PVPC **hora a hora**, hoy y mañana.
 - **Con o sin impuestos**, con un interruptor.
@@ -46,20 +46,20 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 </td>
 <td width="50%" valign="top">
 
-<img src="https://bendi.dev/bolsillo/capturas/luz.png" alt="Sección de la luz: titular con la hora más barata y gráfico de 24 horas en verde, ámbar y rojo">
+<img src="https://bolsillo.bendi.dev/capturas/luz.png" alt="Sección de la luz: titular con la hora más barata y gráfico de 24 horas en verde, ámbar y rojo">
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-<img src="https://bendi.dev/bolsillo/capturas/gasolina.png" alt="Sección de gasolina: gasolinera más barata, tendencia de la semana, mapa y lista ordenada por precio">
+<img src="https://bolsillo.bendi.dev/capturas/gasolina.png" alt="Sección de gasolina: gasolinera más barata, tendencia de la semana, mapa y lista ordenada por precio">
 
 </td>
 <td width="50%" valign="top">
 
 ### ⛽ ¿Dónde echo gasolina?
-**[bendi.dev/bolsillo/gasolina](https://bendi.dev/bolsillo/gasolina/)**
+**[bolsillo.bendi.dev/gasolina](https://bolsillo.bendi.dev/gasolina/)**
 
 - Las **más baratas cerca de ti**, por ubicación o **cualquier código postal**.
 - **Solo las abiertas ahora**, según el horario de cada gasolinera.
@@ -73,7 +73,7 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 <td width="50%" valign="top">
 
 ### 🏠 ¿Cuánto me sube la hipoteca?
-**[bendi.dev/bolsillo/hipoteca](https://bendi.dev/bolsillo/hipoteca/)**
+**[bolsillo.bendi.dev/hipoteca](https://bolsillo.bendi.dev/hipoteca/)**
 
 - Tu **cuota nueva** con el último Euríbor frente al de tu última revisión.
 - **Escenarios** si el Euríbor sube o baja medio punto o uno.
@@ -83,20 +83,20 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 </td>
 <td width="50%" valign="top">
 
-<img src="https://bendi.dev/bolsillo/capturas/hipoteca.png" alt="Simulador de hipoteca: cuánto sube la cuota, escenarios y amortización anticipada">
+<img src="https://bolsillo.bendi.dev/capturas/hipoteca.png" alt="Simulador de hipoteca: cuánto sube la cuota, escenarios y amortización anticipada">
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-<img src="https://bendi.dev/bolsillo/capturas/ipc.png" alt="Calculadora de inflación: equivalencia de euros entre fechas y gráfico de inflación interanual">
+<img src="https://bolsillo.bendi.dev/capturas/ipc.png" alt="Calculadora de inflación: equivalencia de euros entre fechas y gráfico de inflación interanual">
 
 </td>
 <td width="50%" valign="top">
 
 ### 📈 ¿Cuánto ha subido la vida?
-**[bendi.dev/bolsillo/ipc](https://bendi.dev/bolsillo/ipc/)**
+**[bolsillo.bendi.dev/ipc](https://bolsillo.bendi.dev/ipc/)**
 
 - La **inflación del último año**, en una frase.
 - **Calculadora**: cuánto valen hoy tus euros de cualquier mes desde 2002.
@@ -107,9 +107,9 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 </table>
 
 <div align="center">
-<img src="https://bendi.dev/bolsillo/capturas/movil.png" width="260" alt="Portada en el móvil, en modo oscuro">
+<img src="https://bolsillo.bendi.dev/capturas/movil.png" width="260" alt="Portada en el móvil, en modo oscuro">
 &nbsp;&nbsp;
-<img src="https://bendi.dev/bolsillo/capturas/movil-luz.png" width="260" alt="Sección de la luz en el móvil, en modo oscuro">
+<img src="https://bolsillo.bendi.dev/capturas/movil-luz.png" width="260" alt="Sección de la luz en el móvil, en modo oscuro">
 <br>
 <sub>Pensada para el móvil, con modo oscuro, y se puede instalar como app.</sub>
 </div>
@@ -157,7 +157,7 @@ flowchart LR
     end
 
     Fuentes --> DES
-    CAP --> PAGES["🌐 GitHub Pages<br/>bendi.dev/bolsillo"]
+    CAP --> PAGES["🌐 GitHub Pages<br/>bolsillo.bendi.dev"]
     Action -. "si algo falla" .-> ISSUE["🔔 Issue «datos»"]
     PAGES --> MOVIL["📱 Navegador<br/>(funciona sin conexión)"]
 ```
@@ -287,7 +287,7 @@ Es desde donde la API del INE ofrece la serie vigente (base 2025), que es la ref
 
 **© 2026 Bendi. Todos los derechos reservados.** El repositorio es público para que se pueda ver el código, pero no se concede licencia de uso: no se puede copiar, clonar para usarlo, modificar ni redistribuir sin permiso. Detalles en [LICENSE](LICENSE).
 
-Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones ([ver fuentes](https://bendi.dev/bolsillo/fuentes/)). bolsillo no está vinculado a ninguno de esos organismos.
+Los datos pertenecen a sus fuentes y se reutilizan según sus condiciones ([ver fuentes](https://bolsillo.bendi.dev/fuentes/)). bolsillo no está vinculado a ninguno de esos organismos.
 
 <div align="center">
 <br>

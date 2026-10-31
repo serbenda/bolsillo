@@ -132,7 +132,7 @@ test('fuentes y ficheros de la app', async () => {
   const { pagina, errores, contexto } = await abrir('fuentes/');
   assert.deepEqual(errores, []);
   await accesible(pagina);
-  for (const f of ['manifest.webmanifest', 'sw.js', 'sitemap.xml', 'assets/img/compartir.png', 'assets/img/icono-512.png']) {
+  for (const f of ['manifest.webmanifest', 'sw.js', 'sitemap.xml', 'robots.txt', 'assets/img/compartir.png', 'assets/img/icono-512.png']) {
     const r = await pagina.request.get(base + f);
     assert.equal(r.status(), 200, f);
   }
