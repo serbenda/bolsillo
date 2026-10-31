@@ -217,6 +217,62 @@ export const TRADUCCIONES = {
     "Every evening, as soon as Red Eléctrica publishes the prices, we'll tell you the cheapest and most expensive hours for the next day. Works with bolsillo installed as an app in Chrome or Edge.",
   'Activar avisos': 'Turn on alerts',
 
+  // Sueldo frente a la inflación
+  '¿Tu sueldo ha subido más que los precios?': 'Has your salary kept up with prices?',
+  'Lo que cobrabas al mes': 'What you earned a month',
+  'En el año': 'In the year',
+  'Lo que cobras hoy al mes': 'What you earn a month now',
+  'Compara los precios medios de ese año con los de los últimos 12 meses publicados. Usa siempre el mismo tipo de sueldo (neto o bruto) en las dos casillas. Solo se guarda en tu navegador; no se envía a ningún sitio.':
+    "Compares average prices in that year with the last 12 months published. Use the same kind of salary (net or gross) in both boxes. It's only saved in your browser and never sent anywhere.",
+  // Gasolina por provincia
+  'Tu provincia': 'Your province',
+  'Media de España': "Spain's average",
+  'Precio por provincia': 'Price by province',
+  'Ver todas las provincias': 'See all provinces',
+  'Precio medio de hoy en las gasolineras de cada provincia. La barra es la diferencia con la media de España: en rojo, más cara; en verde, más barata.':
+    "Today's average price at the petrol stations in each province. The bar shows the difference from Spain's average: red is dearer, green is cheaper.",
+
+  // ¿De dónde salen los datos? (luz, gasolina, hipoteca, inflación)
+  "¿De dónde sale el precio?": "What's behind the price?",
+  "Es el PVPC (precio voluntario para el pequeño consumidor), la tarifa regulada de la luz. Red Eléctrica publica cada tarde, hacia las 20:30, el precio de cada hora del día siguiente, y bolsillo lo descarga de su API pública.":
+    "It's PVPC, Spain's regulated electricity tariff. Red Eléctrica publishes the price for each hour of the next day every evening at around 20:30, and bolsillo downloads it from their public API.",
+  "¿Por qué cambia cada hora?": "Why does it change every hour?",
+  "Porque sigue el precio del mercado mayorista, que se fija hora a hora según la demanda y cómo se produce la electricidad: con mucho sol y viento es más barata; cuando hacen falta centrales de gas, más cara. Por eso las horas centrales del día suelen ser las más baratas.":
+    "Because it follows the wholesale market price, set hour by hour according to demand and how the electricity is generated: plenty of sun and wind make it cheaper; when gas power stations are needed, it gets dearer. That is why the middle of the day is often the cheapest.",
+  "¿Qué incluye el precio con impuestos?": "What does the price with taxes include?",
+  "El precio de la energía con peajes y cargos, más el impuesto eléctrico y el IVA. No incluye la parte fija de la factura: la potencia contratada y el alquiler del contador.":
+    "The energy price including network charges, plus electricity tax and VAT. It doesn't include the fixed part of the bill: contracted power and meter rental.",
+  "¿Y si no tengo PVPC?": "What if I'm not on PVPC?",
+  "Si tienes una tarifa del mercado libre con precio fijo, pagas lo mismo a cualquier hora y estos precios no te afectan directamente. Tienes PVPC si tu factura dice «precio voluntario para el pequeño consumidor» y tu comercializadora es «de referencia».":
+    "If you're on a fixed-price tariff from the free market, you pay the same at any hour and these prices don't affect you directly. You're on PVPC if your bill mentions PVPC and your supplier is one of the regulated 'reference suppliers'.",
+  "¿De dónde salen los precios?": "Where do the prices come from?",
+  "Del Ministerio para la Transición Ecológica: todas las gasolineras de España están obligadas a comunicarle sus precios. bolsillo descarga el listado completo varias veces al día.":
+    "From Spain's Ministry for the Ecological Transition: every petrol station in Spain must report its prices to it. bolsillo downloads the full list several times a day.",
+  "¿Por qué cambia tanto de una gasolinera a otra?": "Why do prices vary so much between stations?",
+  "Casi la mitad del precio son impuestos iguales en todas (impuesto de hidrocarburos e IVA), pero cada gasolinera pone su margen. Influyen la marca, la competencia cercana, si es de autoservicio o si está en una autovía.":
+    "Nearly half of the price is taxes that are the same everywhere (fuel duty and VAT), but each station sets its own margin. Brand, nearby competition, self-service and motorway locations all make a difference.",
+  "¿Cómo funciona «¿Echo hoy o espero?»?": "How does \"Fill up today or wait?\" work?",
+  "Compara el precio medio de hoy en tu provincia con la media de los siete días anteriores. bolsillo guarda esa media cada día desde finales de octubre de 2026, así que cuantos más días pasen, más útil será.":
+    "It compares today's average price in your province with the average of the previous seven days. bolsillo has recorded that average every day since late October 2026, so it gets more useful over time.",
+  "¿De dónde sale el Euríbor?": "Where does the Euribor come from?",
+  "Lo calcula cada día el Instituto Europeo de los Mercados Monetarios. Para las hipotecas se usa la media de cada mes, que publica el Banco de España como índice oficial. bolsillo lo descarga de la API de estadísticas del Banco de España.":
+    "It's calculated every day by the European Money Markets Institute. Mortgages use each month's average, which the Bank of Spain publishes as the official index. bolsillo downloads it from the Bank of Spain's statistics API.",
+  "¿Cómo se calcula la cuota?": "How is the payment calculated?",
+  "Con el sistema francés, el de casi todas las hipotecas en España: el tipo es el Euríbor más tu diferencial, y la cuota se mantiene igual hasta la siguiente revisión. Al principio pagas sobre todo intereses y, con los años, sobre todo capital.":
+    "With the French amortisation system used by almost all Spanish mortgages: the rate is the Euribor plus your margin, and the payment stays the same until the next review. At first you mostly pay interest and, over the years, mostly capital.",
+  "¿Cuándo me cambia la cuota?": "When does my payment change?",
+  "En cada revisión, normalmente cada 6 o 12 meses, con el Euríbor publicado uno o dos meses antes. Tu escritura dice cada cuánto se revisa y qué mes se toma.":
+    "At each review, usually every 6 or 12 months, using the Euribor published one or two months earlier. Your mortgage deed says how often it is reviewed and which month is used.",
+  "¿De dónde sale la inflación?": "Where does the inflation figure come from?",
+  "Del Índice de Precios de Consumo (IPC) del INE. Cada mes mide los precios de una cesta con cientos de productos y servicios que representan lo que gastan los hogares (comida, vivienda, transporte, ocio…), y cada cosa pesa según cuánto se gasta en ella. bolsillo descarga el índice general desde 2002 con la API pública del INE.":
+    "From INE's Consumer Price Index (CPI). Every month it measures the prices of a basket of hundreds of goods and services that represent household spending (food, housing, transport, leisure…), each weighted by how much is spent on it. bolsillo downloads the headline index back to 2002 from INE's public API.",
+  "¿Por qué no coincide con lo que noto?": "Why doesn't it match what I feel?",
+  "Porque es una media de todos los hogares. Si gastas mucho en algo que ha subido más (el alquiler o la comida, por ejemplo), notarás más inflación que la oficial; si gastas en cosas que suben menos, notarás menos.":
+    "Because it's an average across all households. If you spend a lot on something that has risen faster (rent or food, for example), you'll feel more inflation than the official figure; if your spending goes on things that rise less, you'll feel less.",
+  "¿Cómo se calcula lo de mi sueldo?": "How is the salary comparison worked out?",
+  "Se compara el IPC medio del año que eliges con el de los últimos 12 meses publicados. Si los precios han subido un 20 %, necesitas cobrar un 20 % más para comprar lo mismo; si tu sueldo ha subido menos, has perdido poder de compra.":
+    "It compares the average CPI for the year you choose with the last 12 months published. If prices have risen 20%, you need to earn 20% more to buy the same things; if your salary has risen less, you've lost buying power.",
+
   // Compra
   'Hace 10 años': '10 years ago',
   'Año a año': 'Year by year',

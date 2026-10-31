@@ -67,7 +67,8 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 - Las **más baratas cerca de ti**, por ubicación o **cualquier código postal**.
 - **Solo las abiertas ahora**, según el horario de cada gasolinera.
 - Gasolina 95 y 98, diésel, diésel premium y GLP, de 2 a 25 km.
-- **¿Echo hoy o espero?**: el precio de hoy frente a la semana en tu provincia.
+- **¿Echo hoy o espero?**: el precio de hoy frente a la semana en tu provincia, con la media de España al lado.
+- **Precio por provincia**: dónde está hoy más barato y más caro cada combustible.
 - Mapa, distancia, horario, «Cómo llegar» y lo que ahorras en un depósito.
 
 </td>
@@ -104,6 +105,7 @@ Cada sección responde a una pregunta con un titular claro, y debajo pone los da
 - La **inflación del último año**, en una frase.
 - **Calculadora**: cuánto valen hoy tus euros de cualquier mes desde 2002.
 - La **inflación mes a mes**, con el periodo de tu cálculo sombreado.
+- **¿Tu sueldo ha subido más que los precios?**: si has ganado o perdido poder de compra, en euros.
 
 </td>
 </tr>

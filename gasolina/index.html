@@ -93,12 +93,40 @@
       <h2 id="t-tendencia">¿Echo hoy o espero?</h2>
       <p class="resultado" id="tendencia-frase"></p>
       <p id="tendencia-detalle"></p>
-      <div id="tendencia-caja" hidden><svg id="tendencia-grafico" class="chispa" role="img" aria-label="Evolución del precio medio"></svg></div>
+      <div id="tendencia-caja" hidden>
+        <svg id="tendencia-grafico" class="chispa" role="img" aria-label="Evolución del precio medio"></svg>
+        <p class="leyenda nota"><span><i></i><span id="leyenda-provincia">Tu provincia</span></span><span><i class="general"></i>Media de España</span></p>
+      </div>
     </section>
 
     <section aria-label="Resultados" id="resultados" hidden>
       <div id="mapa" class="mapa"></div>
       <ol class="estaciones" id="lista"></ol>
+    </section>
+
+    <section aria-labelledby="t-provincias" id="bloque-provincias" hidden>
+      <h2 id="t-provincias">Precio por provincia</h2>
+      <p class="resultado" id="provincias-frase" aria-live="polite"></p>
+      <details class="todas-provincias">
+        <summary>Ver todas las provincias</summary>
+        <ol class="productos provincias" id="provincias"></ol>
+      </details>
+      <p class="nota">Precio medio de hoy en las gasolineras de cada provincia. La barra es la diferencia con la media de España: en rojo, más cara; en verde, más barata.</p>
+    </section>
+    <section aria-labelledby="t-explicacion" class="explicacion">
+      <h2 id="t-explicacion">¿De dónde salen los datos?</h2>
+      <details>
+        <summary>¿De dónde salen los precios?</summary>
+        <p>Del Ministerio para la Transición Ecológica: todas las gasolineras de España están obligadas a comunicarle sus precios. bolsillo descarga el listado completo varias veces al día.</p>
+      </details>
+      <details>
+        <summary>¿Por qué cambia tanto de una gasolinera a otra?</summary>
+        <p>Casi la mitad del precio son impuestos iguales en todas (impuesto de hidrocarburos e IVA), pero cada gasolinera pone su margen. Influyen la marca, la competencia cercana, si es de autoservicio o si está en una autovía.</p>
+      </details>
+      <details>
+        <summary>¿Cómo funciona «¿Echo hoy o espero?»?</summary>
+        <p>Compara el precio medio de hoy en tu provincia con la media de los siete días anteriores. bolsillo guarda esa media cada día desde finales de octubre de 2026, así que cuantos más días pasen, más útil será.</p>
+      </details>
     </section>
   </main>
 

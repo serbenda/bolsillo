@@ -1,4 +1,4 @@
-import { equivalencia, interanual } from './ipc.js';
+import { equivalencia, interanual, poderAdquisitivo } from './ipc.js';
 import { tr, euros, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
@@ -101,6 +101,30 @@ function pintarHistoria(desde, hasta) {
   );
 }
 
+function calcularSueldo() {
+  const anyo = Number($('anyo-sueldo').value);
+  const antes = decimal($('sueldo-antes').value);
+  const hoy = decimal($('sueldo-hoy').value);
+  const r = poderAdquisitivo(serie, anyo, antes, hoy);
+  if (!r) {
+    $('resultado-sueldo').textContent = tr('Escribe dos sueldos mayores que cero.', 'Enter two salaries above zero.');
+    $('detalle-sueldo').textContent = '';
+    return;
+  }
+  for (const id of ['sueldo-antes', 'sueldo-hoy', 'anyo-sueldo']) guardar(id, $(id).value);
+  const real = pct(Math.abs(r.real));
+  $('resultado-sueldo').textContent = Math.abs(r.real) < 0.005
+    ? tr(`Tu sueldo ha subido lo mismo que los precios desde ${anyo}.`, `Your salary has kept pace with prices since ${anyo}.`)
+    : r.real > 0
+      ? tr(`Has ganado poder de compra: hoy puedes comprar un ${real} más que en ${anyo}.`, `You've gained buying power: you can buy ${real} more than in ${anyo}.`)
+      : tr(`Has perdido poder de compra: hoy puedes comprar un ${real} menos que en ${anyo}.`, `You've lost buying power: you can buy ${real} less than in ${anyo}.`);
+  const dif = euros(Math.abs(r.diferencia), 0);
+  $('detalle-sueldo').textContent = tr(
+    `Los precios han subido un ${pct(r.inflacion)} desde ${anyo}. Para comprar lo mismo que entonces necesitarías cobrar ${euros(r.necesario, 0)} al mes; cobras ${euros(hoy, 0)}${Math.abs(r.real) < 0.005 ? '.' : `, ${dif} ${r.diferencia > 0 ? 'más' : 'menos'} al mes.`}`,
+    `Prices have risen ${pct(r.inflacion)} since ${anyo}. To buy the same as then you'd need ${euros(r.necesario, 0)} a month; you earn ${euros(hoy, 0)}${Math.abs(r.real) < 0.005 ? '.' : `, ${dif} ${r.diferencia > 0 ? 'more' : 'less'} a month.`}`
+  );
+}
+
 async function iniciar() {
   try {
     const r = await fetch(FICHERO); // precargado desde el HTML
@@ -110,7 +134,7 @@ async function iniciar() {
   } catch {
     $('titular').textContent = tr('¿Cuánto ha subido la vida?', 'How much have prices gone up?');
     avisar(tr('Los datos del IPC no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Inflation data isn't available right now. Please try again shortly."));
-    $('formulario').querySelectorAll('input, select').forEach((el) => (el.disabled = true));
+    document.querySelectorAll('form input, form select').forEach((el) => (el.disabled = true));
     return;
   }
   tasas = interanual(serie);
@@ -138,6 +162,20 @@ async function iniciar() {
   $('formulario').addEventListener('submit', (e) => e.preventDefault());
   $('actualizado').textContent = tr(`Último dato: ${nombreMes(ultimo.mes)}.`, `Latest figure: ${nombreMes(ultimo.mes)}.`);
   calcular();
+
+  // Sueldo: solo años completos, sin contar el último (se compara con los últimos 12 meses)
+  const anos = [...new Set(serie.map((p) => p.mes.slice(0, 4)))]
+    .filter((a) => serie.filter((p) => p.mes.startsWith(`${a}-`)).length === 12 && Number(a) < Number(ultimo.mes.slice(0, 4)))
+    .reverse();
+  for (const a of anos) $('anyo-sueldo').add(new Option(a, a));
+  $('anyo-sueldo').value = anos.find((a) => Number(a) === Number(ultimo.mes.slice(0, 4)) - 5) ?? anos[0];
+  for (const id of ['sueldo-antes', 'sueldo-hoy', 'anyo-sueldo']) {
+    const v = leer(id);
+    if (v !== null && (id !== 'anyo-sueldo' || anos.includes(v))) $(id).value = v;
+    $(id).addEventListener('input', calcularSueldo);
+  }
+  $('form-sueldo').addEventListener('submit', (e) => e.preventDefault());
+  calcularSueldo();
 
   let espera;
   new ResizeObserver(() => {
