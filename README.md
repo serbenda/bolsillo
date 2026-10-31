@@ -18,6 +18,7 @@ Luz hora a hora, gasolineras más baratas, hipoteca e inflación. Sin cookies, s
 ![Sin dependencias](https://img.shields.io/badge/dependencias-0-17784e)
 ![Sin cookies](https://img.shields.io/badge/cookies-0-17784e)
 ![Funciona sin conexión](https://img.shields.io/badge/sin_conexión-sí-17784e)
+[![Apoya en GitHub Sponsors](https://img.shields.io/badge/apoya-GitHub_Sponsors-bf3989?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/serbenda)
 [![Todos los derechos reservados](https://img.shields.io/badge/licencia-todos_los_derechos_reservados-172033)](LICENSE)
 
 <a href="https://bolsillo.bendi.dev/"><img src="https://bolsillo.bendi.dev/capturas/portada.png" width="860" alt="Portada de bolsillo con el recibo del día: luz, hora más barata, gasolina, diésel, Euríbor e inflación"></a>
@@ -280,6 +281,12 @@ Usa el sistema francés de amortización, que es el habitual. Es orientativo: tu
 
 Es desde donde la API del INE ofrece la serie vigente (base 2025), que es la referencia oficial.
 </details>
+
+---
+
+## Apoya el proyecto
+
+bolsillo es gratis, sin anuncios y seguirá siéndolo. Si te ahorra dinero y quieres ayudar a mantenerlo, puedes apoyarlo en **[GitHub Sponsors](https://github.com/sponsors/serbenda)** ❤️
 
 ---
 
