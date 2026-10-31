@@ -36,7 +36,7 @@ function hoyEnMadridA(hora) {
 
 /** Texto de un elemento con los espacios normalizados (incluidos los irrompibles), para comparar sin sorpresas. */
 async function texto(pagina, selector) {
-  return (await texto(pagina, selector)).replace(/\s+/g, ' ').trim();
+  return (await pagina.textContent(selector)).replace(/\s+/g, ' ').trim();
 }
 
 async function abrir(ruta, { hora, ...opciones } = {}) {
