@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Cuánto rinden mis ahorros? Letras del Tesoro · bolsillo</title>
+  <meta name="description" content="Cuánto pagan las Letras del Tesoro a 3, 6, 9 y 12 meses según la última subasta, cuánto ganarías con tus ahorros y cuánto se come la inflación.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://bolsillo.bendi.dev/ahorro/">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <meta name="theme-color" content="#eef1ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#10161f" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="bolsillo">
+  <meta property="og:title" content="¿Cuánto rinden mis ahorros? Letras del Tesoro hoy">
+  <meta property="og:description" content="Cuánto pagan las Letras del Tesoro a 3, 6, 9 y 12 meses según la última subasta, cuánto ganarías con tus ahorros y cuánto se come la inflación.">
+  <meta property="og:url" content="https://bolsillo.bendi.dev/ahorro/">
+  <meta property="og:image" content="https://bolsillo.bendi.dev/assets/img/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
+  <link rel="stylesheet" href="../assets/css/estilos.css">
+  <link rel="preload" href="../data/ahorro.json" as="fetch" crossorigin>
+  <link rel="preload" href="../data/ipc.json" as="fetch" crossorigin>
+</head>
+<body>
+  <header class="envoltorio cabecera">
+    <a class="marca" href="../" aria-label="bolsillo, inicio">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="15" y="15" width="9" height="20" rx="2.5" class="b1"/>
+        <rect x="27.5" y="9" width="9" height="26" rx="2.5" class="b2"/>
+        <rect x="40" y="3" width="9" height="32" rx="2.5" class="b3"/>
+        <path d="M9 24.5c0-1.4 1.1-2.5 2.5-2.5h41c1.4 0 2.5 1.1 2.5 2.5V43c0 1-.6 1.9-1.5 2.3L33.1 54.6a2.6 2.6 0 0 1-2.2 0L10.5 45.3A2.5 2.5 0 0 1 9 43z" class="bolsillo"/>
+        <path d="M13.5 27h37v14.6L32 50.2 13.5 41.6z" class="costura"/>
+      </svg>
+      <span>bolsillo</span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="../luz/"><svg class="icono-nav luz" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M18 3 7 18h8l-2 11 12-16h-8z"/></svg>Luz</a>
+      <a href="../gasolina/"><svg class="icono-nav gasolina" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v22H6zm3 2v6h8V7zM20 12h2a2 2 0 0 1 2 2v9a1.5 1.5 0 0 0 3 0V12l-3-4 1.5-1.5L29 11v12a4 4 0 0 1-8 0v-9h-1zM4 27h18v2H4z"/></svg>Gasolina</a>
+      <a href="../compra/"><svg class="icono-nav compra" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M11.3 5.4 7.2 12H3a1 1 0 0 0-1 1.2l3 12.6A3 3 0 0 0 8 28h16a3 3 0 0 0 2.9-2.2l3-12.6A1 1 0 0 0 29 12h-4.2l-4.1-6.6-1.7 1L22.4 12H9.6l3.4-5.6zM11 16h2v8h-2zm4 0h2v8h-2zm4 0h2v8h-2z"/></svg>Compra</a>
+      <a href="../alquiler/"><svg class="icono-nav alquiler" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M21 3a8 8 0 0 0-7.7 10.2L3 23.5V29h5.5v-3h3v-3h3l2.3-2.3A8 8 0 1 0 21 3zm2 4.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg>Alquiler</a>
+      <a href="../hipoteca/"><svg class="icono-nav hipoteca" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 2 15h4v13h8v-8h4v8h8V15h4z"/></svg>Hipoteca</a>
+      <a href="./" aria-current="page"><svg class="icono-nav ahorro" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M14 4a4 4 0 0 1 3.9 3H20a9 9 0 0 1 8.6 6.3l1.4.2V19l-2.3.6A9 9 0 0 1 24 24v4h-4v-2h-6v2h-4v-4.1A9 9 0 0 1 6 15a9 9 0 0 1 4.1-7.6A4 4 0 0 1 14 4zm8 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 13h3v3H2z"/></svg>Ahorro</a>
+      <a href="../ipc/"><svg class="icono-nav ipc" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26h24v2H4zM6 20l6-6 5 4 9-10 1.5 1.4L17.2 20.6l-5-4L7.4 21.4z"/></svg>Inflación</a>
+    </nav>
+    <div class="idiomas" role="group" aria-label="Idioma">
+      <span aria-current="true">ES</span>
+      <a href="/en/ahorro/" hreflang="en" lang="en" title="English">EN</a>
+    </div>
+  </header>
+
+  <main class="envoltorio">
+    <section aria-labelledby="titular">
+      <h1 class="titular" id="titular">Las Letras del Tesoro a 12 meses pagan un <span class="pendiente-dato">…</span></h1>
+      <p class="entradilla" id="entradilla">Tipo de interés de la última subasta del Tesoro, publicado por el Banco de España.</p>
+      <p class="compartir"><button type="button" class="boton secundario" data-compartir><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/></svg>Compartir</button><span class="estado-compartir" aria-live="polite"></span></p>
+      <p id="mensaje" class="aviso" role="status" hidden></p>
+    </section>
+
+    <section aria-labelledby="t-calculadora">
+      <form class="planificador formulario" id="formulario" novalidate>
+        <h2 id="t-calculadora">¿Cuánto ganaría?</h2>
+        <label class="campo campo-gasto">
+          <span>Lo que quieres ahorrar</span>
+          <span class="con-unidad"><input id="cantidad" inputmode="decimal" autocomplete="off" value="10.000"><b>€</b></span>
+        </label>
+        <fieldset class="duraciones periodos">
+          <legend>Plazo</legend>
+          <label><input type="radio" name="plazo" value="m3"> 3 meses</label>
+          <label><input type="radio" name="plazo" value="m6"> 6 meses</label>
+          <label><input type="radio" name="plazo" value="m9"> 9 meses</label>
+          <label><input type="radio" name="plazo" value="m12" checked> 12 meses</label>
+        </fieldset>
+        <p class="resultado" id="resultado" aria-live="polite"></p>
+        <p id="resultado-detalle"></p>
+      </form>
+    </section>
+
+    <section aria-labelledby="t-plazos">
+      <h2 id="t-plazos">Última subasta de cada plazo</h2>
+      <ol class="productos plazos" id="plazos"></ol>
+      <p class="nota" id="nota-plazos"></p>
+    </section>
+
+    <section aria-labelledby="t-historia" id="bloque-historia">
+      <h2 id="t-historia">El interés de las Letras, subasta a subasta</h2>
+      <figure class="historia grafico-compra">
+        <svg id="historia" role="img"></svg>
+        <figcaption class="nota"><span class="leyenda"><span><i class="producto-sel"></i>Letras a 12 meses</span><span><i class="general"></i>Inflación (IPC)</span></span><span id="pie-historia"></span></figcaption>
+      </figure>
+    </section>
+
+    <section aria-labelledby="t-explicacion" class="explicacion">
+      <h2 id="t-explicacion">Lo que tienes que saber</h2>
+      <details>
+        <summary>¿Qué es una Letra del Tesoro?</summary>
+        <p>Un préstamo que haces al Estado a corto plazo: 3, 6, 9 o 12 meses. Cada Letra vale 1.000 € al vencer y se compra algo más barata; la diferencia es lo que ganas. Es de las inversiones más seguras que hay en España, porque la devuelve el Estado.</p>
+      </details>
+      <details>
+        <summary>¿Cómo se compran?</summary>
+        <p>En las subastas del Tesoro, que se hacen cada mes para cada plazo. Puedes comprarlas sin comisiones en la web del Tesoro Público (Tesoro Directo) o en el Banco de España, o a través de tu banco, que puede cobrar comisiones. Si necesitas el dinero antes de que venzan, tendrías que venderlas en el mercado al precio que haya ese día.</p>
+      </details>
+      <details>
+        <summary>¿Cuánto pago a Hacienda?</summary>
+        <p>Lo que ganas tributa en el IRPF como rendimiento del ahorro: un 19 % de los primeros 6.000 € de rendimientos del año, más en tramos superiores. Las Letras no tienen retención, así que lo pagas en la declaración de la renta. bolsillo descuenta un 19 % para darte una idea de lo que te queda.</p>
+      </details>
+      <details>
+        <summary>¿Por qué comparar con la inflación?</summary>
+        <p>Porque si los precios suben más que lo que te pagan, tu dinero compra menos aunque tengas más euros. Si lo dejas en una cuenta sin intereses, la inflación se lo va comiendo poco a poco.</p>
+      </details>
+      <details>
+        <summary>¿De dónde salen los datos?</summary>
+        <p>Del Banco de España, que publica el tipo de interés de cada subasta de Letras (el tipo marginal, el más alto aceptado) y la rentabilidad diaria del bono a 10 años. bolsillo los descarga con la API de estadísticas del Banco de España. Esto es información, no una recomendación de inversión: bolsillo no es un asesor financiero.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="envoltorio pie">
+    <p class="apoyo"><a href="https://github.com/sponsors/serbenda" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.2 6.9 13.2C3 9.7.5 7.4.5 4.6.5 2.3 2.3.5 4.6.5c1.3 0 2.5.6 3.4 1.6C8.9 1.1 10.1.5 11.4.5c2.3 0 4.1 1.8 4.1 4.1 0 2.8-2.5 5.1-6.4 8.6Z"/></svg>¿Te ahorra dinero? Apoya bolsillo en GitHub Sponsors</a></p>
+    <p>Tipos de interés de las subastas de Letras del Tesoro y rentabilidad del bono a 10 años publicados por el Banco de España. La inflación es el IPC general del INE.</p>
+    <p id="actualizado"></p>
+    <p><a href="../fuentes/">Fuentes y condiciones</a></p>
+  </footer>
+
+  <script type="module" src="../assets/js/ahorro-pagina.js"></script>
+  <script type="module" src="../assets/js/comun.js"></script>
+  <script type="module" src="../assets/js/compartir.js"></script>
+</body>
+</html>

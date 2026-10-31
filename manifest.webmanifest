@@ -45,6 +45,10 @@
       "url": "compra/"
     },
     {
+      "name": "Alquiler",
+      "url": "alquiler/"
+    },
+    {
       "name": "Hipoteca",
       "url": "hipoteca/"
     },

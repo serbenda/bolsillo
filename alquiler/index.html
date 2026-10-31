@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Cuánto me pueden subir el alquiler? · bolsillo</title>
+  <meta name="description" content="Cuánto te pueden subir el alquiler este año, con el índice oficial del INE (IRAV) para contratos de vivienda, y cómo se calcula.">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://bolsillo.bendi.dev/alquiler/">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <meta name="theme-color" content="#eef1ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#10161f" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="bolsillo">
+  <meta property="og:title" content="¿Cuánto me pueden subir el alquiler?">
+  <meta property="og:description" content="Cuánto te pueden subir el alquiler este año, con el índice oficial del INE (IRAV) para contratos de vivienda, y cómo se calcula.">
+  <meta property="og:url" content="https://bolsillo.bendi.dev/alquiler/">
+  <meta property="og:image" content="https://bolsillo.bendi.dev/assets/img/compartir.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../vendor/fuentes/archivo.css">
+  <link rel="stylesheet" href="../assets/css/estilos.css">
+  <link rel="preload" href="../data/alquiler.json" as="fetch" crossorigin>
+  <link rel="preload" href="../data/ipc.json" as="fetch" crossorigin>
+</head>
+<body>
+  <header class="envoltorio cabecera">
+    <a class="marca" href="../" aria-label="bolsillo, inicio">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="15" y="15" width="9" height="20" rx="2.5" class="b1"/>
+        <rect x="27.5" y="9" width="9" height="26" rx="2.5" class="b2"/>
+        <rect x="40" y="3" width="9" height="32" rx="2.5" class="b3"/>
+        <path d="M9 24.5c0-1.4 1.1-2.5 2.5-2.5h41c1.4 0 2.5 1.1 2.5 2.5V43c0 1-.6 1.9-1.5 2.3L33.1 54.6a2.6 2.6 0 0 1-2.2 0L10.5 45.3A2.5 2.5 0 0 1 9 43z" class="bolsillo"/>
+        <path d="M13.5 27h37v14.6L32 50.2 13.5 41.6z" class="costura"/>
+      </svg>
+      <span>bolsillo</span>
+    </a>
+    <nav class="nav" aria-label="Secciones">
+      <a href="../luz/"><svg class="icono-nav luz" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M18 3 7 18h8l-2 11 12-16h-8z"/></svg>Luz</a>
+      <a href="../gasolina/"><svg class="icono-nav gasolina" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v22H6zm3 2v6h8V7zM20 12h2a2 2 0 0 1 2 2v9a1.5 1.5 0 0 0 3 0V12l-3-4 1.5-1.5L29 11v12a4 4 0 0 1-8 0v-9h-1zM4 27h18v2H4z"/></svg>Gasolina</a>
+      <a href="../compra/"><svg class="icono-nav compra" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M11.3 5.4 7.2 12H3a1 1 0 0 0-1 1.2l3 12.6A3 3 0 0 0 8 28h16a3 3 0 0 0 2.9-2.2l3-12.6A1 1 0 0 0 29 12h-4.2l-4.1-6.6-1.7 1L22.4 12H9.6l3.4-5.6zM11 16h2v8h-2zm4 0h2v8h-2zm4 0h2v8h-2z"/></svg>Compra</a>
+      <a href="./" aria-current="page"><svg class="icono-nav alquiler" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M21 3a8 8 0 0 0-7.7 10.2L3 23.5V29h5.5v-3h3v-3h3l2.3-2.3A8 8 0 1 0 21 3zm2 4.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/></svg>Alquiler</a>
+      <a href="../hipoteca/"><svg class="icono-nav hipoteca" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 2 15h4v13h8v-8h4v8h8V15h4z"/></svg>Hipoteca</a>
+      <a href="../ahorro/"><svg class="icono-nav ahorro" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M14 4a4 4 0 0 1 3.9 3H20a9 9 0 0 1 8.6 6.3l1.4.2V19l-2.3.6A9 9 0 0 1 24 24v4h-4v-2h-6v2h-4v-4.1A9 9 0 0 1 6 15a9 9 0 0 1 4.1-7.6A4 4 0 0 1 14 4zm8 9a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 13h3v3H2z"/></svg>Ahorro</a>
+      <a href="../ipc/"><svg class="icono-nav ipc" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 26h24v2H4zM6 20l6-6 5 4 9-10 1.5 1.4L17.2 20.6l-5-4L7.4 21.4z"/></svg>Inflación</a>
+    </nav>
+    <div class="idiomas" role="group" aria-label="Idioma">
+      <span aria-current="true">ES</span>
+      <a href="/en/alquiler/" hreflang="en" lang="en" title="English">EN</a>
+    </div>
+  </header>
+
+  <main class="envoltorio">
+    <section aria-labelledby="titular">
+      <h1 class="titular" id="titular">Este año te pueden subir el alquiler como mucho un <span class="pendiente-dato">…</span></h1>
+      <p class="entradilla" id="entradilla">Con el índice oficial del INE para actualizar los alquileres de vivienda (IRAV).</p>
+      <p class="compartir"><button type="button" class="boton secundario" data-compartir><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/></svg>Compartir</button><span class="estado-compartir" aria-live="polite"></span></p>
+      <p id="mensaje" class="aviso" role="status" hidden></p>
+    </section>
+
+    <section aria-labelledby="t-calculadora">
+      <form class="planificador formulario" id="formulario" novalidate>
+        <h2 id="t-calculadora">¿Cuánto me pueden subir?</h2>
+        <div class="campos">
+          <label class="campo">
+            <span>Lo que pagas al mes</span>
+            <span class="con-unidad"><input id="renta" inputmode="decimal" autocomplete="off" value="800"><b>€</b></span>
+          </label>
+          <label class="campo">
+            <span>Mes en que te lo suben</span>
+            <select id="mes-subida"></select>
+          </label>
+        </div>
+        <fieldset class="duraciones periodos">
+          <legend>¿Cuándo firmaste el contrato?</legend>
+          <label><input type="radio" name="firma" value="nuevo" checked> Desde el 26 de mayo de 2023</label>
+          <label><input type="radio" name="firma" value="antiguo"> Antes</label>
+        </fieldset>
+        <p class="resultado" id="resultado" aria-live="polite"></p>
+        <p id="resultado-detalle"></p>
+      </form>
+    </section>
+
+    <section aria-labelledby="t-historia" id="bloque-historia">
+      <h2 id="t-historia">El límite, mes a mes</h2>
+      <figure class="historia grafico-compra">
+        <svg id="historia" role="img"></svg>
+        <figcaption class="nota"><span class="leyenda"><span><i class="producto-sel"></i>Límite del alquiler (IRAV)</span><span><i class="general"></i>Inflación (IPC)</span></span><span id="pie-historia"></span></figcaption>
+      </figure>
+    </section>
+
+    <section aria-labelledby="t-explicacion" class="explicacion">
+      <h2 id="t-explicacion">Lo que tienes que saber</h2>
+      <details>
+        <summary>¿Qué es el IRAV?</summary>
+        <p>El Índice de Referencia de Arrendamientos de Vivienda, creado por la Ley de Vivienda para evitar subidas desproporcionadas. Lo calcula el INE cada mes y es el menor de tres valores: la inflación (IPC), la inflación subyacente y una tasa media ajustada. Por eso suele ser más bajo que el IPC cuando los precios suben mucho.</p>
+      </details>
+      <details>
+        <summary>¿A qué contratos se aplica?</summary>
+        <p>A los contratos de alquiler de vivienda firmados desde el 26 de mayo de 2023, sea el casero un particular o una empresa y esté o no la vivienda en una zona tensionada. Los contratos anteriores se actualizan con lo que diga el contrato, normalmente el IPC.</p>
+      </details>
+      <details>
+        <summary>¿Qué mes del índice se usa?</summary>
+        <p>El último publicado cuando toca actualizar la renta. El INE publica cada dato a mediados del mes siguiente, así que en una subida de enero se usa el de noviembre. Si tu subida es en un mes que aún no ha llegado, bolsillo usa el último dato y te avisa de que es una estimación.</p>
+      </details>
+      <details>
+        <summary>¿Me lo pueden subir si mi contrato no dice nada?</summary>
+        <p>No. La Ley de Arrendamientos Urbanos solo permite actualizar la renta si el contrato lo dice expresamente. Y el IRAV es un máximo: tu casero puede subirte menos o no subirte nada.</p>
+      </details>
+      <details>
+        <summary>¿De dónde salen los datos?</summary>
+        <p>Del INE, que publica el IRAV desde enero de 2025 con datos desde noviembre de 2024. bolsillo lo descarga con la API pública del INE y se actualiza automáticamente cada vez que sale un dato nuevo. Esto es información, no asesoramiento legal: ante cualquier duda, revisa tu contrato o consulta a la oficina de consumo o vivienda de tu comunidad.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="envoltorio pie">
+    <p class="apoyo"><a href="https://github.com/sponsors/serbenda" rel="noopener"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14.2 6.9 13.2C3 9.7.5 7.4.5 4.6.5 2.3 2.3.5 4.6.5c1.3 0 2.5.6 3.4 1.6C8.9 1.1 10.1.5 11.4.5c2.3 0 4.1 1.8 4.1 4.1 0 2.8-2.5 5.1-6.4 8.6Z"/></svg>¿Te ahorra dinero? Apoya bolsillo en GitHub Sponsors</a></p>
+    <p>Índice de Referencia de Arrendamientos de Vivienda (IRAV) publicado por el INE, variación anual. Para contratos firmados antes del 26 de mayo de 2023 se muestra el IPC general como referencia.</p>
+    <p id="actualizado"></p>
+    <p><a href="../fuentes/">Fuentes y condiciones</a></p>
+  </footer>
+
+  <script type="module" src="../assets/js/alquiler-pagina.js"></script>
+  <script type="module" src="../assets/js/comun.js"></script>
+  <script type="module" src="../assets/js/compartir.js"></script>
+</body>
+</html>

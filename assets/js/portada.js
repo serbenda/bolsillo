@@ -31,6 +31,16 @@ json('gasolina/indice.json').then(({ medias }) => {
   if (medias?.diesel) $('r-diesel').textContent = `${numero(medias.diesel, 3)} €/l`;
 }).catch(() => {});
 
+json('ahorro.json').then(({ letras }) => {
+  const u = letras?.m12?.at(-1);
+  if (u) $('r-letras').textContent = porcentaje(u.valor, 2);
+}).catch(() => {});
+
+json('alquiler.json').then(({ irav }) => {
+  const u = irav?.at(-1);
+  if (u) $('r-alquiler').textContent = porcentaje(u.valor, 2);
+}).catch(() => {});
+
 json('ipc.json').then(({ serie }) => {
   const t = interanual(serie).at(-1);
   if (t) $('r-ipc').textContent = porcentaje(t.tasa * 100, 1);
