@@ -49,7 +49,7 @@ const compartir = (frase, pregunta1, pregunta2) => `<div style="width:1200px;hei
       <span style="background:#b42318;color:#fff;padding:10px 22px;border-radius:12px">${pregunta2}</span>
     </div>
   </div>`;
-await captura(compartir('Luz, gasolina e hipoteca con datos oficiales.', '¿Cuándo pongo la lavadora?', '¿Dónde echo gasolina?'), 1200, 630, 'assets/img/compartir.png');
-await captura(compartir('Electricity, fuel and mortgage costs in Spain, with official data.', 'When to run the washer?', 'Where to fill up?'), 1200, 630, 'assets/img/compartir-en.png');
+await captura(compartir('Luz, gasolina, compra, alquiler, ahorro e hipoteca con datos oficiales.', '¿Cuándo pongo la lavadora?', '¿Dónde echo gasolina?'), 1200, 630, 'assets/img/compartir.png');
+await captura(compartir('Electricity, fuel, groceries, rent, savings and mortgages in Spain, with official data.', 'When to run the washer?', 'Where to fill up?'), 1200, 630, 'assets/img/compartir-en.png');
 
 await navegador.close();

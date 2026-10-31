@@ -23,9 +23,26 @@ after(async () => {
   await servidor?.cerrar();
 });
 
-async function abrir(ruta, opciones = {}) {
+// Hora fija en Madrid para las páginas que cambian según la hora (la luz): a las 22:00 ya han pasado
+// casi todas las horas del día, que es cuando el gráfico tiene más horas atenuadas. Así un fallo que
+// solo aparece a ciertas horas sale siempre, no según cuándo se ejecuten los tests.
+function hoyEnMadridA(hora) {
+  const fecha = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date());
+  const desfase = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', timeZoneName: 'shortOffset' })
+    .formatToParts(new Date()).find((p) => p.type === 'timeZoneName').value.replace('GMT', '') || '+0';
+  const [h, m = '00'] = desfase.replace(/^([+-])(\d+)$/, '$1$2:00').split(':');
+  return new Date(`${fecha}T${String(hora).padStart(2, '0')}:00:00${h.startsWith('-') ? '-' : '+'}${h.replace(/^[+-]/, '').padStart(2, '0')}:${m}`);
+}
+
+/** Texto de un elemento con los espacios normalizados (incluidos los irrompibles), para comparar sin sorpresas. */
+async function texto(pagina, selector) {
+  return (await texto(pagina, selector)).replace(/\s+/g, ' ').trim();
+}
+
+async function abrir(ruta, { hora, ...opciones } = {}) {
   const contexto = await navegador.newContext({ locale: 'es-ES', timezoneId: 'Europe/Madrid', ...opciones });
   const pagina = await contexto.newPage();
+  if (hora !== undefined) await pagina.clock.setFixedTime(hoyEnMadridA(hora));
   const errores = [];
   pagina.on('pageerror', (e) => errores.push(e.message));
   // Fuera de la web (mapas, visitas): no se descarga nada en los tests
@@ -44,27 +61,28 @@ async function accesible(pagina) {
 test('portada: recibo con datos del día', async () => {
   const { pagina, errores, contexto } = await abrir('');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#r-luz'), /€\/kWh/);
-  assert.match(await pagina.textContent('#r-g95'), /€\/l/);
-  assert.match(await pagina.textContent('#r-euribor'), /%/);
-  assert.match(await pagina.textContent('#r-ipc'), /%/);
-  assert.match(await pagina.textContent('#r-compra'), /%/);
-  assert.match(await pagina.textContent('#r-letras'), /%/);
-  assert.match(await pagina.textContent('#r-alquiler'), /%/);
+  assert.match(await texto(pagina, '#r-luz'), /€\/kWh/);
+  assert.match(await texto(pagina, '#r-g95'), /€\/l/);
+  assert.match(await texto(pagina, '#r-euribor'), /%/);
+  assert.match(await texto(pagina, '#r-ipc'), /%/);
+  assert.match(await texto(pagina, '#r-compra'), /%/);
+  assert.match(await texto(pagina, '#r-letras'), /%/);
+  assert.match(await texto(pagina, '#r-alquiler'), /%/);
+  assert.match(await texto(pagina, '#r-butano'), /€/);
   await accesible(pagina);
   await contexto.close();
 });
 
 test('luz: titular, gráfico y coste por aparato', async () => {
-  const { pagina, errores, contexto } = await abrir('luz/');
+  const { pagina, errores, contexto } = await abrir('luz/', { hora: 22 });
   assert.deepEqual(errores, []);
-  assert.doesNotMatch(await pagina.textContent('#titular'), /Cargando|no está disponible/);
+  assert.doesNotMatch(await texto(pagina, '#titular'), /Cargando|no está disponible/);
   assert.ok((await pagina.locator('#grafico .barra').count()) >= 23, 'barras de 24 horas');
   assert.equal(await pagina.locator('#costes tr').count(), 5);
   await pagina.click('text=Secadora');
-  assert.match(await pagina.textContent('#t-plan'), /secadora/);
+  assert.match(await texto(pagina, '#t-plan'), /secadora/);
   await pagina.click('#con-impuestos');
-  assert.match(await pagina.textContent('#ahorro'), /sin impuestos/);
+  assert.match(await texto(pagina, '#ahorro'), /sin impuestos/);
   // Por qué está cara o barata: lo que se pinta tiene que cuadrar con los datos publicados
   // (si REE no dio datos de generación, la sección no aparece y la página sigue funcionando)
   let gen = null;
@@ -73,7 +91,7 @@ test('luz: titular, gráfico y coste por aparato', async () => {
   } catch {}
   if (gen?.length) {
     const conPrecio = gen.filter((d) => d.precio !== null).length;
-    assert.match(await pagina.textContent('#gen-frase'), /renovable/);
+    assert.match(await texto(pagina, '#gen-frase'), /renovable/);
     assert.ok((await pagina.locator('#mezcla .seg').count()) >= 2, `segmentos de generación: ${await pagina.locator('#mezcla .seg').count()}`);
     assert.equal(await pagina.locator('#grafico-dias .barra').count(), conPrecio, 'un día por barra');
   } else {
@@ -89,7 +107,7 @@ test('gasolina: búsqueda por código postal', async () => {
   await pagina.fill('#cp', '28100');
   await pagina.click('button[type=submit]');
   await pagina.waitForSelector('.estacion', { timeout: 10000 });
-  assert.match(await pagina.textContent('#titular'), /€\/l/);
+  assert.match(await texto(pagina, '#titular'), /€\/l/);
   assert.ok((await pagina.locator('.estacion').count()) > 0, 'gasolineras en la lista');
   await accesible(pagina);
   await contexto.close();
@@ -102,20 +120,20 @@ test('gasolina: búsqueda por ubicación', async () => {
   });
   await pagina.click('#ubicacion');
   await pagina.waitForSelector('.estacion', { timeout: 10000 });
-  assert.match(await pagina.textContent('#entradilla'), /cerca de ti/);
+  assert.match(await texto(pagina, '#entradilla'), /cerca de ti/);
   await contexto.close();
 });
 
 test('hipoteca: cuota con el último Euríbor', async () => {
   const { pagina, errores, contexto } = await abrir('hipoteca/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /cuota/i);
+  assert.match(await texto(pagina, '#titular'), /cuota/i);
   assert.equal(await pagina.locator('#escenarios tr').count(), 5);
   await pagina.fill('#capital', '200000');
-  assert.match(await pagina.textContent('#entradilla'), /pasarías de pagar/);
+  assert.match(await texto(pagina, '#entradilla'), /pasarías de pagar/);
   await pagina.fill('#extra', '20000');
-  assert.match(await pagina.textContent('#op-plazo-dato'), /antes/);
-  assert.match(await pagina.textContent('#op-cuota-dato'), /al mes/);
+  assert.match(await texto(pagina, '#op-plazo-dato'), /antes/);
+  assert.match(await texto(pagina, '#op-cuota-dato'), /al mes/);
   await accesible(pagina);
   await contexto.close();
 });
@@ -123,9 +141,9 @@ test('hipoteca: cuota con el último Euríbor', async () => {
 test('inflación: calculadora del IPC', async () => {
   const { pagina, errores, contexto } = await abrir('ipc/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /%/);
+  assert.match(await texto(pagina, '#titular'), /%/);
   await pagina.fill('#cantidad', '250');
-  assert.match(await pagina.textContent('#resultado'), /^250,00\s€ de .+ equivalen a .+\s€ de /);
+  assert.match(await texto(pagina, '#resultado'), /^250,00\s€ de .+ equivalen a .+\s€ de /);
   assert.ok((await pagina.locator('#historia polyline').count()) === 1);
   await accesible(pagina);
   await contexto.close();
@@ -134,25 +152,25 @@ test('inflación: calculadora del IPC', async () => {
 test('compra: lo que sube y lo que baja', async () => {
   const { pagina, errores, contexto } = await abrir('compra/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /^La compra cuesta hoy un .+ (más|menos) que hace un año\.$/);
+  assert.match(await texto(pagina, '#titular'), /^La compra cuesta hoy un .+ (más|menos) que hace un año\.$/);
   assert.ok((await pagina.locator('#productos .producto').count()) >= 15);
   await pagina.fill('#gasto', '80');
-  assert.match(await pagina.textContent('#resultado'), /^La misma compra hoy te cuesta .+\s€\.$/);
+  assert.match(await texto(pagina, '#resultado'), /^La misma compra hoy te cuesta .+\s€\.$/);
   await pagina.check('input[name=periodo][value="60"]');
-  assert.match(await pagina.textContent('#t-productos'), /5 años/);
-  assert.match(await pagina.textContent('#etiqueta-gasto'), /hace 5 años/);
+  assert.match(await texto(pagina, '#t-productos'), /5 años/);
+  assert.match(await texto(pagina, '#etiqueta-gasto'), /hace 5 años/);
   // Año a año, de la comida y de un producto
   assert.ok((await pagina.locator('#anual .producto').count()) >= 10);
-  assert.match(await pagina.textContent('#resumen-anual'), /^Toda la comida: [+−].+ desde .+ cuesta hoy/);
+  assert.match(await texto(pagina, '#resumen-anual'), /^Toda la comida: [+−].+ desde .+ cuesta hoy/);
   await pagina.selectOption('#producto-anual', 'huevos');
   assert.equal(await pagina.locator('#grafico-compra polyline').count(), 3); // huevos, toda la comida e IPC general
-  assert.match(await pagina.textContent('#pie-grafico'), /^Precio comparado con .+ \(= 100\)\. Huevos: \d+ hoy/);
-  assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: /);
+  assert.match(await texto(pagina, '#pie-grafico'), /^Precio comparado con .+ \(= 100\)\. Huevos: \d+ hoy/);
+  assert.match(await texto(pagina, '#resumen-anual'), /^Huevos: /);
   // En euros: lo que costaba cada año la compra de hoy
   await pagina.check('input[name=vista-anual][value="coste"]');
   await pagina.fill('#gasto-hoy', '100');
-  assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: lo que hoy te cuesta 100,00\s€ costaba .+\s€ en 2002/);
-  assert.match((await pagina.textContent('#anual .producto:first-child')).replace(/\s+/g, ' ').trim(), /^Hoy \(.+\) 100,00 €$/);
+  assert.match(await texto(pagina, '#resumen-anual'), /^Huevos: lo que hoy te cuesta 100,00\s€ costaba .+\s€ en 2002/);
+  assert.match((await texto(pagina, '#anual .producto:first-child')).replace(/\s+/g, ' ').trim(), /^Hoy \(.+\) 100,00 €$/);
   await accesible(pagina);
   await contexto.close();
 });
@@ -162,7 +180,7 @@ test('compartir: copia el titular y el enlace cuando no se puede compartir', asy
   await pagina.evaluate(() => { delete Navigator.prototype.share; });
   await pagina.click('[data-compartir]');
   await pagina.waitForFunction(() => document.querySelector('.estado-compartir').textContent);
-  assert.match(await pagina.textContent('.estado-compartir'), /^Copiado/);
+  assert.match(await texto(pagina, '.estado-compartir'), /^Copiado/);
   const copiado = await pagina.evaluate(() => navigator.clipboard.readText());
   assert.match(copiado, /^La compra cuesta hoy un .+\n.+\/compra\/$/);
   // La imagen para WhatsApp se genera con el tamaño de las tarjetas de redes
@@ -181,17 +199,17 @@ test('inflación: sueldo frente a los precios', async () => {
   const { pagina, errores, contexto } = await abrir('ipc/');
   await pagina.fill('#sueldo-antes', '1.500');
   await pagina.fill('#sueldo-hoy', '1.000');
-  assert.match(await pagina.textContent('#resultado-sueldo'), /^Has perdido poder de compra: hoy puedes comprar un .+ menos que en \d{4}\.$/);
+  assert.match(await texto(pagina, '#resultado-sueldo'), /^Has perdido poder de compra: hoy puedes comprar un .+ menos que en \d{4}\.$/);
   await pagina.fill('#sueldo-hoy', '5.000');
-  assert.match(await pagina.textContent('#resultado-sueldo'), /^Has ganado poder de compra/);
-  assert.match(await pagina.textContent('#detalle-sueldo'), /necesitarías cobrar .+ al mes/);
+  assert.match(await texto(pagina, '#resultado-sueldo'), /^Has ganado poder de compra/);
+  assert.match(await texto(pagina, '#detalle-sueldo'), /necesitarías cobrar .+ al mes/);
   assert.deepEqual(errores, []);
   await contexto.close();
 });
 
 test('gasolina: precio por provincia', async () => {
   const { pagina, errores, contexto } = await abrir('gasolina/');
-  assert.match(await pagina.textContent('#provincias-frase'), /^Hoy .+ está más barat[ao] en .+ y más car[ao] en .+ Media de España: /);
+  assert.match(await texto(pagina, '#provincias-frase'), /^Hoy .+ está más barat[ao] en .+ y más car[ao] en .+ Media de España: /);
   assert.ok((await pagina.locator('#provincias .producto').count()) >= 40); // 52 provincias con datos
   assert.deepEqual(errores, []);
   await contexto.close();
@@ -200,11 +218,11 @@ test('gasolina: precio por provincia', async () => {
 test('alquiler: cuánto te pueden subir', async () => {
   const { pagina, errores, contexto } = await abrir('alquiler/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /^Si te suben el alquiler en \p{L}+, como mucho un .+\s%\.$/u);
+  assert.match(await texto(pagina, '#titular'), /^Si te suben el alquiler en \p{L}+, como mucho un .+\s%\.$/u);
   await pagina.fill('#renta', '1.000');
-  assert.match(await pagina.textContent('#resultado'), /^(Te pueden subir como mucho .+ al mes: de 1\.?000,00\s€ a .+\s€\.|Ese mes no te pueden subir el alquiler\.)$/);
+  assert.match(await texto(pagina, '#resultado'), /^(Te pueden subir como mucho .+ al mes: de 1\.?000,00\s€ a .+\s€\.|Ese mes no te pueden subir el alquiler\.)$/);
   await pagina.check('input[name=firma][value="antiguo"]');
-  assert.match(await pagina.textContent('#resultado-detalle'), /IPC/);
+  assert.match(await texto(pagina, '#resultado-detalle'), /IPC/);
   assert.equal(await pagina.locator('#historia polyline').count(), 2);
   await accesible(pagina);
   await contexto.close();
@@ -213,10 +231,33 @@ test('alquiler: cuánto te pueden subir', async () => {
 test('ahorro: Letras del Tesoro', async () => {
   const { pagina, errores, contexto } = await abrir('ahorro/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /^Las Letras del Tesoro a 12 meses pagan un .+\s%\.$/);
+  assert.match(await texto(pagina, '#titular'), /^Las Letras del Tesoro a 12 meses pagan un .+\s%\.$/);
   await pagina.fill('#cantidad', '5.000');
-  assert.match(await pagina.textContent('#resultado'), /^En 12 meses ganarías .+\s€: unos .+\s€ después de Hacienda\.$/);
+  assert.match(await texto(pagina, '#resultado'), /^En 12 meses ganarías .+\s€: unos .+\s€ después de Hacienda\.$/);
   assert.ok((await pagina.locator('#plazos .producto').count()) >= 4);
+  await accesible(pagina);
+  await contexto.close();
+});
+
+test('calefacción: butano y gas', async () => {
+  const { pagina, errores, contexto } = await abrir('calefaccion/');
+  assert.deepEqual(errores, []);
+  assert.match(await texto(pagina, '#titular'), /^La bombona de butano (cuesta|costaba) .+ € hasta el /);
+  await pagina.fill('#kwh', '3.000');
+  assert.match(await texto(pagina, '#resultado'), /^Con la TUR\.1 pagarías unos .+ € al año/);
+  assert.equal(await pagina.locator('#historia polyline').count(), 1);
+  await accesible(pagina);
+  await contexto.close();
+});
+
+test('portada: tu bolsillo con lo guardado', async () => {
+  const { pagina, errores, contexto } = await abrir('');
+  await pagina.evaluate(() => { localStorage.setItem('bolsillo.compra.gasto', '100'); localStorage.setItem('bolsillo.cp', '28100'); });
+  await pagina.reload();
+  await pagina.waitForLoadState('networkidle');
+  await pagina.waitForSelector('#mi-bolsillo:not([hidden])');
+  assert.ok((await pagina.locator('#mi-lista li').count()) >= 2);
+  assert.deepEqual(errores, []);
   await accesible(pagina);
   await contexto.close();
 });
@@ -252,9 +293,9 @@ async function textoEnCastellano(pagina) {
   }, CASTELLANO.source);
 }
 
-for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', compra: 'en/compra/', alquiler: 'en/alquiler/', ahorro: 'en/ahorro/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
+for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', gasolina: 'en/gasolina/', compra: 'en/compra/', alquiler: 'en/alquiler/', ahorro: 'en/ahorro/', calefacción: 'en/calefaccion/', quién: 'en/quien/', hipoteca: 'en/hipoteca/', inflación: 'en/ipc/', fuentes: 'en/fuentes/' })) {
   test(`inglés: ${nombre} sin errores, sin castellano y accesible`, async () => {
-    const { pagina, errores, contexto } = await abrir(ruta);
+    const { pagina, errores, contexto } = await abrir(ruta, ruta.includes('luz') ? { hora: 22 } : {});
     assert.deepEqual(errores, []);
     assert.equal(await pagina.getAttribute('html', 'lang'), 'en');
     assert.deepEqual(await textoEnCastellano(pagina), []);
@@ -266,34 +307,34 @@ for (const [nombre, ruta] of Object.entries({ portada: 'en/', luz: 'en/luz/', ga
 }
 
 test('inglés: los cálculos salen en inglés', async () => {
-  let { pagina, contexto } = await abrir('en/luz/');
-  assert.match(await pagina.textContent('#titular'), /cheapest|Right now/i);
-  assert.match(await pagina.textContent('#t-plan'), /^When should I/);
+  let { pagina, contexto } = await abrir('en/luz/', { hora: 22 });
+  assert.match(await texto(pagina, '#titular'), /cheapest|Right now/i);
+  assert.match(await texto(pagina, '#t-plan'), /^When should I/);
   await contexto.close();
 
   ({ pagina, contexto } = await abrir('en/hipoteca/'));
   await pagina.fill('#diferencial', '0.75');
-  assert.match(await pagina.textContent('#titular'), /payment/i);
-  assert.match(await pagina.textContent('#entradilla'), /Euribor .* a month\.$/);
+  assert.match(await texto(pagina, '#titular'), /payment/i);
+  assert.match(await texto(pagina, '#entradilla'), /Euribor .* a month\.$/);
   await contexto.close();
 
   ({ pagina, contexto } = await abrir('en/ipc/'));
   await pagina.fill('#cantidad', '1,000');
-  assert.match(await pagina.textContent('#resultado'), /^€1,000\.00 in .+ is worth €[\d,]+\.\d\d in /);
+  assert.match(await texto(pagina, '#resultado'), /^€1,000\.00 in .+ is worth €[\d,]+\.\d\d in /);
   await contexto.close();
 
   ({ pagina, contexto } = await abrir('en/compra/'));
-  assert.match(await pagina.textContent('#titular'), /^Groceries cost .+ (more|less) today than a year ago\.$/);
+  assert.match(await texto(pagina, '#titular'), /^Groceries cost .+ (more|less) today than a year ago\.$/);
   await pagina.fill('#gasto', '1,000');
-  assert.match(await pagina.textContent('#resultado'), /^The same shop costs €[\d,]+\.\d\d today\.$/);
+  assert.match(await texto(pagina, '#resultado'), /^The same shop costs €[\d,]+\.\d\d today\.$/);
   await contexto.close();
 
   ({ pagina, contexto } = await abrir('en/gasolina/'));
   await pagina.fill('#cp', '28100');
   await pagina.click('button[type=submit]');
   await pagina.waitForSelector('.estacion', { timeout: 10000 });
-  assert.match(await pagina.textContent('#titular'), /^(Cheapest within|No )/);
-  assert.match(await pagina.textContent('.llegar'), /Directions/);
+  assert.match(await texto(pagina, '#titular'), /^(Cheapest within|No )/);
+  assert.match(await texto(pagina, '.llegar'), /Directions/);
   await contexto.close();
 });
 

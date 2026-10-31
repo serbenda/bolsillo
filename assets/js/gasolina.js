@@ -31,6 +31,7 @@ const leer = (k) => { try { return localStorage.getItem(`bolsillo.${k}`); } catc
 let indice = null; // fecha, medias y caja de cada provincia
 // «Palmas (Las)» → «Las Palmas», como se escriben normalmente
 const nombreProvincia = (n) => String(n ?? '').replace(/^(.+?)\s*\(([^)]+)\)$/, (_, nombre, art) => `${art.charAt(0).toUpperCase()}${art.slice(1).toLowerCase()} ${nombre}`);
+const slugProvincia = (n) => n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 let provinciaElegida = null; // la de la última búsqueda, para destacarla
 const cargadas = new Map(); // provincia → estaciones
 let estaciones = [];
@@ -139,7 +140,7 @@ function pintarProvincias() {
       const dif = p.precio - media;
       const clase = dif > 0.0005 ? 'sube' : dif < -0.0005 ? 'baja' : '';
       return `<li class="producto${p.id === provinciaElegida ? ' tuya' : ''}">
-        <span class="nombre">${escapar(p.nombre)}</span>
+        <span class="nombre"><a href="${new URL(`../../gasolina/${slugProvincia(p.nombre)}/`, import.meta.url).pathname}">${escapar(p.nombre)}</a></span>
         <span class="eje-barra ${clase}" aria-hidden="true"><span class="barra-var" style="width:${((Math.abs(dif) / maximo) * 50).toFixed(1)}%"></span></span>
         <span class="cifra ${clase}">${euros(p.precio)} €</span>
       </li>`;
