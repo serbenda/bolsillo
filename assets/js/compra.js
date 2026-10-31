@@ -82,3 +82,17 @@ export function anual(serie) {
   }
   return salida;
 }
+
+/**
+ * Lo que costaba cada año la compra que hoy cuesta `gastoHoy` euros:
+ * [{ anyo, mes, coste }], con el dato de diciembre de cada año y el último mes para el año en curso.
+ */
+export function costeAnual(serie, gastoHoy) {
+  const ultimo = serie?.at(-1);
+  if (!ultimo || !(ultimo.valor > 0)) return [];
+  const porAnyo = new Map();
+  for (const p of serie) if (p.valor > 0) porAnyo.set(p.mes.slice(0, 4), p); // se queda con el último mes de cada año
+  return [...porAnyo.values()]
+    .filter((p) => p.mes.endsWith('-12') || p.mes === ultimo.mes)
+    .map((p) => ({ anyo: Number(p.mes.slice(0, 4)), mes: p.mes, coste: (gastoHoy * p.valor) / ultimo.valor }));
+}

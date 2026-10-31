@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { PRODUCTOS, ALIMENTOS, mesesAntes, variacion, ranking, compraHoy, urlSerie, anual } from '../assets/js/compra.js';
+import { PRODUCTOS, ALIMENTOS, mesesAntes, variacion, ranking, compraHoy, urlSerie, anual, costeAnual } from '../assets/js/compra.js';
 
 const serie = (valores, ultimo = '2026-09') =>
   valores.map((valor, i) => ({ mes: mesesAntes(ultimo, valores.length - 1 - i), valor }));
@@ -59,4 +59,14 @@ test('variación de cada año, de diciembre a diciembre', () => {
   assert.equal(a[1].hasta, '2026-09');
   assert.equal(a[1].parcial, true);
   assert.deepEqual(anual([]), []);
+});
+
+test('lo que costaba cada año la compra de hoy', () => {
+  // dic. 2024 = 80, dic. 2025 = 90, sep. 2026 = 100
+  const s = serie([80, ...Array(11).fill(85), 90, ...Array(8).fill(95), 100], '2026-09');
+  const c = costeAnual(s, 50);
+  assert.deepEqual(c.map((x) => x.anyo), [2024, 2025, 2026]);
+  assert.deepEqual(c.map((x) => x.coste), [40, 45, 50]);
+  assert.equal(c.at(-1).mes, '2026-09');
+  assert.deepEqual(costeAnual([], 50), []);
 });

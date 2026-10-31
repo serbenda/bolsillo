@@ -1,10 +1,12 @@
 // Página «¿Cuánto ha subido la compra?».
 
-import { ALIMENTOS, PRODUCTOS, ranking, compraHoy, variacion, anual } from './compra.js';
+import { ALIMENTOS, PRODUCTOS, ranking, compraHoy, variacion, anual, costeAnual } from './compra.js';
 import { tr, idioma, euros, porcentaje, formato } from './idioma.js';
 
 const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/compra.json', import.meta.url);
+const FICHERO_IPC = new URL('../../data/ipc.json', import.meta.url);
+let ipcGeneral = null; // IPC general, para comparar (opcional)
 
 const FORMATO_MES = formato({ month: 'long', year: 'numeric', timeZone: 'UTC' });
 const nombreMes = (mes) => FORMATO_MES.format(new Date(`${mes}-01T00:00:00Z`));
@@ -109,10 +111,85 @@ function pintarProductos() {
 const nombreDe = (p) => (idioma === 'en' ? p.en : p.es);
 const anyoTexto = (a) => (a.parcial ? tr(`${a.anyo} (hasta ${nombreMes(a.hasta).split(' ')[0]})`, `${a.anyo} (to ${nombreMes(a.hasta).split(' ')[0]})`) : String(a.anyo));
 
-function pintarAnual() {
+function productoAnual() {
   const id = $('producto-anual').value;
-  const p = id === 'alimentos' ? { ...ALIMENTOS, es: tr('la comida', 'food'), en: 'food', serie: datos.alimentos } : datos.productos.find((x) => x.id === id);
+  return id === 'alimentos'
+    ? { id, nombre: tr('Toda la comida', 'All food'), serie: datos.alimentos }
+    : (() => { const p = datos.productos.find((x) => x.id === id); return p && { id, nombre: nombreDe(p), serie: p.serie }; })();
+}
+const vistaAnual = () => document.querySelector('input[name=vista-anual]:checked').value;
+const fila = (nombre, clase, ancho, cifra) => `<li class="producto">
+        <span class="nombre">${nombre}</span>
+        <span class="eje-barra ${clase}" aria-hidden="true"><span class="barra-var" style="width:${ancho}%"></span></span>
+        <span class="cifra ${clase.replace(/coste|actual/g, '').trim()}">${cifra}</span>
+      </li>`;
+
+/** Gráfico de líneas: cada serie con 100 = su primer mes, para ver cuántas veces cuesta lo de entonces. */
+function pintarGrafico(p) {
+  const svg = $('grafico-compra');
+  const comida = { clase: '', nombre: tr('Toda la comida', 'All food'), serie: datos.alimentos };
+  const lineasG = [
+    ...(p.id === 'alimentos' ? [] : [{ clase: 'producto-sel', nombre: p.nombre, serie: p.serie }]),
+    comida,
+    ...(ipcGeneral?.length ? [{ clase: 'general', nombre: tr('Todos los precios (IPC general)', 'All prices (headline CPI)'), serie: ipcGeneral }] : []),
+  ];
+  const inicio = datos.alimentos[0].mes;
+  const meses = datos.alimentos.map((x) => x.mes);
+  const indice = (serie) => {
+    const mapa = new Map(serie.map((x) => [x.mes, x.valor]));
+    const base = mapa.get(inicio);
+    return base > 0 ? meses.map((m) => (mapa.has(m) ? (mapa.get(m) / base) * 100 : null)) : null;
+  };
+  const datosL = lineasG.map((l) => ({ ...l, v: indice(l.serie) })).filter((l) => l.v);
+  const todos = datosL.flatMap((l) => l.v.filter((x) => x != null));
+  const W = Math.max(svg.clientWidth, 300);
+  const H = Math.max(svg.clientHeight, 180);
+  const M = { t: 16, r: 46, b: 28, l: 40 };
+  const min = Math.floor(Math.min(100, ...todos) / 50) * 50;
+  const max = Math.ceil(Math.max(...todos) / 50) * 50;
+  const x = (i) => M.l + (i / (meses.length - 1)) * (W - M.l - M.r);
+  const y = (v) => M.t + ((max - v) / (max - min)) * (H - M.t - M.b);
+  let g = '';
+  for (let v = min; v <= max; v += 50) {
+    g += `<line x1="${M.l}" x2="${W - M.r}" y1="${y(v)}" y2="${y(v)}" class="${v === 100 ? 'cero' : 'rejilla'}"/>`;
+    g += `<text x="${M.l - 8}" y="${y(v) + 4}" class="eje" text-anchor="end">${v}</text>`;
+  }
+  const cada = W < 600 ? 6 : 3;
+  meses.forEach((m, i) => {
+    if (m.endsWith('-01') && Number(m.slice(0, 4)) % cada === 0) g += `<text x="${x(i)}" y="${H - 6}" class="eje" text-anchor="middle">${m.slice(0, 4)}</text>`;
+  });
+  // La línea elegida, la última para que quede encima
+  for (const l of [...datosL].reverse()) {
+    const puntos = l.v.map((v, i) => (v == null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`)).filter(Boolean).join(' ');
+    g += `<polyline points="${puntos}" class="linea ${l.clase}"/>`;
+  }
+  const principal = datosL[0];
+  const final = principal.v.at(-1);
+  g += `<text x="${W - M.r + 6}" y="${y(final) + 4}" class="valor">${Math.round(final)}</text>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = g;
+
+  $('leyenda-compra').innerHTML = datosL.map((l) => `<span><i class="${l.clase}"></i>${l.nombre}</span>`).join('');
+  const veces = (Math.round(final) / 100).toLocaleString(idioma === 'en' ? 'en-GB' : 'es-ES', { maximumFractionDigits: 2 });
+  const texto = tr(
+    `Precio comparado con ${nombreMes(inicio)} (= 100). ${principal.nombre}: ${Math.round(final)} hoy, es decir, ${veces} veces lo que costaba entonces.`,
+    `Price compared with ${nombreMes(inicio)} (= 100). ${principal.nombre}: ${Math.round(final)} today, or ${veces} times what it cost then.`
+  );
+  $('pie-grafico').textContent = texto;
+  svg.setAttribute('aria-label', texto);
+}
+
+function pintarAnual() {
+  const p = productoAnual();
   if (!p) return;
+  pintarGrafico(p);
+  const coste = vistaAnual() === 'coste';
+  $('campo-hoy').hidden = !coste;
+  if (coste) pintarCoste(p);
+  else pintarSubida(p);
+}
+
+function pintarSubida(p) {
   const anos = anual(p.serie);
   if (!anos.length) return;
   const maximo = Math.max(0.01, ...anos.map((a) => Math.abs(a.variacion)));
@@ -121,11 +198,7 @@ function pintarAnual() {
     .reverse()
     .map((a) => {
       const clase = a.variacion > 0.0005 ? 'sube' : a.variacion < -0.0005 ? 'baja' : '';
-      return `<li class="producto">
-        <span class="nombre">${anyoTexto(a)}</span>
-        <span class="eje-barra ${clase}" aria-hidden="true"><span class="barra-var" style="width:${((Math.abs(a.variacion) / maximo) * 50).toFixed(1)}%"></span></span>
-        <span class="cifra ${clase}">${conSigno(a.variacion)}</span>
-      </li>`;
+      return fila(anyoTexto(a), clase, ((Math.abs(a.variacion) / maximo) * 50).toFixed(1), conSigno(a.variacion));
     })
     .join('');
 
@@ -135,15 +208,53 @@ function pintarAnual() {
   const completos = anos.filter((a) => !a.parcial);
   const peor = completos.reduce((m, a) => (a.variacion > m.variacion ? a : m), completos[0]);
   const mejor = completos.reduce((m, a) => (a.variacion < m.variacion ? a : m), completos[0]);
-  const nombre = id === 'alimentos' ? tr('Toda la comida', 'All food') : nombreDe(p);
   const desde = nombreMes(serie[0].mes);
   const cienHoy = euros(100 * (1 + total), 0);
   const extremo = mejor.variacion < 0
     ? tr(`y el que más bajó, ${mejor.anyo} (${conSigno(mejor.variacion)})`, `and the biggest fall in ${mejor.anyo} (${conSigno(mejor.variacion)})`)
     : tr(`y el más tranquilo, ${mejor.anyo} (${conSigno(mejor.variacion)})`, `and the calmest year was ${mejor.anyo} (${conSigno(mejor.variacion)})`);
   $('resumen-anual').textContent = tr(
-    `${nombre}: ${conSigno(total, 0)} desde ${desde}. Lo que costaba 100 € cuesta hoy ${cienHoy}. El año que más subió fue ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`,
-    `${nombre}: ${conSigno(total, 0)} since ${desde}. What cost €100 now costs ${cienHoy}. The biggest rise was in ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`
+    `${p.nombre}: ${conSigno(total, 0)} desde ${desde}. Lo que costaba 100 € cuesta hoy ${cienHoy}. El año que más subió fue ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`,
+    `${p.nombre}: ${conSigno(total, 0)} since ${desde}. What cost €100 now costs ${cienHoy}. The biggest rise was in ${peor.anyo} (${conSigno(peor.variacion)}), ${extremo}.`
+  );
+  $('nota-anual').textContent = tr(
+    'Variación de precio de cada año, de diciembre a diciembre. El año en curso, desde diciembre hasta el último mes publicado.',
+    'Price change each year, from December to December. The current year runs from December to the latest month published.'
+  );
+}
+
+function pintarCoste(p) {
+  const hoy = decimal($('gasto-hoy').value);
+  if (!(hoy > 0)) {
+    $('resumen-anual').textContent = tr('Escribe una cantidad mayor que cero, por ejemplo 100.', 'Enter an amount above zero, for example 100.');
+    $('anual').innerHTML = '';
+    return;
+  }
+  guardar('hoy', $('gasto-hoy').value);
+  const costes = costeAnual(p.serie, hoy);
+  if (!costes.length) return;
+  const maximo = Math.max(...costes.map((c) => c.coste));
+  const actual = costes.at(-1);
+  $('anual').innerHTML = costes
+    .slice()
+    .reverse()
+    .map((c) => fila(
+      c === actual ? tr(`Hoy (${nombreMes(c.mes)})`, `Now (${nombreMes(c.mes)})`) : String(c.anyo),
+      `coste${c === actual ? ' actual' : ''}`,
+      ((c.coste / maximo) * 100).toFixed(1),
+      euros(c.coste)
+    ))
+    .join('');
+
+  const primero = costes[0];
+  const hace5 = costes.find((c) => c.anyo === actual.anyo - 5);
+  $('resumen-anual').textContent = tr(
+    `${p.nombre}: lo que hoy te cuesta ${euros(hoy)} costaba ${euros(primero.coste)} en ${primero.anyo}${hace5 ? ` y ${euros(hace5.coste)} en ${hace5.anyo}` : ''}.`,
+    `${p.nombre}: what costs you ${euros(hoy)} today cost ${euros(primero.coste)} in ${primero.anyo}${hace5 ? ` and ${euros(hace5.coste)} in ${hace5.anyo}` : ''}.`
+  );
+  $('nota-anual').textContent = tr(
+    'Lo que costaba la misma compra en diciembre de cada año, según el IPC del INE. Hoy, el último mes publicado.',
+    'What the same shop cost in December each year, based on INE’s CPI. Now means the latest month published.'
   );
 }
 
@@ -163,6 +274,7 @@ async function iniciar() {
       productos: json.productos.filter((p) => textos[p.id]).map((p) => ({ ...textos[p.id], serie: p.serie })),
     };
     if (!datos.alimentos?.length || !datos.productos.length) throw new Error('vacío');
+    ipcGeneral = await fetch(FICHERO_IPC).then((r) => (r.ok ? r.json() : null)).then((j) => j?.serie ?? null).catch(() => null);
   } catch {
     $('titular').textContent = tr('¿Cuánto ha subido la compra?', 'How much have groceries gone up?');
     avisar(tr('Los precios de la compra no están disponibles ahora mismo. Vuelve a intentarlo en un rato.', "Grocery prices aren't available right now. Please try again shortly."));
@@ -190,6 +302,15 @@ async function iniciar() {
   const guardado = leer('producto');
   if (guardado && opciones.some((x) => x.id === guardado)) $('producto-anual').value = guardado;
   $('producto-anual').addEventListener('change', () => { guardar('producto', $('producto-anual').value); pintarAnual(); });
+  const vista = leer('vista');
+  const opcionVista = vista && document.querySelector(`input[name=vista-anual][value="${vista}"]`);
+  if (opcionVista) opcionVista.checked = true;
+  const hoyGuardado = leer('hoy');
+  if (hoyGuardado) $('gasto-hoy').value = hoyGuardado;
+  document.querySelectorAll('input[name=vista-anual]').forEach((i) =>
+    i.addEventListener('change', () => { guardar('vista', i.value); pintarAnual(); })
+  );
+  $('gasto-hoy').addEventListener('input', pintarAnual);
 
   pintarCabecera();
   pintarTodo();

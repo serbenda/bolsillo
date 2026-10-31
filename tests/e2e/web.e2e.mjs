@@ -143,7 +143,14 @@ test('compra: lo que sube y lo que baja', async () => {
   assert.ok((await pagina.locator('#anual .producto').count()) >= 10);
   assert.match(await pagina.textContent('#resumen-anual'), /^Toda la comida: [+−].+ desde .+ cuesta hoy/);
   await pagina.selectOption('#producto-anual', 'huevos');
+  assert.equal(await pagina.locator('#grafico-compra polyline').count(), 3); // huevos, toda la comida e IPC general
+  assert.match(await pagina.textContent('#pie-grafico'), /^Precio comparado con .+ \(= 100\)\. Huevos: \d+ hoy/);
   assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: /);
+  // En euros: lo que costaba cada año la compra de hoy
+  await pagina.check('input[name=vista-anual][value="coste"]');
+  await pagina.fill('#gasto-hoy', '100');
+  assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: lo que hoy te cuesta 100,00\s€ costaba .+\s€ en 2002/);
+  assert.match(await pagina.textContent('#anual .producto:first-child'), /^\s*Hoy .+100,00\s€\s*$/);
   await accesible(pagina);
   await contexto.close();
 });

@@ -220,11 +220,22 @@ export const TRADUCCIONES = {
   // Compra
   'Hace 10 años': '10 years ago',
   'Año a año': 'Year by year',
+  Ver: 'Show',
+  'Subida de cada año': 'Rise each year',
+  'Lo que costaba': 'What it cost',
+  'Lo que te cuesta hoy la compra': 'What your shop costs today',
   Producto: 'Product',
   'Toda la comida': 'All food',
   'Variación de precio de cada año, de diciembre a diciembre. El año en curso, desde diciembre hasta el último mes publicado.':
     'Price change each year, from December to December. The current year runs from December to the latest month published.',
   'Cómo leer estos datos': 'How to read these figures',
+  '¿De dónde salen los datos?': 'Where does the data come from?',
+  'Del Índice de Precios de Consumo (IPC) del': 'From the Consumer Price Index (CPI) published by',
+  ', el mismo que se usa para medir la inflación oficial. Cada mes, el INE recoge los precios de los mismos productos en tiendas de toda España y calcula un índice para cada tipo de producto (las «rúbricas»): pan, huevos, aceite… bolsillo descarga esos índices desde 2002 con la API pública del INE y se actualizan automáticamente cada vez que sale un dato nuevo, a mediados de cada mes.':
+    ", the same index used to measure official inflation. Every month INE collects the prices of the same products in shops across Spain and calculates an index for each type of product (the 'headings'): bread, eggs, oil… bolsillo downloads those indices back to 2002 from INE's public API and updates them automatically when a new figure comes out, in the middle of each month.",
+  '¿Cómo se calcula lo que sube?': 'How is the rise calculated?',
+  'Comparando el índice de dos meses. Si el índice de los huevos era 80 hace un año y hoy es 90, han subido un 12,5 % (90 ÷ 80 − 1). Lo que costaba cada año la compra de hoy se calcula igual: tu cantidad por el índice de diciembre de ese año, dividido por el índice de hoy. No son precios de una tienda, sino cuánto cambian los precios de media.':
+    "By comparing the index for two months. If the egg index was 80 a year ago and is 90 today, eggs have gone up 12.5% (90 ÷ 80 − 1). What today's shop cost in each year is worked out the same way: your amount times that December's index, divided by today's index. These aren't prices in a shop, but how much prices change on average.",
   '¿Qué significa que algo sube un 10 %?': 'What does a 10% rise mean?',
   'Que lo que costaba 1 € cuesta ahora 1,10 €. Si baja un 10 %, cuesta 0,90 €. Los porcentajes no se suman: dos años seguidos al 10 % son un 21 %, no un 20 %.':
     "That what cost €1 now costs €1.10. If it falls 10%, it costs €0.90. Percentages don't add up: two years in a row at 10% make 21%, not 20%.",
