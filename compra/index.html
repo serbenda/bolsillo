@@ -93,13 +93,34 @@
         <span>Producto</span>
         <select id="producto-anual"><option value="alimentos">Toda la comida</option></select>
       </label>
+      <figure class="historia grafico-compra">
+        <svg id="grafico-compra" role="img"></svg>
+        <figcaption class="nota"><span class="leyenda" id="leyenda-compra"></span><span id="pie-grafico"></span></figcaption>
+      </figure>
+      <fieldset class="duraciones periodos vistas-anual">
+        <legend>Ver</legend>
+        <label><input type="radio" name="vista-anual" value="subida" checked> Subida de cada año</label>
+        <label><input type="radio" name="vista-anual" value="coste"> Lo que costaba</label>
+      </fieldset>
+      <label class="campo campo-gasto" id="campo-hoy" hidden>
+        <span>Lo que te cuesta hoy la compra</span>
+        <span class="con-unidad"><input id="gasto-hoy" inputmode="decimal" autocomplete="off" value="100"><b>€</b></span>
+      </label>
       <p class="resumen-anual" id="resumen-anual" aria-live="polite"></p>
       <ol class="productos anual" id="anual"></ol>
-      <p class="nota">Variación de precio de cada año, de diciembre a diciembre. El año en curso, desde diciembre hasta el último mes publicado.</p>
+      <p class="nota" id="nota-anual">Variación de precio de cada año, de diciembre a diciembre. El año en curso, desde diciembre hasta el último mes publicado.</p>
     </section>
 
     <section aria-labelledby="t-explicacion" class="explicacion">
       <h2 id="t-explicacion">Cómo leer estos datos</h2>
+      <details>
+        <summary>¿De dónde salen los datos?</summary>
+        <p>Del Índice de Precios de Consumo (IPC) del <a href="https://www.ine.es/dyngs/IPC/es/index.htm">INE</a>, el mismo que se usa para medir la inflación oficial. Cada mes, el INE recoge los precios de los mismos productos en tiendas de toda España y calcula un índice para cada tipo de producto (las «rúbricas»): pan, huevos, aceite… bolsillo descarga esos índices desde 2002 con la API pública del INE y se actualizan automáticamente cada vez que sale un dato nuevo, a mediados de cada mes.</p>
+      </details>
+      <details>
+        <summary>¿Cómo se calcula lo que sube?</summary>
+        <p>Comparando el índice de dos meses. Si el índice de los huevos era 80 hace un año y hoy es 90, han subido un 12,5 % (90 ÷ 80 − 1). Lo que costaba cada año la compra de hoy se calcula igual: tu cantidad por el índice de diciembre de ese año, dividido por el índice de hoy. No son precios de una tienda, sino cuánto cambian los precios de media.</p>
+      </details>
       <details>
         <summary>¿Qué significa que algo sube un 10 %?</summary>
         <p>Que lo que costaba 1 € cuesta ahora 1,10 €. Si baja un 10 %, cuesta 0,90 €. Los porcentajes no se suman: dos años seguidos al 10 % son un 21 %, no un 20 %.</p>

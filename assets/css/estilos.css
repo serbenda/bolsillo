@@ -613,3 +613,15 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
 .explicacion details:last-of-type { border-bottom: 1px solid var(--linea); }
 .explicacion summary { cursor: pointer; font-weight: 600; }
 .explicacion details p { margin: 0.6rem 0 0; color: var(--tenue); }
+.vistas-anual { margin-top: 1rem; }
+.productos.anual .coste .barra-var { left: 0; background: var(--tinta); opacity: 0.8; }
+.productos.anual .coste.actual .barra-var { background: var(--foco); opacity: 1; }
+.productos.anual .coste.eje-barra::before { display: none; }
+.productos.anual .producto { grid-template-columns: minmax(6rem, 11rem) 1fr 5.5rem; }
+.grafico-compra .linea.producto-sel { stroke: var(--punta); stroke-width: 2.5; }
+.grafico-compra .linea.general { stroke: var(--tenue); stroke-dasharray: 5 4; }
+.grafico-compra .valor { font-size: 12px; font-family: var(--fuente); font-weight: 600; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin-bottom: 0.4rem; color: var(--tinta); }
+.leyenda i { display: inline-block; width: 1.2rem; height: 3px; vertical-align: middle; margin-right: 0.4rem; background: var(--tinta); }
+.leyenda i.producto-sel { background: var(--punta); }
+.leyenda i.general { background: repeating-linear-gradient(90deg, var(--tenue) 0 5px, transparent 5px 9px); }
