@@ -87,6 +87,7 @@ async function iniciar() {
     ({ serie } = await r.json());
     if (!serie?.length) throw new Error('vacío');
   } catch {
+    $('titular').textContent = '¿Cuánto ha subido la vida?';
     avisar('Los datos del IPC no están disponibles ahora mismo. Vuelve a intentarlo en un rato.');
     $('formulario').querySelectorAll('input, select').forEach((el) => (el.disabled = true));
     return;
