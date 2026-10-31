@@ -73,6 +73,9 @@ jobs:
           mkdir -p _site vendor
           cp -r index.html luz gasolina hipoteca ipc fuentes assets data vendor \
             manifest.webmanifest sw.js sitemap.xml robots.txt .nojekyll _site/
+          # Versión en los estilos y scripts de cada página: al publicar, nadie ve HTML nuevo con CSS viejo
+          v="${GITHUB_SHA::8}"
+          find _site -name '*.html' -exec sed -i -E "s#(href=\"[^\"]+\.css)\"#\1?v=$v\"#g; s#(src=\"[^\"]+\.js)\"#\1?v=$v\"#g" {} +
 
       - name: Estado de las fuentes
         if: always()
