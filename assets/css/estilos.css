@@ -551,3 +551,16 @@ main { min-height: calc(100vh - 5rem); min-height: calc(100svh - 5rem); }
   .idiomas { order: 2; }
   .cabecera .nav { order: 3; flex-basis: 100%; margin-left: 0; justify-content: space-between; }
 }
+
+/* Iconos de sección en el menú */
+.nav a { display: inline-flex; align-items: center; gap: 0.4rem; }
+.icono-nav { width: 1.25rem; height: 1.25rem; flex: none; padding: 0.22rem; border-radius: 6px; fill: #fff; }
+.icono-nav.luz { background: var(--llano); fill: #1a1405; }
+.icono-nav.gasolina { background: var(--punta); }
+.icono-nav.hipoteca { background: var(--valle); }
+.icono-nav.ipc { background: var(--tinta); fill: var(--papel); }
+@media (max-width: 640px) {
+  /* En el móvil, el icono encima del nombre para que quepan las cuatro secciones */
+  .nav a { flex-direction: column; gap: 0.2rem; font-size: 0.8rem; }
+  .icono-nav { width: 1.6rem; height: 1.6rem; padding: 0.3rem; border-radius: 8px; }
+}
