@@ -1,4 +1,4 @@
-// Servidor estático mínimo que imita GitHub Pages: sirve _site/ bajo /bolsillo/.
+// Servidor estático mínimo que imita GitHub Pages: sirve _site/ en la raíz, como bolsillo.bendi.dev.
 // Lo usan los tests de navegador, las capturas y Lighthouse.
 
 import { createServer } from 'node:http';
@@ -14,15 +14,7 @@ const TIPOS = {
 export async function arrancar(raiz = new URL('../../_site/', import.meta.url).pathname) {
   const servidor = createServer(async (req, res) => {
     const pedido = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    if (pedido === '/robots.txt') {
-      res.writeHead(200, { 'Content-Type': 'text/plain' }).end('User-agent: *\nAllow: /\n\nSitemap: https://bendi.dev/bolsillo/sitemap.xml\n');
-      return;
-    }
-    if (!pedido.startsWith('/bolsillo')) {
-      res.writeHead(302, { Location: '/bolsillo/' }).end();
-      return;
-    }
-    let ruta = normalize(join(raiz, pedido.replace(/^\/bolsillo/, '')));
+    let ruta = normalize(join(raiz, pedido));
     if (!ruta.startsWith(normalize(raiz))) { res.writeHead(403).end(); return; }
     try {
       if ((await stat(ruta)).isDirectory()) ruta = join(ruta, 'index.html');
@@ -34,7 +26,7 @@ export async function arrancar(raiz = new URL('../../_site/', import.meta.url).p
   });
   await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
   return {
-    base: `http://127.0.0.1:${servidor.address().port}/bolsillo/`,
+    base: `http://127.0.0.1:${servidor.address().port}/`,
     cerrar: () => new Promise((ok) => servidor.close(ok)),
   };
 }
