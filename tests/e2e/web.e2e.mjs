@@ -200,7 +200,7 @@ test('gasolina: precio por provincia', async () => {
 test('alquiler: cuánto te pueden subir', async () => {
   const { pagina, errores, contexto } = await abrir('alquiler/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /^Si te suben el alquiler en \p{L}+, como mucho un .+ %\.$/u);
+  assert.match(await pagina.textContent('#titular'), /^Si te suben el alquiler en \p{L}+, como mucho un .+\s%\.$/u);
   await pagina.fill('#renta', '1.000');
   assert.match(await pagina.textContent('#resultado'), /^(Te pueden subir como mucho .+ al mes: de 1\.?000,00\s€ a .+\s€\.|Ese mes no te pueden subir el alquiler\.)$/);
   await pagina.check('input[name=firma][value="antiguo"]');
@@ -213,7 +213,7 @@ test('alquiler: cuánto te pueden subir', async () => {
 test('ahorro: Letras del Tesoro', async () => {
   const { pagina, errores, contexto } = await abrir('ahorro/');
   assert.deepEqual(errores, []);
-  assert.match(await pagina.textContent('#titular'), /^Las Letras del Tesoro a 12 meses pagan un .+ %\.$/);
+  assert.match(await pagina.textContent('#titular'), /^Las Letras del Tesoro a 12 meses pagan un .+\s%\.$/);
   await pagina.fill('#cantidad', '5.000');
   assert.match(await pagina.textContent('#resultado'), /^En 12 meses ganarías .+\s€: unos .+\s€ después de Hacienda\.$/);
   assert.ok((await pagina.locator('#plazos .producto').count()) >= 4);
