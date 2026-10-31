@@ -150,7 +150,7 @@ test('compra: lo que sube y lo que baja', async () => {
   await pagina.check('input[name=vista-anual][value="coste"]');
   await pagina.fill('#gasto-hoy', '100');
   assert.match(await pagina.textContent('#resumen-anual'), /^Huevos: lo que hoy te cuesta 100,00\s€ costaba .+\s€ en 2002/);
-  assert.match(await pagina.textContent('#anual .producto:first-child'), /^\s*Hoy .+100,00\s€\s*$/);
+  assert.match((await pagina.textContent('#anual .producto:first-child')).replace(/\s+/g, ' ').trim(), /^Hoy \(.+\) 100,00 €$/);
   await accesible(pagina);
   await contexto.close();
 });
