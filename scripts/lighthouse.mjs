@@ -34,7 +34,9 @@ for (const [nombre, ruta] of Object.entries(PAGINAS)) {
     blockedUrlPatterns: ['*goatcounter*', '*gc.zgo.at*', '*tile.openstreetmap.org*'],
   });
   resultados[nombre] = Object.fromEntries(Object.keys(CATEGORIAS).map((c) => [c, lhr.categories[c]?.score ?? 0]));
-  console.log(nombre, Object.entries(resultados[nombre]).map(([c, v]) => `${CATEGORIAS[c].nombre} ${Math.round(v * 100)}`).join(' · '));
+  const linea = Object.entries(resultados[nombre]).map(([c, v]) => `${CATEGORIAS[c].nombre} ${Math.round(v * 100)}`).join(', ');
+  // En la Action, cada página sale como anotación en la PR
+  console.log(process.env.GITHUB_ACTIONS ? `::notice title=Lighthouse ${nombre}::${linea}` : `${nombre}: ${linea}`);
 }
 
 await chrome.kill();

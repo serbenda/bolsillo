@@ -35,7 +35,8 @@ async function historicoDe(prov) {
 }
 
 const centimos = (x) => new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(Math.abs(x) * 100);
-const diaCorto = (f) => new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${f}T12:00:00Z`));
+const FORMATO_DIA = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const diaCorto = (f) => FORMATO_DIA.format(new Date(`${f}T12:00:00Z`));
 
 async function pintarTendencia(prov, c) {
   const bloque = $('bloque-tendencia');

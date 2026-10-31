@@ -5,8 +5,8 @@ const FICHERO = new URL('../../data/ipc.json', import.meta.url);
 
 const euros = (n) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', useGrouping: 'always' }).format(n);
 const pct = (x, dec = 1) => `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(x * 100)}\u00a0%`;
-const nombreMes = (mes) =>
-  new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${mes}-01T00:00:00Z`));
+const FORMATO_MES = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const nombreMes = (mes) => FORMATO_MES.format(new Date(`${mes}-01T00:00:00Z`));
 const decimal = (s) => Number(String(s).trim().replace(/\./g, '').replace(',', '.'));
 
 const guardar = (k, v) => { try { localStorage.setItem(`bolsillo.ipc.${k}`, v); } catch {} };
@@ -82,7 +82,7 @@ function pintarHistoria(desde, hasta) {
 
 async function iniciar() {
   try {
-    const r = await fetch(FICHERO, { cache: 'no-cache' });
+    const r = await fetch(FICHERO); // precargado desde el HTML
     if (!r.ok) throw new Error(r.status);
     ({ serie } = await r.json());
     if (!serie?.length) throw new Error('vacío');

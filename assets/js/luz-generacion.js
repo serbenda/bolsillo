@@ -7,8 +7,8 @@ const $ = (id) => document.getElementById(id);
 const FICHERO = new URL('../../data/generacion.json', import.meta.url);
 const pct = (x) => `${Math.round(x * 100)}\u00a0%`;
 const precio = (x) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(x);
-const fechaCorta = (f) =>
-  new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${f}T12:00:00Z`));
+const FORMATO_CORTO = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const fechaCorta = (f) => FORMATO_CORTO.format(new Date(`${f}T12:00:00Z`));
 
 /** Lista en castellano: «solar, eólica y nuclear». */
 const enumerar = (xs) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} y ${xs.at(-1)}`);

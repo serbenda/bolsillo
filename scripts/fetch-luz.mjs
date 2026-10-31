@@ -28,7 +28,8 @@ for (const desplazamiento of [0, 1]) {
     }
   } catch (e) {
     console.warn(`${fecha}: ${e.message}`);
-    errores.push(`${fecha}: ${e.message}`);
+    // Antes de las 21:00 es normal que el precio de mañana no exista todavía (REE responde 502)
+    if (desplazamiento === 0 || horaMadrid() >= 21) errores.push(`${fecha}: ${e.message}`);
   }
   if (!dias[fecha] && anteriores[fecha]) {
     dias[fecha] = anteriores[fecha];

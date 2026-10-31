@@ -14,6 +14,10 @@ const TIPOS = {
 export async function arrancar(raiz = new URL('../../_site/', import.meta.url).pathname) {
   const servidor = createServer(async (req, res) => {
     const pedido = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    if (pedido === '/robots.txt') {
+      res.writeHead(200, { 'Content-Type': 'text/plain' }).end('User-agent: *\nAllow: /\n\nSitemap: https://bendi.dev/bolsillo/sitemap.xml\n');
+      return;
+    }
     if (!pedido.startsWith('/bolsillo')) {
       res.writeHead(302, { Location: '/bolsillo/' }).end();
       return;
